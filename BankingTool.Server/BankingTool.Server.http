@@ -1,0 +1,6 @@
+@BankingTool.Server_HostAddress = http://localhost:5271
+
+GET {{BankingTool.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
