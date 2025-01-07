@@ -1,0 +1,46 @@
+<div class="d-flex align-items-center justify-content-center vh-100 bg-light">
+  <div class="card p-4 shadow-lg" style="width: 400px; border-radius: 20px;">
+    <div class="card-body">
+      <h2 class="text-center mb-4 text-primary" style="letter-spacing: 1px; font-weight: 600;">Login</h2>
+      <form (ngSubmit)="login()" [formGroup]="loginForm" novalidate>
+        <!-- Email Field -->
+        <div class="mb-3">
+          <label for="email" class="form-label text-secondary">Email Address</label>
+          <input type="email"
+                 id="email"
+                 class="form-control"
+                 formControlName="email"
+                 placeholder="Enter your email"
+                 required>
+        </div>
+        <!-- Password Field -->
+        <div class="mb-4">
+          <label for="password" class="form-label text-secondary">Password</label>
+          <input type="password"
+                 id="password"
+                 class="form-control"
+                 formControlName="password"
+                 placeholder="Enter your password"
+                 required>
+        </div>
+        <!-- Login Button -->
+        <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius: 10px;">Login</button>
+      </form>
+      <!-- Forgot Password -->
+      <div class="text-center mt-3">
+        <a href="#" class="text-primary" style="font-size: 0.9rem; text-decoration: none;">Forgot Password?</a>
+      </div>
+      <!-- Divider -->
+      <div class="d-flex align-items-center my-3">
+        <hr class="flex-grow-1">
+        <span class="px-3 text-secondary" style="font-size: 0.8rem;">OR</span>
+        <hr class="flex-grow-1">
+      </div>
+      <!-- Signup Link -->
+      <div class="text-center mt-4">
+        <p style="font-size: 0.9rem;">Don't have an account? <a href="#" class="text-primary" style="font-weight: 500;">Sign Up</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
