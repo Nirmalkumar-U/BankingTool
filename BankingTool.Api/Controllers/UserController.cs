@@ -24,9 +24,9 @@ namespace BankingTool.Api.Controllers
             return new OkObjectResult(Result);
         }
         [HttpGet]
-        public async Task<IActionResult> Login(string emailId, string password)
+        public async Task<IActionResult> Login(string email, string password)
         {
-            var Result = await _userService.Login(emailId, password);
+            var Result = await _userService.Login(email, password);
             return new OkObjectResult(Result);
         }
         [HttpPost]

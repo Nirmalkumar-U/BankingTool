@@ -3,16 +3,23 @@ using System.Security.Claims;
 using System.Text;
 using BankingTool.Model;
 using BankingTool.Repository;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BankingTool.Service
 {
-    public class UserService(IUserRepository userRepository, IEncriptDecriptService encriptDecriptService, IRoleRepository roleRepository, ICommonRepository commonRepository) : IUserService
+    public class UserService(IUserRepository userRepository, IEncriptDecriptService encriptDecriptService,
+        IRoleRepository roleRepository, ICommonRepository commonRepository,
+        IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IEncriptDecriptService _encriptDecriptService = encriptDecriptService;
         private readonly IRoleRepository _roleRepository = roleRepository;
         private readonly ICommonRepository _commonRepository = commonRepository;
+        private readonly IConfiguration _configuration = configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+
         public async Task<ResponseDto<LoggedInUserDto>> Login(string email, string password)
         {
             var response = new ResponseDto<LoggedInUserDto>
@@ -57,12 +64,11 @@ namespace BankingTool.Service
         {
             var response = new ResponseDto<TokenDto> { Status = false };
 
-            var securityKey = "NMyISuRpeMrSAecLreHtKAeyR12I3!NI";
+            var securityKey = _configuration["AppSettings:SecurityKey"];
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(securityKey));
-            var issuer = "itismekumaru";
-            var audience = "itisaudience";
-            var expiresInSeconds = 900;
-            var expiresIn = DateTime.Now.AddSeconds(expiresInSeconds);
+            var issuer = _configuration["AppSettings:Issuer"];
+            var audience = _configuration["AppSettings:Audience"];
+            var expiresInSeconds = Convert.ToInt32(_configuration["AppSettings:ExpiresIn"]);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var actions = await _userRepository.GetAllActionIdOfRole(user.RoleId);
@@ -70,39 +76,31 @@ namespace BankingTool.Service
 
             var claims = new List<ClaimDto>
                     {
-                        new ClaimDto { Key = AppClaimTypes.UserId, Value = user.UserId.ToString()},
-                        new ClaimDto { Key = AppClaimTypes.FirstName, Value = user.FirstName},
-                        new ClaimDto { Key = AppClaimTypes.LastName, Value = user.LastName },
-                        new ClaimDto { Key = AppClaimTypes.EmailId, Value = user.Email },
-                        new ClaimDto { Key = AppClaimTypes.RoleId, Value = user.RoleId.ToString()},
-                        new ClaimDto { Key = AppClaimTypes.Actions, Value = act}
+                        new() { Key = AppClaimTypes.UserId, Value = user.UserId.ToString()},
+                        new() { Key = AppClaimTypes.FirstName, Value = user.FirstName},
+                        new() { Key = AppClaimTypes.LastName, Value = user.LastName },
+                        new() { Key = AppClaimTypes.EmailId, Value = user.Email },
+                        new() { Key = AppClaimTypes.RoleId, Value = user.RoleId.ToString()},
+                        new() { Key = AppClaimTypes.Actions, Value = act}
                     };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                            new(AppClaimTypes.UserId, claims.Find(x=>x.Key==AppClaimTypes.UserId)?.Value),
-                            new(AppClaimTypes.FirstName, claims.Find(x=>x.Key==AppClaimTypes.FirstName)?.Value),
-                            new(AppClaimTypes.LastName, claims.Find(x=>x.Key==AppClaimTypes.LastName)?.Value),
-                            new(AppClaimTypes.EmailId, claims.Find(x=>x.Key==AppClaimTypes.EmailId)?.Value),
-                            new(AppClaimTypes.RoleId, claims.Find(x=>x.Key==AppClaimTypes.RoleId)?.Value),
-                            new(AppClaimTypes.Actions, claims.Find(x=>x.Key==AppClaimTypes.Actions)?.Value)
-                }),
+                Subject = new ClaimsIdentity(claims.Select(c => new Claim(c.Key, c.Value)), "Custom"),
                 IssuedAt = DateTime.Now,
-                Issuer = issuer,
                 Audience = audience,
+                Issuer = issuer,
                 SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256)
             };
-
-            tokenDescriptor.Expires = tokenDescriptor.IssuedAt?.AddSeconds(expiresInSeconds);
+            tokenDescriptor.Expires = DateTime.Now.AddSeconds(expiresInSeconds);
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             var actionPaths = await _userRepository.GetActionsByUserId(user.UserId);
+            var accessToken = tokenHandler.WriteToken(token);
 
             response.Result = new()
             {
-                AccessToken = tokenHandler.WriteToken(token),
+                AccessToken = accessToken,
                 Claims = claims,
                 ExpireIn = expiresInSeconds.ToString(),
                 ActionPaths = actionPaths

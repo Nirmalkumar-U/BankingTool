@@ -1,12 +1,10 @@
-﻿using System.IO.Compression;
-using System.Text;
+﻿using System.Text;
 using Autofac;
 using BankingTool.Api.CustomeDI;
 using BankingTool.Api.Middleware;
 using BankingTool.Model;
 using BankingTool.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -24,12 +22,11 @@ namespace BankingTool.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpContextAccessor();
             services.AddControllers();
-            services.AddSignalR(options =>
-            {
-                options.EnableDetailedErrors = true;
-            });
+            //services.AddSignalR(options =>
+            //{
+            //    options.EnableDetailedErrors = true;
+            //});
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
@@ -50,6 +47,7 @@ namespace BankingTool.Api
             });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
 
             var appSettings = Configuration.GetSection("AppSettings");
 
@@ -61,34 +59,40 @@ namespace BankingTool.Api
                 options.AllowEmptyInputInBodyModelBinding = true;
             });
 
-            services.Configure<GzipCompressionProviderOptions>(options =>
-            {
-                options.Level = CompressionLevel.Optimal;
-            });
+            //services.Configure<GzipCompressionProviderOptions>(options =>
+            //{
+            //    options.Level = CompressionLevel.Optimal;
+            //});
 
-            services.AddResponseCompression(options =>
-            {
-                options.EnableForHttps = true;
-                options.Providers.Add<GzipCompressionProvider>();
-            });
+            //services.AddResponseCompression(options =>
+            //{
+            //    options.EnableForHttps = true;
+            //    options.Providers.Add<GzipCompressionProvider>();
+            //});
 
             // Configure JWT authentication
-            var securityKey = "NMyISuRpeMrSAecLreHtKAeyR12I3!NI";
+            var securityKey = Configuration["AppSettings:SecurityKey"];
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(securityKey));
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.AddAuthentication(op =>
+            {
+                op.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = "itismekumaru",
-                        ValidateAudience = true,
-                        ValidAudience = "itisaudience",
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = mySecurityKey,
-                        ValidateLifetime = true
-                    };
-                });
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration["AppSettings:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["AppSettings:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = mySecurityKey,
+                    ValidateLifetime = true
+                };
+            });
         }
 
         public void Configure(WebApplication app, IWebHostEnvironment env, IHostApplicationLifetime hostApplicationLifetime, IHttpContextAccessor httpContextAccessor)
@@ -107,13 +111,11 @@ namespace BankingTool.Api
 
             app.UseRouting();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseAuthentication();
+
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             ApplicationAppContext.Configure(httpContextAccessor, Configuration);
         }
     }

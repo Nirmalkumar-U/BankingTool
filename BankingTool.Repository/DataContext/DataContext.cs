@@ -1,11 +1,27 @@
 ﻿using BankingTool.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Action = BankingTool.Model.Action;
 
 namespace BankingTool.Repository
 {
-    public class DataContext(DbContextOptions<DataContext> dbContextOptions) : DbContext(dbContextOptions)
+    public class DataContext : DbContext
     {
+        public readonly int UserId;
+        public readonly int RoleId;
+        public readonly string UserEmail;
+        public readonly int RoleLevel;
+        public DataContext(DbContextOptions<DataContext> dbContextOptions, IHttpContextAccessor httpContextAccessor) : base(dbContextOptions)
+        {
+            if (httpContextAccessor.HttpContext.User.Claims.Any())
+            {
+                this.UserId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.UserId)?.Value);
+                this.RoleId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.RoleId)?.Value);
+                this.RoleLevel = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.RoleLevel)?.Value);
+                this.UserEmail = httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.EmailId)?.Value;
+            }
+        }
+
         public DbSet<Role> Role { get; set; }
         public DbSet<Users> Users { get; set; }
         public DbSet<Action> Action { get; set; }

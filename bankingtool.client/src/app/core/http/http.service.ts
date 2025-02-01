@@ -11,38 +11,38 @@ export class HttpService {
 
   baseUrl = AppSettingsDto.baseUrl;
   constructor(private localStoreService: LocalStorageService, private emitService: EmitterService) { }
-  requestObj = (method: string = 'GET', headerType: string = 'DEFAULT', body?: any) =>  {
+  requestObj = (method: string = 'GET', headerType: string = 'DEFAULT', body?: any) => {
     return {
-     method,
-     headerType,
-     body
-   }
+      method,
+      headerType,
+      body
+    }
   }
 
-  get(url: string,isLoading:boolean = true):Observable<any> {
-    return this.executeRequest(url, this.requestObj(methods.GET,methods.GET),isLoading);
+  get(url: string, isLoading: boolean = true): Observable<any> {
+    return this.executeRequest(url, this.requestObj(methods.GET, methods.GET), isLoading);
   }
 
-  post(url: string, body: any,isLoading:boolean = true):Observable<any> {
-    return this.executeRequest(url, this.requestObj(methods.POST, methods.POST, JSON.stringify(body)),isLoading);
+  post(url: string, body: any, isLoading: boolean = true): Observable<any> {
+    return this.executeRequest(url, this.requestObj(methods.POST, methods.POST, JSON.stringify(body)), isLoading);
   }
 
-  executeRequest(url:string, requestObj: any,isLoading:boolean):Observable<any> {
+  executeRequest(url: string, requestObj: any, isLoading: boolean): Observable<any> {
     return new Observable((observer: Observer<any>) => {
       let requestInit = this.getFetchObject(requestObj);
-      if(isLoading){
+      if (isLoading) {
         this.emitService.loaderEmitter.emit(true);
       }
       console.log(this.baseUrl + url);
       fetch(this.baseUrl + url, requestInit)
-        .then((response:any) => {
+        .then((response: any) => {
           return this.handelResponse(response);
         })
         .then(result => {
-          if(!result.status){
+          if (!result.status) {
             //alart
           }
-          if(isLoading){
+          if (isLoading) {
             this.emitService.loaderEmitter.emit(false);
           }
           observer.next(result);
@@ -67,7 +67,7 @@ export class HttpService {
         break;
       }
       default: {
-        headers =this.getHeaders()
+        headers = this.getHeaders()
       }
     }
     let request: any = {
@@ -113,7 +113,11 @@ export class HttpService {
       return response.json();
     } else if (!response || response.status === 204) {
       return;
+    } else if (response && response.status >= 401) {
+      this.emitService.loaderEmitter.emit(false);
+      throw response;
     } else if (response && response.status >= 500) {
+      this.emitService.loaderEmitter.emit(false);
       throw response;
     } else {
       return response.json()
