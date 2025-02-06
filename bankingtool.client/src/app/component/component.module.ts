@@ -11,8 +11,6 @@ import { RoleListComponent } from './role-list/role-list.component';
 import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { AddEditUserResolver } from '../core/resolver/add-edit-user.resolver';
-import { CreateAccountComponent } from './create-account/create-account.component';
-import { CreateAccountResolver } from '../core/resolver/create-account.resolver';
 
 const routes: Routes = [
   {
@@ -46,12 +44,6 @@ const routes: Routes = [
     title: PageTitle.userList,
     component: UserListComponent
   },
-  {
-    path: AppPaths.createAccount,
-    title: PageTitle.createAccount,
-    component: CreateAccountComponent,
-    resolve: { DataResolver: CreateAccountResolver },
-  },
 ];
 
 @NgModule({
@@ -61,8 +53,7 @@ const routes: Routes = [
     AddEditRoleComponent,
     RoleListComponent,
     AddEditUserComponent,
-    UserListComponent,
-    CreateAccountComponent
+    UserListComponent
   ],
   imports: [
     RouterModule.forChild(routes),

@@ -70,12 +70,6 @@ BEGIN
 END
 GO
 
-IF(OBJECT_ID('[FK_Account_BankId]') IS NOT NULL)
-BEGIN
-	ALTER TABLE [Account] DROP CONSTRAINT [FK_Account_BankId]
-END
-GO
-
 ------------------------------------------------------------------------DROP CONSTRAINT-------------------------------
 IF EXISTS (SELECT * FROM sys.tables where name = N'Role')
 BEGIN
@@ -154,18 +148,6 @@ BEGIN
 	DROP TABLE [City]
 END
 GO
-
-IF EXISTS (SELECT * FROM sys.tables where name = N'Bank')
-BEGIN
-	DROP TABLE [Bank]
-END
-GO
-
-IF EXISTS (SELECT * FROM sys.tables where name = N'CodeValue')
-BEGIN
-	DROP TABLE [CodeValue]
-END
-GO
 ----------------------------------------------------------------------------------DROP TABLE--------------------------
 CREATE TABLE [Role] (
 	RoleId INT CONSTRAINT [PK_RoleId] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
@@ -240,10 +222,9 @@ CREATE TABLE [Customer] (
 CREATE TABLE [Account] (
 	AccountId INT CONSTRAINT [PK_Account] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	CustomerId INT NOT NULL CONSTRAINT [FK_Account_CustomerId] FOREIGN KEY REFERENCES Customer(CustomerId),
-	BankId INT NOT NULL CONSTRAINT [FK_Account_BankId] FOREIGN KEY REFERENCES Bank(BankId),
 	Balance INT NOT NULL,
 	AccountNumber VARCHAR(15) NOT NULL,
-	AccountTypeId INT NOT NULL,
+	AccountType VARCHAR(15) NOT NULL,
 	AccountStatus VARCHAR(15) NOT NULL,
 	CreatedDate DATETIME NOT NULL,
 	CreatedBy VARCHAR(30) NOT NULL,
@@ -311,23 +292,4 @@ CREATE TABLE [City] (
     ModifiedDate DATETIME NULL,
     ModifiedBy VARCHAR(30) NULL,
     IsDeleted BIT NOT NULL DEFAULT 0
-);
-
-CREATE TABLE Bank (
-    BankId INT CONSTRAINT [PK_Bank] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
-    BankName VARCHAR(100) NOT NULL,
-    BankAbbrivation VARCHAR(10) NOT NULL
-);
-
-CREATE TABLE CodeValue (
-    CodeValueId INT CONSTRAINT [PK_CodeValue] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
-    TypeName VARCHAR(100) NOT NULL,
-    TypeCode INT NOT NULL,
-	CodeValue1 VARCHAR(50) NULL,
-	CodeValue2 VARCHAR(50) NULL,
-	CodeValue3 VARCHAR(50) NULL,
-	CodeValue1Description VARCHAR(100) NULL,
-	CodeValue2Description VARCHAR(100) NULL,
-	CodeValue3Description VARCHAR(100) NULL,
-	NotInUse BIT NOT NULL
 );

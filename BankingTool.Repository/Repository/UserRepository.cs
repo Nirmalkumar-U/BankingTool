@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankingTool.Repository
 {
-    public class UserRepository(DataContext dataContext) : EntityRepository<Users>(dataContext), IUserRepository
+    public class UserRepository(DataContext dataContext, IStoreProcedureRepository storeProcedureRepository) : EntityRepository<Users>(dataContext), IUserRepository
     {
-        #region Get
+        private readonly IStoreProcedureRepository _storeProcedureRepository = storeProcedureRepository;
         public async Task<(Users User, Role Role)> GetUserAndRoleByEmailId(string emailId)
         {
             var result = await (from u in dataContext.Users.AsNoTracking()
@@ -48,6 +48,15 @@ namespace BankingTool.Repository
                 Value = z.CityName
             }).ToListAsync();
         }
+        public async Task<int> InsertUser(Users user)
+        {
+            Insert(user);
+            return await Task.FromResult(user.UserId);
+        }
+        public async Task<bool> InsertUserRole(UserRole userRole)
+        {
+            return await Task.FromResult(Insert(userRole));
+        }
         public async Task<List<GetActionsByUserIdDto>> GetActionsByUserId(int userId)
         {
             var sql = "EXEC GetActionsByUserId @UserId";
@@ -65,18 +74,6 @@ namespace BankingTool.Repository
 
             return actions;
         }
-        #endregion GET
-
-        #region Saving
-        public async Task<int> InsertUser(Users user)
-        {
-            Insert(user);
-            return await Task.FromResult(user.UserId);
-        }
-        public async Task<bool> InsertUserRole(UserRole userRole)
-        {
-            return await Task.FromResult(Insert(userRole));
-        }
         public async Task<bool> InsertStaff(Staff staff)
         {
             return await Task.FromResult(Insert(staff));
@@ -85,6 +82,5 @@ namespace BankingTool.Repository
         {
             return await Task.FromResult(Insert(user));
         }
-        #endregion Saving
     }
 }

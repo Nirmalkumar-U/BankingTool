@@ -1,5 +1,4 @@
 import { CreateIndexedDb } from "../core/indexedDBService/indexed-db-service.service";
-import { DropDownDto, YesOrNoDto } from "../dto/drop-down-dto";
 
 export class Constant {
   public static true: string = 'true';
@@ -8,9 +7,7 @@ export class Constant {
   public static dbVersion: number = 1.0
   public static actionTablePrimaryKey: string = 'actionId';
   public static actionCoumns: CreateIndexedDb[] = [{ columnName: 'actionId', isUnique: true }, { columnName: 'actionName', isUnique: false }, { columnName: 'actionPath', isUnique: false },
-  { columnName: 'actionType', isUnique: false }, { columnName: 'menuLevel', isUnique: false }, { columnName: 'parrentMenuId', isUnique: false }, { columnName: 'sequence', isUnique: false }];
-
-  public static yesOrNo: YesOrNoDto[] = [{ key: true, value: 'Yes' },{ key: false, value: 'No' }]
+    { columnName: 'actionType', isUnique: false }, { columnName: 'menuLevel', isUnique: false }, { columnName: 'parrentMenuId', isUnique: false }, { columnName: 'sequence', isUnique: false }];
 }
 export class AppPaths {
   public static home: string = 'home';
@@ -23,9 +20,6 @@ export class AppPaths {
   //user
   public static userList: string = 'userList';
   public static addEditUser: string = 'addEditUser';
-
-  //Account
-  public static createAccount: string = 'createAccount';
 }
 
 export class AppRoute {
@@ -39,9 +33,6 @@ export class AppRoute {
   //user
   public static userList: string = '/userList';
   public static addEditUser: string = '/addEditUser';
-
-  //Account
-  public static createAccount: string = '/createAccount';
 }
 export class PageTitle {
   public static home: string = 'Home';
@@ -54,9 +45,6 @@ export class PageTitle {
   //user
   public static userList: string = 'User List';
   public static addEditUser: string = 'Add Edit User';
-
-  //Account
-  public static createAccount: string = 'Create Account';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';

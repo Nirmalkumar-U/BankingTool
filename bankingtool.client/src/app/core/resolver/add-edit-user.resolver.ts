@@ -7,6 +7,10 @@ import { UserService } from '../service/user.service';
   providedIn: 'root'
 })
 export class AddEditUserResolver implements Resolve<any> {
+  //resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+  //  return of(true);
+  //}
+
   constructor(private userService: UserService) { }
   resolve(): Observable<any> {
     return this.userService.getUserInitialLoad(null).pipe(
