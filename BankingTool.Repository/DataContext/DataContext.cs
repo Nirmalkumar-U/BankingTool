@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Action = BankingTool.Model.Action;
@@ -35,6 +36,8 @@ namespace BankingTool.Repository
         public DbSet<State> State { get; set; }
         public DbSet<Transaction> Transaction { get; set; }
         public DbSet<Staff> Staff { get; set; }
+        public DbSet<Bank> Bank { get; set; }
+        public DbSet<CodeValue> CodeValue { get; set; }
 
         // SP
         public DbSet<GetActionsByUserIdDto> GetActionsByUserIdDto { get; set; }
@@ -91,6 +94,14 @@ namespace BankingTool.Repository
             modelBuilder.Entity<Transaction>(entity =>
             {
                 entity.HasKey(ur => ur.TransactionId);
+            });
+            modelBuilder.Entity<Bank>(entity =>
+            {
+                entity.HasKey(ur => ur.BankId);
+            });
+            modelBuilder.Entity<CodeValue>(entity =>
+            {
+                entity.HasKey(ur => ur.CodeValueId);
             });
 
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());

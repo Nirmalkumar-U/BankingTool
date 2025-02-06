@@ -24,8 +24,8 @@ namespace BankingTool.Api.Filter
             }
         }
         public void OnAuthorization1(AuthorizationFilterContext context)
-        {
-            var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+        { 
+            var authHeader = context.HttpContext.Request.Headers.Authorization.FirstOrDefault();
             if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
             {
                 context.Result = new UnauthorizedResult();
