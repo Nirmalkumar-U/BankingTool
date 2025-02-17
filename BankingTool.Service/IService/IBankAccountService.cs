@@ -7,5 +7,7 @@ namespace BankingTool.Service.IService
     {
         Task<ResponseDto<CreateAccountInitialLoadDto>> GetCreateAccountInitialLoad();
         Task<ResponseDto<bool>> CreateAccount(CreateAccountDto model);
+        Task<ResponseDto<List<DropDownDto>>> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId);
+        Task<ResponseDto<bool>> IsCustomerHasCreditCardInThatBank(int customerId, int bankId);
     }
 }

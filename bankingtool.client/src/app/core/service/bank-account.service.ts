@@ -15,4 +15,10 @@ export class BankAccountService {
   createAccount(model: CreateAccountDto): Observable<any> {
     return this.httpService.post('BankAccount/CreateAccount', model);
   }
+  getBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId: number, accountTypeId: number): Observable<any> {
+    return this.httpService.get('BankAccount/GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown?customerId=' + customerId.toString() + "&accountTypeId=" + accountTypeId.toString());
+  }
+  isCustomerHasCreditCardInThatBank(customerId: number, bankId: number): Observable<any> {
+    return this.httpService.get('BankAccount/IsCustomerHasCreditCardInThatBank?customerId=' + customerId.toString() + "&bankId=" + bankId.toString());
+  }
 }

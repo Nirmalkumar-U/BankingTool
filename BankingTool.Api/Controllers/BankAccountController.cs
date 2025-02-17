@@ -22,5 +22,17 @@ namespace BankingTool.Api.Controllers
             var Result = await _bankAccountService.CreateAccount(model);
             return new OkObjectResult(Result);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId)
+        {
+            var Result = await _bankAccountService.GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId, accountTypeId);
+            return new OkObjectResult(Result);
+        }
+        [HttpGet]
+        public async Task<IActionResult> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
+        {
+            var Result = await _bankAccountService.IsCustomerHasCreditCardInThatBank(customerId, bankId);
+            return new OkObjectResult(Result);
+        }
     }
 }

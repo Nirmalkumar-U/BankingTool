@@ -14,6 +14,19 @@ namespace BankingTool.Repository.Repository
                 Value = z.BankAbbrivation + " | " + z.BankName,
             }).OrderBy(x => x.Value).ToListAsync();
         }
+
+        public async Task<List<DropDownDto>> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId)
+        {
+            var aa = await (from a in dataContext.Account.AsNoTracking()
+                            where a.CustomerId == customerId && a.AccountTypeId == accountTypeId
+                            select a.BankId).ToListAsync();
+
+            return await dataContext.Bank.Where(x => !aa.Contains(x.BankId)).Select(z => new DropDownDto
+            {
+                Key = z.BankId,
+                Value = z.BankAbbrivation + " | " + z.BankName,
+            }).OrderBy(x => x.Value).ToListAsync();
+        }
         public async Task<List<DropDownDto>> GetAccountTypeDropDown()
         {
             return await dataContext.CodeValue.Where(x => x.TypeCode == Constants.AccountType && x.InUse).OrderBy(s => s.Sequence)
@@ -23,6 +36,14 @@ namespace BankingTool.Repository.Repository
                     Value = z.CodeValue1,
                 }).ToListAsync();
         }
+        public async Task<bool> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
+        {
+            return await (from a in dataContext.Account.AsNoTracking()
+                            join c in dataContext.Card.AsNoTracking() on a.AccountId equals c.AccountId
+                            where a.CustomerId == customerId && a.BankId == bankId && c.CardType == CardType.CreditCard
+                            select c).AnyAsync();
+        }
+
         public async Task<List<DropDownDto>> GetAllActiveCustomerDropDown()
         {
             return await (from c in dataContext.Customer.AsNoTracking()

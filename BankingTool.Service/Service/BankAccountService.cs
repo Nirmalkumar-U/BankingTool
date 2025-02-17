@@ -18,10 +18,29 @@ namespace BankingTool.Service.Service
                 Result = new()
                 {
                     AccountTypeList = await _bankAccountRepository.GetAccountTypeDropDown(),
-                    BankList = await _bankAccountRepository.GetBankDetailsDropDown(),
                     CustomerList = await _bankAccountRepository.GetAllActiveCustomerDropDown()
                 },
                 Status = true,
+                Message = []
+            };
+        }
+
+        public async Task<ResponseDto<List<DropDownDto>>> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId)
+        {
+            return new ResponseDto<List<DropDownDto>>
+            {
+                Result = await _bankAccountRepository.GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId, accountTypeId),
+                Status = true,
+                Message = []
+            };
+        }
+        public async Task<ResponseDto<bool>> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
+        {
+            bool isCustomerHasCreditCardInThatBank = await _bankAccountRepository.IsCustomerHasCreditCardInThatBank(customerId, bankId);
+            return new ResponseDto<bool>
+            {
+                Result = isCustomerHasCreditCardInThatBank,
+                Status = isCustomerHasCreditCardInThatBank,
                 Message = []
             };
         }

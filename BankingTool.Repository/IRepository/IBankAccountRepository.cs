@@ -11,6 +11,8 @@ namespace BankingTool.Repository.IRepository
         int? InsertAccount(Account account);
         Task<bool> IsAnyAccountForThisCustomer(int customerId);
         Task<Customer> GetCustomerByCustomerId(int customerId);
+        Task<List<DropDownDto>> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId);
+        Task<bool> IsCustomerHasCreditCardInThatBank(int customerId, int bankId);
         void UpdateCustomer(Customer customer);
         int? InsertTransaction(Transaction transaction);
         Task<Card> GetLastCard(string cardType);

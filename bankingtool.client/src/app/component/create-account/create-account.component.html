@@ -38,7 +38,7 @@
           </div>
           <div class="col-md-4">
             <label class="form-label">Do you want credit card?</label>
-            <select class="form-select" formControlName="customerWantCreditCard" required>
+            <select class="form-select" formControlName="customerWantCreditCard" [attr.disabled]="isCustAsCC == true ? true : null" required>
               <option value="">Select</option>
               <option *ngFor="let yn of yesOrNo" [ngValue]="yn.key">{{ yn.value }}</option>
             </select>
