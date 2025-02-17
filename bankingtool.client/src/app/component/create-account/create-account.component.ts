@@ -20,7 +20,7 @@ export class CreateAccountComponent {
   bankList: DropDownDto[] = [];
   yesOrNo: YesOrNoDto[] = Constant.yesOrNo;
   messageList: string[] = [];
-  isSubmitted: boolean = false;
+  isSubmitted: boolean = true;
 
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService) {
     this.accountForm = this.fb.group({
@@ -39,6 +39,7 @@ export class CreateAccountComponent {
   }
   createAccount() {
     if (!this.accountForm.invalid) {
+      this.messageList = [];
       let values: CreateAccountDto = this.accountForm.value;
       this.bankAccountService.createAccount(values).subscribe((responce: ResponseDto<boolean>) => {
         this.messageList.push(...responce.message);

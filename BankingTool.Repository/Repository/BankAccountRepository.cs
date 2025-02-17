@@ -62,7 +62,7 @@ namespace BankingTool.Repository.Repository
             account.ModifiedBy = null;
             account.ModifiedDate = null;
             account.IsDeleted = false;
-            var isInserted = Insert(account);
+            var isInserted = Insert(account, false);
             return isInserted ? account.AccountId : null;
         }
         public int? InsertTransaction(Transaction transaction)
@@ -72,7 +72,7 @@ namespace BankingTool.Repository.Repository
             transaction.ModifiedBy = null;
             transaction.ModifiedDate = null;
             transaction.IsDeleted = false;
-            var isInserted = Insert(transaction);
+            var isInserted = Insert(transaction, false);
             return isInserted ? transaction.TransactionId : null;
         }
         public int? InsertCard(Card card)
@@ -82,7 +82,7 @@ namespace BankingTool.Repository.Repository
             card.ModifiedBy = null;
             card.ModifiedDate = null;
             card.IsDeleted = false;
-            var isInserted = Insert(card);
+            var isInserted = Insert(card, false);
             return isInserted ? card.CardId : null;
         }
         public int? InsertCreditScore(CreditScore creditScore)
@@ -92,14 +92,14 @@ namespace BankingTool.Repository.Repository
             creditScore.ModifiedBy = null;
             creditScore.ModifiedDate = null;
             creditScore.IsDeleted = false;
-            var isInserted = Insert(creditScore);
+            var isInserted = Insert(creditScore, false);
             return isInserted ? creditScore.CreditScoreId : null;
         }
         public void UpdateCustomer(Customer customer)
         {
             customer.ModifiedBy = "Admin";
             customer.ModifiedDate = DateTime.Now;
-            Update(customer);
+            Update(customer, false);
         }
     }
 }

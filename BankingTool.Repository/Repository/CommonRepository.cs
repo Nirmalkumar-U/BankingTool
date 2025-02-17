@@ -17,5 +17,9 @@ namespace BankingTool.Repository
         {
             return await dataContext.City.Where(z => !z.IsDeleted && z.StateId == stateId).Select(x => new DropDownDto { Key = x.CityId, Value = x.CityName }).ToListAsync();
         }
+        public async Task SaveTransaction()
+        {
+            await Task.FromResult(SaveData());
+        }
     }
 }

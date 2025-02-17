@@ -6,9 +6,10 @@ using BankingTool.Service.IService;
 
 namespace BankingTool.Service.Service
 {
-    public class BankAccountService(IBankAccountRepository bankAccountRepository) : IBankAccountService
+    public class BankAccountService(IBankAccountRepository bankAccountRepository, ICommonRepository commonRepository) : IBankAccountService
     {
         private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
+        private readonly ICommonRepository _commonRepository = commonRepository;
 
         public async Task<ResponseDto<CreateAccountInitialLoadDto>> GetCreateAccountInitialLoad()
         {
@@ -57,7 +58,7 @@ namespace BankingTool.Service.Service
                 AccountId = accountId.Value,
                 TransactionTime = DateTime.Now
             };
-            int? transactionId = _bankAccountRepository.InsertTransaction(transaction);
+            _ = _bankAccountRepository.InsertTransaction(transaction);
 
             await UpdatePrimaryAccountNumber(model.DoYouWantToChangeThisAccountToPrimaryAccount, account.AccountNumber, account.CustomerId);
 
@@ -91,24 +92,17 @@ namespace BankingTool.Service.Service
             }
             else
             {
-                try
+                CreditScore cardScore = new()
                 {
-                    CreditScore cardScore = new()
-                    {
-                        CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
-                        CustomerId = account.CustomerId,
-                        Description = null,
-                        Status = CreditScoreStatus.Active,
+                    CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
+                    CustomerId = account.CustomerId,
+                    Description = null,
+                    Status = CreditScoreStatus.Active,
 
-                    };
-                    _bankAccountRepository.InsertCreditScore(cardScore);
-                }
-                catch(Exception e)
-                {
-
-                }
-                
+                };
+                _bankAccountRepository.InsertCreditScore(cardScore);
             }
+            await _commonRepository.SaveTransaction();
 
             response.Result = true;
             response.Status = true;

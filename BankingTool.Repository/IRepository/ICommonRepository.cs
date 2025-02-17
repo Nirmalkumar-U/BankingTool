@@ -4,6 +4,7 @@ namespace BankingTool.Repository
 {
     public interface ICommonRepository
     {
-        Task<List<DropDownDto>> GetAllStateDropDownList();
+        Task<List<DropDownDto>> GetAllStateDropDownList(); 
+        Task SaveTransaction();
     }
 }
