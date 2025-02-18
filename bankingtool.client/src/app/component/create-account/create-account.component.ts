@@ -50,7 +50,7 @@ export class CreateAccountComponent {
     this.accountTypeList = initialData.result.accountTypeList;
 
     this.accountForm.get('customerId')?.valueChanges.subscribe(customerId => {
-      this.getBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId, this.accountTypeId);
+      this.getBankDetailsDropDownWithoutCustomerAndAccountType(customerId, this.accountTypeId);
       this.accountForm.setValue({
         accountTypeId: this.defaultValue,
         bankId: this.defaultValue,
@@ -59,7 +59,7 @@ export class CreateAccountComponent {
     });
 
     this.accountForm.get('accountTypeId')?.valueChanges.subscribe(accountTypeId => {
-      this.getBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(this.customerId, accountTypeId);
+      this.getBankDetailsDropDownWithoutCustomerAndAccountType(this.customerId, accountTypeId);
       this.accountForm.setValue({
         bankId: this.defaultValue,
         customerWantCreditCard: false
@@ -80,9 +80,9 @@ export class CreateAccountComponent {
     });
   }
 
-  getBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId: number, accountTypeId: number) {
+  getBankDetailsDropDownWithoutCustomerAndAccountType(customerId: number, accountTypeId: number) {
     if (!isNullOrEmpty(accountTypeId) && !isNullOrEmpty(customerId)) {
-      this.bankAccountService.getBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId, accountTypeId).subscribe((bankList: ResponseDto<DropDownDto[]>) => {
+      this.bankAccountService.getBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId).subscribe((bankList: ResponseDto<DropDownDto[]>) => {
         this.bankList = bankList.result;
       });
     } else {

@@ -24,12 +24,11 @@ namespace BankingTool.Service.Service
                 Message = []
             };
         }
-
-        public async Task<ResponseDto<List<DropDownDto>>> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId)
+        public async Task<ResponseDto<List<DropDownDto>>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
         {
             return new ResponseDto<List<DropDownDto>>
             {
-                Result = await _bankAccountRepository.GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId, accountTypeId),
+                Result = await _bankAccountRepository.GetBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId),
                 Status = true,
                 Message = []
             };
@@ -44,7 +43,6 @@ namespace BankingTool.Service.Service
                 Message = []
             };
         }
-
         public async Task<ResponseDto<bool>> CreateAccount(CreateAccountDto model)
         {
             var response = new ResponseDto<bool>
@@ -75,7 +73,8 @@ namespace BankingTool.Service.Service
                 Amount = Constants.AccountMininumBalanceForSavingsAccount,
                 Description = "Initial Credit",
                 AccountId = accountId.Value,
-                TransactionTime = DateTime.Now
+                TransactionTime = DateTime.Now,
+                StageBalance = Constants.AccountMininumBalanceForSavingsAccount
             };
             _ = _bankAccountRepository.InsertTransaction(transaction);
 
@@ -128,7 +127,39 @@ namespace BankingTool.Service.Service
             response.Message.Add("Account Created Successfully...");
             return response;
         }
-
+        public async Task<ResponseDto<GetTransactionsListDto>> TransactionsListForCustomer(int bankId, int accountTypeId, int customerId)
+        {
+            var (accountId, name, bankName, accountType) = await _bankAccountRepository.GetAccountIdByBankIdAndAccountTypeAndCustomerId(bankId, accountTypeId, customerId);
+            return new ResponseDto<GetTransactionsListDto>
+            {
+                Message = [],
+                Result = new GetTransactionsListDto
+                {
+                    AccountInfo = await _bankAccountRepository.GetAccountInfo(accountId, accountType, name, bankName),
+                    CardInfo = await _bankAccountRepository.GetCardInfoByAccountId(accountId, name, bankName),
+                    TransactionsList = await _bankAccountRepository.GetTransactionByAccountId(accountId),
+                },
+                Status = true
+            };
+        }
+        public async Task<ResponseDto<List<DropDownDto>>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId)
+        {
+            return new ResponseDto<List<DropDownDto>>
+            {
+                Message = [],
+                Result = await _bankAccountRepository.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId),
+                Status = true
+            };
+        }
+        public async Task<ResponseDto<List<DropDownDto>>> BankDropDownList(int customerId)
+        {
+            return new ResponseDto<List<DropDownDto>>
+            {
+                Message = [],
+                Result = await _bankAccountRepository.GetBankDropDownListByCustomerId(customerId),
+                Status = true
+            };
+        }
         private async Task UpdatePrimaryAccountNumber(bool DoYouWantToChangeThisAccountToPrimaryAccount, string AccountNumber, int CustomerId)
         {
             bool isAnyAccountForThisCustomer = await _bankAccountRepository.IsAnyAccountForThisCustomer(CustomerId);

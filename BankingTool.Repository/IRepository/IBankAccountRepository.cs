@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.BankAccount;
 
 namespace BankingTool.Repository.IRepository
 {
@@ -11,8 +12,14 @@ namespace BankingTool.Repository.IRepository
         int? InsertAccount(Account account);
         Task<bool> IsAnyAccountForThisCustomer(int customerId);
         Task<Customer> GetCustomerByCustomerId(int customerId);
-        Task<List<DropDownDto>> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId);
+        Task<List<DropDownDto>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId);
         Task<bool> IsCustomerHasCreditCardInThatBank(int customerId, int bankId);
+        Task<List<TransactionsListDto>> GetTransactionByAccountId(int accountId);
+        Task<TransactionsListAccountInfoDto> GetAccountInfo(int accountId, string accountType, string name, string bankName);
+        Task<List<TransactionsListCardInfoDto>> GetCardInfoByAccountId(int accountId, string name, string bankName);
+        Task<(int, string, string, string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId);
+        Task<List<DropDownDto>> GetBankDropDownListByCustomerId(int customerId);
+        Task<List<DropDownDto>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int BankId);
         void UpdateCustomer(Customer customer);
         int? InsertTransaction(Transaction transaction);
         Task<Card> GetLastCard(string cardType);

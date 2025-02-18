@@ -1,4 +1,5 @@
-﻿using BankingTool.Model.Dto.BankAccount;
+﻿using BankingTool.Model;
+using BankingTool.Model.Dto.BankAccount;
 using BankingTool.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,15 +24,33 @@ namespace BankingTool.Api.Controllers
             return new OkObjectResult(Result);
         }
         [HttpGet]
-        public async Task<IActionResult> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId)
+        public async Task<IActionResult> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
         {
-            var Result = await _bankAccountService.GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(customerId, accountTypeId);
+            var Result = await _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId);
             return new OkObjectResult(Result);
         }
         [HttpGet]
         public async Task<IActionResult> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
         {
             var Result = await _bankAccountService.IsCustomerHasCreditCardInThatBank(customerId, bankId);
+            return new OkObjectResult(Result);
+        }
+        [HttpGet]
+        public async Task<IActionResult> TransactionsListForCustomer(int bankId, int accountTypeId, int customerId)
+        {
+            var Result = await _bankAccountService.TransactionsListForCustomer(bankId, accountTypeId, customerId);
+            return new OkObjectResult(Result);
+        }
+        [HttpGet]
+        public async Task<IActionResult> BankDropDownList(int customerId)
+        {
+            var Result = await _bankAccountService.BankDropDownList(customerId);
+            return new OkObjectResult(Result);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId)
+        {
+            var Result = await _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId);
             return new OkObjectResult(Result);
         }
     }

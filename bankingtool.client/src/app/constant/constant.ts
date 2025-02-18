@@ -26,6 +26,7 @@ export class AppPaths {
 
   //Account
   public static createAccount: string = 'createAccount';
+  public static transactions: string = 'transactions';
 }
 
 export class AppRoute {
@@ -42,6 +43,7 @@ export class AppRoute {
 
   //Account
   public static createAccount: string = '/createAccount';
+  public static transactions: string = '/transactions';
 }
 export class PageTitle {
   public static home: string = 'Home';
@@ -57,6 +59,7 @@ export class PageTitle {
 
   //Account
   public static createAccount: string = 'Create Account';
+  public static transactions: string = 'Transactions List';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';

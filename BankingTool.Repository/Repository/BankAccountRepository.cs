@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.BankAccount;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,8 +15,7 @@ namespace BankingTool.Repository.Repository
                 Value = z.BankAbbrivation + " | " + z.BankName,
             }).OrderBy(x => x.Value).ToListAsync();
         }
-
-        public async Task<List<DropDownDto>> GetBankDetailsByWithoutCustomerIdAndAccountTypeDropDown(int customerId, int accountTypeId)
+        public async Task<List<DropDownDto>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
         {
             var aa = await (from a in dataContext.Account.AsNoTracking()
                             where a.CustomerId == customerId && a.AccountTypeId == accountTypeId
@@ -39,11 +39,10 @@ namespace BankingTool.Repository.Repository
         public async Task<bool> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
         {
             return await (from a in dataContext.Account.AsNoTracking()
-                            join c in dataContext.Card.AsNoTracking() on a.AccountId equals c.AccountId
-                            where a.CustomerId == customerId && a.BankId == bankId && c.CardType == CardType.CreditCard
-                            select c).AnyAsync();
+                          join c in dataContext.Card.AsNoTracking() on a.AccountId equals c.AccountId
+                          where a.CustomerId == customerId && a.BankId == bankId && c.CardType == CardType.CreditCard
+                          select c).AnyAsync();
         }
-
         public async Task<List<DropDownDto>> GetAllActiveCustomerDropDown()
         {
             return await (from c in dataContext.Customer.AsNoTracking()
@@ -75,7 +74,73 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.Customer.FirstOrDefaultAsync(x => x.CustomerId == customerId);
         }
-
+        public async Task<List<TransactionsListDto>> GetTransactionByAccountId(int accountId)
+        {
+            return await dataContext.Transaction.Where(x => x.AccountId == accountId).Select(z => new TransactionsListDto
+            {
+                Amount = z.Amount,
+                StageBalance = z.StageBalance,
+                TransactionDate = z.TransactionTime,
+                TransactionType = z.TransactionType,
+                TransactionId = z.TransactionId
+            }).ToListAsync();
+        }
+        public async Task<TransactionsListAccountInfoDto> GetAccountInfo(int accountId, string accountType, string name, string bankName)
+        {
+            return await dataContext.Account.Where(x => x.AccountId == accountId).Select(z => new TransactionsListAccountInfoDto
+            {
+                AccountHolderName = name,
+                AccountNumber = z.AccountNumber,
+                AccountType = accountType,
+                Balance = z.Balance,
+                BankName = bankName
+            }).FirstOrDefaultAsync();
+        }
+        public async Task<List<TransactionsListCardInfoDto>> GetCardInfoByAccountId(int accountId, string name, string bankName)
+        {
+            return await dataContext.Card.Where(x => x.AccountId == accountId).Select(z => new TransactionsListCardInfoDto
+            {
+                BankName = bankName,
+                BalanceLimit = z.CardType == CardType.CreditCard ? z.CardLimit : null,
+                CardType = z.CardType,
+                CVV = z.CVV,
+                ExpirationDate = z.ExpireDate,
+                HolderName = name
+            }).ToListAsync();
+        }
+        public async Task<(int, string, string,string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId)
+        {
+            var accType = await dataContext.CodeValue.FirstOrDefaultAsync(x => x.CodeValueId == accountTypeId);
+            var account = await dataContext.Account.FirstOrDefaultAsync(x => x.BankId == bankId && x.AccountTypeId == accType.CodeValueId && x.CustomerId == customerId);
+            var name = await (from u in dataContext.Users.AsNoTracking()
+                              join c in dataContext.Customer.AsNoTracking() on u.UserId equals c.UserId
+                              where c.CustomerId == customerId
+                              select u).FirstOrDefaultAsync();
+            var bankName = await dataContext.Bank.FirstOrDefaultAsync(x => x.BankId == bankId);
+            return (account.AccountId, name.FirstName + " " + name.LastName, bankName.BankName, accType.TypeName);
+        }
+        public async Task<List<DropDownDto>> GetBankDropDownListByCustomerId(int customerId)
+        {
+            return await (from a in dataContext.Account.AsNoTracking()
+                          join b in dataContext.Bank.AsNoTracking() on a.BankId equals b.BankId
+                          where a.CustomerId == customerId
+                          select new DropDownDto
+                          {
+                              Key = b.BankId,
+                              Value = b.BankName
+                          }).ToListAsync();
+        }
+        public async Task<List<DropDownDto>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int BankId)
+        {
+            return await (from a in dataContext.Account.AsNoTracking()
+                          join cv in dataContext.CodeValue.AsNoTracking() on a.AccountTypeId equals cv.CodeValueId
+                          where a.CustomerId == customerId && a.BankId == BankId
+                          select new DropDownDto
+                          {
+                              Key = cv.CodeValueId,
+                              Value = cv.CodeValue1
+                          }).ToListAsync();
+        }
         public int? InsertAccount(Account account)
         {
             account.CreatedBy = "Admin";
