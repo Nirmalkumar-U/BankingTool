@@ -103,6 +103,7 @@ namespace BankingTool.Repository.Repository
                 BankName = bankName,
                 BalanceLimit = z.CardType == CardType.CreditCard ? z.CardLimit : null,
                 CardType = z.CardType,
+                CardNumber = z.CardNumber,
                 CVV = z.CVV,
                 ExpirationDate = z.ExpireDate,
                 HolderName = name
@@ -117,7 +118,7 @@ namespace BankingTool.Repository.Repository
                               where c.CustomerId == customerId
                               select u).FirstOrDefaultAsync();
             var bankName = await dataContext.Bank.FirstOrDefaultAsync(x => x.BankId == bankId);
-            return (account.AccountId, name.FirstName + " " + name.LastName, bankName.BankName, accType.TypeName);
+            return (account.AccountId, name.FirstName + " " + name.LastName, bankName.BankName, accType.CodeValue1);
         }
         public async Task<List<DropDownDto>> GetBankDropDownListByCustomerId(int customerId)
         {

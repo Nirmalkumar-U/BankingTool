@@ -67,4 +67,6 @@ export class ClaimKey {
   public static firstName: string = 'FirstName';
   public static lastName: string = 'LastName';
   public static idb: string = 'idb';
+  public static customerId: string = 'CustomerId';
+  public static staffId: string = 'StaffId';
 }

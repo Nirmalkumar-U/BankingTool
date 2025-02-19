@@ -1,1 +1,92 @@
-<p>transactions-list works!</p>
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Transactions</h1>
+      </div>
+      <div class='card-body'>
+        <form class="row g-3 was-validated" novalidate [formGroup]="transactionForm">
+          <div class="col-md-4">
+            <label class="form-label">Bank</label>
+            <select class="form-select" formControlName="bankId" required>
+              <option value="">Select</option>
+              <option *ngFor="let bank of bankList" [ngValue]="bank.key">{{ bank.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Bank...
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Account Type</label>
+            <select class="form-select" formControlName="accountTypeId" required>
+              <option value="">Select</option>
+              <option *ngFor="let atl of accountTypeList" [ngValue]="atl.key">{{ atl.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Enter Account Type...
+            </div>
+          </div>
+        </form>
+        <hr *ngIf="cardInfo && cardInfo != null && cardInfo.length != 0" />
+        <div class="p-3">
+          <div class="atm-card" *ngFor="let card of cardInfo">
+            <h5 class="card-title">{{card.bankName}}</h5>
+            <h6 class="card-number">{{card.cardNumber}}</h6>
+            <h6>CVV: {{card.cvv}}</h6>
+            <div style="position: relative;top: 67px;">
+              <h6 class="mt-2" *ngIf="card.balanceLimit != null">{{card.balanceLimit}}</h6>
+              <h6 class="card-holder">{{card.holderName}}</h6>
+              <h6 class="card-type">{{card.cardType}}</h6>
+            </div>
+          </div>
+        </div>
+        <hr *ngIf="accountInfo && accountInfo != null" />
+        <div class="row p-2" *ngIf="accountInfo && accountInfo != null">
+          <div class="col-md-3">
+            <h4>Bank Name</h4>
+            <h6>{{accountInfo.bankName}}</h6>
+          </div>
+          <div class="col-md-3">
+            <h4>Account Holder Name</h4>
+            <h6>{{accountInfo.accountHolderName}}</h6>
+          </div>
+          <div class="col-md-3">
+            <h4>Account Number</h4>
+            <h6>{{accountInfo.accountNumber}}</h6>
+          </div>
+          <div class="col-md-3">
+            <h4>Account Type</h4>
+            <h6>{{accountInfo.accountType}}</h6>
+          </div>
+          <div class="col-md-3">
+            <h4>Balance</h4>
+            <h6>{{accountInfo.balance}}</h6>
+          </div>
+        </div>
+        <hr *ngIf="transactionsList && transactionsList != null && transactionsList.length != 0" />
+        <table *ngIf="transactionsList && transactionsList != null && transactionsList.length != 0" class="table caption-top">
+          <thead>
+            <tr>
+              <th scope="col">Transaction Id</th>
+              <th scope="col">Date</th>
+              <th scope="col">Credit</th>
+              <th scope="col">Debit</th>
+              <th scope="col">Stage Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let trans of transactionsList">
+              <td>{{trans.transactionId}}</td>
+              <td>{{trans.transactionDate | date:'dd-MM-yyyy'}}</td>
+              <td>{{ trans.transactionType === 'Credit' ? trans.amount : '' }}</td>
+              <td>{{ trans.transactionType === 'Debit' ? trans.amount : '' }}</td>
+              <td>{{trans.stageBalance}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+

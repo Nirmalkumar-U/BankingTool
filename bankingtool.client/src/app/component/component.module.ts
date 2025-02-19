@@ -14,6 +14,7 @@ import { AddEditUserResolver } from '../core/resolver/add-edit-user.resolver';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { CreateAccountResolver } from '../core/resolver/create-account.resolver';
 import { TransactionsListComponent } from './transactions-list/transactions-list.component';
+import { TransactionListResolver } from '../core/resolver/transaction-list.resolver';
 
 const routes: Routes = [
   {
@@ -57,8 +58,9 @@ const routes: Routes = [
     path: AppPaths.transactions,
     title: PageTitle.transactions,
     component: TransactionsListComponent,
+    resolve: { DataResolver: TransactionListResolver }
   }
-];
+]; 
 
 @NgModule({
   declarations: [

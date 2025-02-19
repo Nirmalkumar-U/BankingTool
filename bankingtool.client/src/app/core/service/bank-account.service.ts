@@ -21,4 +21,13 @@ export class BankAccountService {
   isCustomerHasCreditCardInThatBank(customerId: number, bankId: number): Observable<any> {
     return this.httpService.get('BankAccount/IsCustomerHasCreditCardInThatBank?customerId=' + customerId.toString() + "&bankId=" + bankId.toString());
   }
+  transactionsListForCustomer(bankId: number, accountTypeId: number, customerId: number): Observable<any> {
+    return this.httpService.get('BankAccount/TransactionsListForCustomer?customerId=' + customerId.toString() + "&accountTypeId=" + accountTypeId.toString() + "&bankId=" + bankId.toString());
+  }
+  bankDropDownList(customerId: number): Observable<any> {
+    return this.httpService.get('BankAccount/BankDropDownList?customerId=' + customerId.toString());
+  }
+  getAccountTypeDropDownListByCustomerIdAndBankId(customerId: number, bankId: number): Observable<any> {
+    return this.httpService.get('BankAccount/GetAccountTypeDropDownListByCustomerIdAndBankId?customerId=' + customerId.toString() + "&bankId=" + bankId.toString());
+  }
 }

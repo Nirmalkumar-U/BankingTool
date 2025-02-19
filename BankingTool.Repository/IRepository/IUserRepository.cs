@@ -8,6 +8,8 @@ namespace BankingTool.Repository
         Task<(Users User, Role Role)> GetUserAndRoleByUserId(int userId);
         Task<List<int>> GetAllActionIdOfRole(int RoleId);
         Task<List<DropDownDto>> GetCityDropDownListByStateId(int stateId);
+        Task<Customer> GetCustomerByUserId(int userId);
+        Task<Staff> GetStaffByUserId(int userId);
         Task<int> InsertUser(Users user);
         Task<bool> InsertUserRole(UserRole userRole);
         Task<List<GetActionsByUserIdDto>> GetActionsByUserId(int userId);

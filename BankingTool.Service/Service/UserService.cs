@@ -72,6 +72,8 @@ namespace BankingTool.Service
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var actions = await _userRepository.GetAllActionIdOfRole(user.RoleId);
+            var customer = await _userRepository.GetCustomerByUserId(user.UserId);
+            Staff staff = await _userRepository.GetStaffByUserId(user.UserId);
             var act = string.Join(",", actions);
 
             var claims = new List<ClaimDto>
@@ -81,7 +83,9 @@ namespace BankingTool.Service
                         new() { Key = AppClaimTypes.LastName, Value = user.LastName },
                         new() { Key = AppClaimTypes.EmailId, Value = user.Email },
                         new() { Key = AppClaimTypes.RoleId, Value = user.RoleId.ToString()},
-                        new() { Key = AppClaimTypes.Actions, Value = act}
+                        new() { Key = AppClaimTypes.Actions, Value = act},
+                        new() { Key = AppClaimTypes.StaffId, Value = staff != null? staff.StaffId.ToString():""},
+                        new() { Key = AppClaimTypes.CustomerId, Value = customer != null? customer.CustomerId.ToString():""}
                     };
 
             var tokenDescriptor = new SecurityTokenDescriptor

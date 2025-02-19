@@ -40,5 +40,7 @@
         public const string RoleId = nameof(RoleId);
         public const string RoleLevel = nameof(RoleLevel);
         public const string Actions = nameof(Actions);
+        public const string StaffId = nameof(StaffId);
+        public const string CustomerId = nameof(CustomerId);
     }
 }

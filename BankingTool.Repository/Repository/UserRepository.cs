@@ -40,6 +40,14 @@ namespace BankingTool.Repository
         {
             return await dataContext.RoleAccess.Where(x => x.RoleId == RoleId).Select(z => z.ActionId).ToListAsync();
         }
+        public async Task<Customer> GetCustomerByUserId(int userId)
+        {
+            return await dataContext.Customer.FirstOrDefaultAsync(x => x.UserId == userId);
+        }
+        public async Task<Staff> GetStaffByUserId(int userId)
+        {
+            return await dataContext.Staff.FirstOrDefaultAsync(x => x.UserId == userId);
+        }
         public async Task<List<DropDownDto>> GetCityDropDownListByStateId(int stateId)
         {
             return await dataContext.City.Where(x => x.StateId == stateId).Select(z => new DropDownDto

@@ -8,7 +8,6 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\bankingtool.client\</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="src\app\component\" />
     <Folder Include="src\app\constant\" />
     <Folder Include="src\app\core\apiService\" />
     <Folder Include="src\app\core\commonFunction\" />

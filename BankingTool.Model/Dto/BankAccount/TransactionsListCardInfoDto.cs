@@ -3,6 +3,7 @@
     public class TransactionsListCardInfoDto
     {
         public string CardType { get; set; }
+        public string CardNumber { get; set; }
         public string BankName { get; set; }
         public string HolderName { get; set; }
         public DateTime ExpirationDate { get; set; }
