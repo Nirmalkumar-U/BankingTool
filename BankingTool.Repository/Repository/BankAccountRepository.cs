@@ -81,6 +81,7 @@ namespace BankingTool.Repository.Repository
                 Amount = z.Amount,
                 StageBalance = z.StageBalance,
                 TransactionDate = z.TransactionTime,
+                Description = z.Description,
                 TransactionType = z.TransactionType,
                 TransactionId = z.TransactionId
             }).ToListAsync();
@@ -149,7 +150,7 @@ namespace BankingTool.Repository.Repository
             account.ModifiedBy = null;
             account.ModifiedDate = null;
             account.IsDeleted = false;
-            var isInserted = Insert(account, false);
+            var isInserted = Insert(account);
             return isInserted ? account.AccountId : null;
         }
         public int? InsertTransaction(Transaction transaction)
@@ -159,7 +160,7 @@ namespace BankingTool.Repository.Repository
             transaction.ModifiedBy = null;
             transaction.ModifiedDate = null;
             transaction.IsDeleted = false;
-            var isInserted = Insert(transaction, false);
+            var isInserted = Insert(transaction);
             return isInserted ? transaction.TransactionId : null;
         }
         public int? InsertCard(Card card)
@@ -169,7 +170,7 @@ namespace BankingTool.Repository.Repository
             card.ModifiedBy = null;
             card.ModifiedDate = null;
             card.IsDeleted = false;
-            var isInserted = Insert(card, false);
+            var isInserted = Insert(card, true);
             return isInserted ? card.CardId : null;
         }
         public int? InsertCreditScore(CreditScore creditScore)
@@ -179,14 +180,14 @@ namespace BankingTool.Repository.Repository
             creditScore.ModifiedBy = null;
             creditScore.ModifiedDate = null;
             creditScore.IsDeleted = false;
-            var isInserted = Insert(creditScore, false);
+            var isInserted = Insert(creditScore);
             return isInserted ? creditScore.CreditScoreId : null;
         }
         public void UpdateCustomer(Customer customer)
         {
             customer.ModifiedBy = "Admin";
             customer.ModifiedDate = DateTime.Now;
-            Update(customer, false);
+            Update(customer);
         }
     }
 }

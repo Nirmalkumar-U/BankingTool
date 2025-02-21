@@ -149,7 +149,7 @@ BEGIN
 END
 GO
 
-IF EXISTS (SELECT * FROM sys.tables where name = N'Role')
+IF EXISTS (SELECT * FROM sys.tables where name = N'City')
 BEGIN
 	DROP TABLE [City]
 END
@@ -184,8 +184,8 @@ CREATE TABLE [Users] (
 	EmailId VARCHAR(500) NOT NULL,
 	FirstName VARCHAR(100) NOT NULL,
 	LastName VARCHAR(100) NOT NULL,
-	City VARCHAR(30) NOT NULL,
-	State VARCHAR(30) NOT NULL,
+	City INT NOT NULL,
+	State INT NOT NULL,
 	IsActive BIT DEFAULT 1,
 	CreatedDate DATETIME NOT NULL,
 	CreatedBy VARCHAR(30) NOT NULL,
@@ -201,6 +201,7 @@ CREATE TABLE [Action] (
 	Access VARCHAR(15) NULL,
 	MenuLevel INT NULL,
 	ParrentMenuId INT NULL,
+	Sequence INT NULL,
 	CreatedDate DATETIME NOT NULL,
 	CreatedBy VARCHAR(30) NOT NULL,
 	ModifiedDate DATETIME NULL,
@@ -230,19 +231,25 @@ CREATE TABLE [Customer] (
 	CustomerId INT CONSTRAINT [PK_Customer] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	UserId INT NOT NULL CONSTRAINT [FK_Customer_UserId] FOREIGN KEY REFERENCES Users(UserId),
 	CustomerLevel INT NOT NULL,
-	PrimaryAccountNumber VARCHAR(15) NULL,
+	PrimaryAccountNumber VARCHAR(16) NULL,
 	CreatedDate DATETIME NOT NULL,
 	CreatedBy VARCHAR(30) NOT NULL,
 	ModifiedDate DATETIME NULL,
 	ModifiedBy VARCHAR(30) NULL,
 	IsDeleted BIT DEFAULT 0)
 
+CREATE TABLE Bank (
+    BankId INT CONSTRAINT [PK_Bank] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
+    BankName VARCHAR(100) NOT NULL,
+    BankAbbrivation VARCHAR(10) NOT NULL
+);
+
 CREATE TABLE [Account] (
 	AccountId INT CONSTRAINT [PK_Account] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	CustomerId INT NOT NULL CONSTRAINT [FK_Account_CustomerId] FOREIGN KEY REFERENCES Customer(CustomerId),
 	BankId INT NOT NULL CONSTRAINT [FK_Account_BankId] FOREIGN KEY REFERENCES Bank(BankId),
 	Balance INT NOT NULL,
-	AccountNumber VARCHAR(15) NOT NULL,
+	AccountNumber VARCHAR(16) NOT NULL,
 	AccountTypeId INT NOT NULL,
 	AccountStatus VARCHAR(15) NOT NULL,
 	CreatedDate DATETIME NOT NULL,
@@ -257,6 +264,7 @@ CREATE TABLE [Transaction] (
 	Description VARCHAR(500) NULL,
 	TransactionType VARCHAR(15) NOT NULL,
 	Amount INT NOT NULL,
+	StageBalance INT NULL,
 	TransactionTime DATETIME NOT NULL,
 	CreatedDate DATETIME NOT NULL,
 	CreatedBy VARCHAR(30) NOT NULL,
@@ -281,7 +289,7 @@ CREATE TABLE [Card] (
 CREATE TABLE [CreditScore] (
 	CreditScoreId INT CONSTRAINT [PK_CreditScore] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	CustomerId INT NOT NULL CONSTRAINT [FK_CreditScore_CustomerId] FOREIGN KEY REFERENCES Customer(CustomerId),
-	CreditScore INT NULL,
+	CreditScoreValue INT NULL,
 	Status VARCHAR(15) NOT NULL,
 	Description VARCHAR(500) NULL,
 	CreatedDate DATETIME NOT NULL,
@@ -313,12 +321,6 @@ CREATE TABLE [City] (
     IsDeleted BIT NOT NULL DEFAULT 0
 );
 
-CREATE TABLE Bank (
-    BankId INT CONSTRAINT [PK_Bank] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
-    BankName VARCHAR(100) NOT NULL,
-    BankAbbrivation VARCHAR(10) NOT NULL
-);
-
 CREATE TABLE CodeValue (
     CodeValueId INT CONSTRAINT [PK_CodeValue] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
     TypeName VARCHAR(100) NOT NULL,
@@ -329,5 +331,6 @@ CREATE TABLE CodeValue (
 	CodeValue1Description VARCHAR(100) NULL,
 	CodeValue2Description VARCHAR(100) NULL,
 	CodeValue3Description VARCHAR(100) NULL,
-	NotInUse BIT NOT NULL
+	InUse BIT NOT NULL,
+	Sequence INT NULL
 );

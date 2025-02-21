@@ -21,7 +21,7 @@ export class CreateAccountComponent {
   bankList: DropDownDto[] = [];
   yesOrNo: YesOrNoDto[] = Constant.yesOrNo;
   messageList: string[] = [];
-  isSubmitted: boolean = true;
+  isSubmitted: boolean = false;
   isCustAsCC: boolean = false;
   defaultValue: string = '';
 

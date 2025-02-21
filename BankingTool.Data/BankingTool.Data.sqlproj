@@ -56,10 +56,23 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="Schema" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\MergeScripts" />
+    <Folder Include="Scripts\Schema" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Schema\Schema.sql" />
-    <None Include="Schema\StoreProcedure.sql" />
+    <None Include="Scripts\MergeScripts\BankTable.sql" />
+    <None Include="Scripts\MergeScripts\CityTable.sql" />
+    <None Include="Scripts\MergeScripts\CodeValue.sql" />
+    <None Include="Scripts\MergeScripts\RoleTable.sql" />
+    <None Include="Scripts\MergeScripts\StateTable.sql" />
+    <None Include="Scripts\Schema\Schema.sql" />
+    <None Include="Scripts\Schema\StoreProcedure.sql" />
+    <None Include="Scripts\ConsolidateScript.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\MergeScripts\ConsolidateMergeScripts.sql" />
+    <None Include="Scripts\MergeScripts\UsersTable.sql" />
+    <None Include="Scripts\MergeScripts\ActionTable.sql" />
   </ItemGroup>
 </Project>

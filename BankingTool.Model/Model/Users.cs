@@ -10,7 +10,5 @@
         public int City { get; set; }
         public int State { get; set; }
         public bool IsActive { get; set; }
-
-        //public virtual UserRole UserRoles { get; set; }
     }
 }

@@ -1,0 +1,55 @@
+﻿
+SET IDENTITY_INSERT [CodeValue] ON
+
+MERGE INTO [CodeValue] AS Target
+USING (VALUES
+  (1,N'AccountType',100,N'Saving Account','SA',NULL,N'Bank account type is savings account',NULL,NULL,1,1)
+ ,(2,N'AccountType',100,N'Current Account','CA',NULL,N'Bank account type is current account',NULL,NULL,1,2)
+ ,(3,N'AccountType',100,N'Fixed Deposit Account','FD',NULL,N'Bank account type is Fixed Deposit Account',NULL,NULL,1,3)
+ ,(4,N'AccountType',100,N'Recurring Deposit Account','RD',NULL,N'Bank account type is Recurring Deposit Account',NULL,NULL,1,4)
+) AS Source ([CodeValueId],[TypeName],[TypeCode],[CodeValue1],[CodeValue2],[CodeValue3],[CodeValue1Description],[CodeValue2Description],[CodeValue3Description],[InUse],[Sequence])
+ON (Target.[CodeValueId] = Source.[CodeValueId])
+WHEN MATCHED AND (
+	NULLIF(Source.[TypeName], Target.[TypeName]) IS NOT NULL OR NULLIF(Target.[TypeName], Source.[TypeName]) IS NOT NULL OR 
+	NULLIF(Source.[TypeCode], Target.[TypeCode]) IS NOT NULL OR NULLIF(Target.[TypeCode], Source.[TypeCode]) IS NOT NULL OR 
+	NULLIF(Source.[CodeValue1], Target.[CodeValue1]) IS NOT NULL OR NULLIF(Target.[CodeValue1], Source.[CodeValue1]) IS NOT NULL OR 
+	NULLIF(Source.[CodeValue2], Target.[CodeValue2]) IS NOT NULL OR NULLIF(Target.[CodeValue2], Source.[CodeValue2]) IS NOT NULL OR 
+	NULLIF(Source.[CodeValue3], Target.[CodeValue3]) IS NOT NULL OR NULLIF(Target.[CodeValue3], Source.[CodeValue3]) IS NOT NULL OR 
+	NULLIF(Source.[CodeValue1Description], Target.[CodeValue1Description]) IS NOT NULL OR NULLIF(Target.[CodeValue1Description], Source.[CodeValue1Description]) IS NOT NULL OR 
+	NULLIF(Source.[CodeValue2Description], Target.[CodeValue2Description]) IS NOT NULL OR NULLIF(Target.[CodeValue2Description], Source.[CodeValue2Description]) IS NOT NULL OR 
+	NULLIF(Source.[CodeValue3Description], Target.[CodeValue3Description]) IS NOT NULL OR NULLIF(Target.[CodeValue3Description], Source.[CodeValue3Description]) IS NOT NULL OR 
+	NULLIF(Source.[InUse], Target.[InUse]) IS NOT NULL OR NULLIF(Target.[InUse], Source.[InUse]) IS NOT NULL OR 
+	NULLIF(Source.[Sequence], Target.[Sequence]) IS NOT NULL OR NULLIF(Target.[Sequence], Source.[Sequence]) IS NOT NULL) THEN
+ UPDATE SET
+  [TypeName] = Source.[TypeName], 
+  [TypeCode] = Source.[TypeCode], 
+  [CodeValue1] = Source.[CodeValue1], 
+  [CodeValue2] = Source.[CodeValue2], 
+  [CodeValue3] = Source.[CodeValue3], 
+  [CodeValue1Description] = Source.[CodeValue1Description], 
+  [CodeValue2Description] = Source.[CodeValue2Description], 
+  [CodeValue3Description] = Source.[CodeValue3Description], 
+  [InUse] = Source.[InUse], 
+  [Sequence] = Source.[Sequence]
+WHEN NOT MATCHED BY TARGET THEN
+ INSERT([CodeValueId],[TypeName],[TypeCode],[CodeValue1],[CodeValue2],[CodeValue3],[CodeValue1Description],[CodeValue2Description],[CodeValue3Description],[InUse],[Sequence])
+ VALUES(Source.[CodeValueId],Source.[TypeName],Source.[TypeCode],Source.[CodeValue1],Source.[CodeValue2],Source.[CodeValue3],Source.[CodeValue1Description],Source.[CodeValue2Description],Source.[CodeValue3Description],Source.[InUse],Source.[Sequence])
+WHEN NOT MATCHED BY SOURCE THEN 
+ DELETE
+;
+GO
+DECLARE @mergeError int
+ , @mergeCount int
+SELECT @mergeError = @@ERROR, @mergeCount = @@ROWCOUNT
+IF @mergeError != 0
+ BEGIN
+ PRINT 'ERROR OCCURRED IN MERGE FOR [CodeValue]. Rows affected: ' + CAST(@mergeCount AS VARCHAR(100)); -- SQL should always return zero rows affected
+ END
+ELSE
+ BEGIN
+ PRINT '[CodeValue] rows affected by MERGE: ' + CAST(@mergeCount AS VARCHAR(100));
+ END
+GO
+
+SET IDENTITY_INSERT [CodeValue] OFF
+GO

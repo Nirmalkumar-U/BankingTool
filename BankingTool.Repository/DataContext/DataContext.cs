@@ -51,6 +51,7 @@ namespace BankingTool.Repository
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasKey(u => u.UserId);
+                entity.Property(e => e.State).HasColumnName("State").HasColumnType("int");
             });
 
             modelBuilder.Entity<Action>(entity =>

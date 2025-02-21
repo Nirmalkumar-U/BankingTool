@@ -6,6 +6,7 @@
         public DateTime TransactionDate { get; set; }
         public int Amount { get; set; }
         public string TransactionType { get; set; }
+        public string Description { get; set; }
         public int StageBalance { get; set; }
     }
 }

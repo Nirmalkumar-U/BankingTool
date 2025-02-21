@@ -110,16 +110,15 @@ namespace BankingTool.Service.Service
             }
             else
             {
-                CreditScore cardScore = new()
-                {
-                    CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
-                    CustomerId = account.CustomerId,
-                    Description = null,
-                    Status = CreditScoreStatus.Active,
-
-                };
-                _bankAccountRepository.InsertCreditScore(cardScore);
-            }
+                    CreditScore cardScore = new()
+                    {
+                        CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
+                        CustomerId = account.CustomerId,
+                        Description = null,
+                        Status = CreditScoreStatus.Active,
+                    };
+                    _bankAccountRepository.InsertCreditScore(cardScore);
+                }
             await _commonRepository.SaveTransaction();
 
             response.Result = true;
