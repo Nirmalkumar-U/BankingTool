@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.User;
 
 namespace BankingTool.Repository
 {
@@ -10,6 +11,7 @@ namespace BankingTool.Repository
         Task<List<DropDownDto>> GetCityDropDownListByStateId(int stateId);
         Task<Customer> GetCustomerByUserId(int userId);
         Task<Staff> GetStaffByUserId(int userId);
+        Task<List<UserListDto>> GetUserList();
         Task<int> InsertUser(Users user);
         Task<bool> InsertUserRole(UserRole userRole);
         Task<List<GetActionsByUserIdDto>> GetActionsByUserId(int userId);

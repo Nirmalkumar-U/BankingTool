@@ -1,1 +1,29 @@
-<p>user-list works!</p>
+<table class="table caption-top">
+  <thead>
+    <tr>
+      <th scope="col" width="15%">User Name</th>
+      <th scope="col" width="15%">Email Id</th>
+      <th scope="col" width="10%">Password</th>
+      <th scope="col" width="10%">Role</th>
+      <th scope="col" width="20%">Primary Account number</th>
+      <th scope="col" width="10%">State</th>
+      <th scope="col" width="10%">City</th>
+      <th scope="col" width="10%">Is Active</th>
+    </tr>
+  </thead>
+  <tr *ngIf="userList && userList.length === 0">
+    <td colspan="8" class="p-2 text-center">No Records Found</td>
+  </tr>
+  <tbody *ngIf="userList && userList.length > 0">
+    <tr *ngFor="let user of userList">
+      <td>{{ user.userName }}</td>
+      <td>{{ user.userMailId }}</td>
+      <td>{{ user.password }}</td>
+      <td>{{ user.roleName }}</td>
+      <td>{{ user.primaryAccountNumber }}</td>
+      <td>{{ user.state }}</td>
+      <td>{{ user.city }}</td>
+      <td>{{ user.isActive }}</td>
+    </tr>
+  </tbody>
+</table>

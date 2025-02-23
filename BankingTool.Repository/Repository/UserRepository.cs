@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankingTool.Repository
@@ -72,6 +73,28 @@ namespace BankingTool.Repository
                 .ToListAsync();
 
             return actions;
+        }
+        public async Task<List<UserListDto>> GetUserList()
+        {
+            return await (from u in dataContext.Users.AsNoTracking()
+                          join ur in dataContext.UserRole.AsNoTracking() on u.UserId equals ur.UserId
+                          join r in dataContext.Role.AsNoTracking() on ur.RoleId equals r.RoleId
+                          join c in dataContext.Customer.AsNoTracking() on u.UserId equals c.UserId
+                          join s in dataContext.State on u.State equals s.StateId
+                          join ci in dataContext.City on u.City equals ci.CityId
+                          where u.IsDeleted == false
+                          select new UserListDto
+                          {
+                              UserId = u.UserId,
+                              UserName = u.FirstName + " " + u.LastName,
+                              UserMailId = u.EmailId,
+                              IsActive = u.IsActive,
+                              Password = u.Password,
+                              PrimaryAccountNumber = c.PrimaryAccountNumber,
+                              RoleName = r.RoleName,
+                              State = s.StateName,
+                              City = ci.CityName
+                          }).ToListAsync();
         }
         #endregion GET
 

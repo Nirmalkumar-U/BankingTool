@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.User;
 
 namespace BankingTool.Service
 {
@@ -8,6 +9,7 @@ namespace BankingTool.Service
         Task<ResponseDto<TokenDto>> CreateToken(LoggedInUserDto user);
         Task<ResponseDto<UserInitialLoadDto>> GetUserInitialLoad(int? userId);
         Task<List<DropDownDto>> GetCityDropDownListByStateId(int stateId);
+        Task<ResponseDto<List<UserListDto>>> GetUserList();
         Task<ResponseDto<int>> InsertUser(SaveUserDto user);
         Task<List<GetActionsByUserIdDto>> Test(int id);
     }

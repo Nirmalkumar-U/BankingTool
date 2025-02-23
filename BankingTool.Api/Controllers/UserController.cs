@@ -54,6 +54,12 @@ namespace BankingTool.Api.Controllers
             return new OkObjectResult(Result);
         }
         [HttpGet]
+        public async Task<IActionResult> GetUserList()
+        {
+            var Result = await _userService.GetUserList();
+            return new OkObjectResult(Result);
+        }
+        [HttpGet]
         public async Task<IActionResult> Test(int userId)
         {
             var Result = await _userService.Test(userId);

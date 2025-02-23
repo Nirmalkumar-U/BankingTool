@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using BankingTool.Model;
+using BankingTool.Model.Dto.User;
 using BankingTool.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -11,14 +12,13 @@ namespace BankingTool.Service
 {
     public class UserService(IUserRepository userRepository, IEncriptDecriptService encriptDecriptService,
         IRoleRepository roleRepository, ICommonRepository commonRepository,
-        IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : IUserService
+        IConfiguration configuration) : IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IEncriptDecriptService _encriptDecriptService = encriptDecriptService;
         private readonly IRoleRepository _roleRepository = roleRepository;
         private readonly ICommonRepository _commonRepository = commonRepository;
         private readonly IConfiguration _configuration = configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
         public async Task<ResponseDto<LoggedInUserDto>> Login(string email, string password)
         {
@@ -59,7 +59,6 @@ namespace BankingTool.Service
             }
             return response;
         }
-
         public async Task<ResponseDto<TokenDto>> CreateToken(LoggedInUserDto user)
         {
             var response = new ResponseDto<TokenDto> { Status = false };
@@ -112,7 +111,6 @@ namespace BankingTool.Service
             response.Status = true;
             return response;
         }
-
         public async Task<ResponseDto<UserInitialLoadDto>> GetUserInitialLoad(int? userId)
         {
             var response = new ResponseDto<UserInitialLoadDto> { Status = false };
@@ -142,12 +140,10 @@ namespace BankingTool.Service
             response.Status = true;
             return response;
         }
-
         public async Task<List<DropDownDto>> GetCityDropDownListByStateId(int stateId)
         {
             return await _userRepository.GetCityDropDownListByStateId(stateId);
         }
-
         public async Task<ResponseDto<int>> InsertUser(SaveUserDto user)
         {
             ResponseDto<int> response = new()
@@ -221,7 +217,28 @@ namespace BankingTool.Service
 
             return response;
         }
-
+        public async Task<ResponseDto<List<UserListDto>>> GetUserList()
+        {
+            var userList = await _userRepository.GetUserList();
+            var result = userList.Select(x => new UserListDto
+            {
+                UserId = x.UserId,
+                UserName = x.UserName,
+                UserMailId = x.UserMailId,
+                IsActive = x.IsActive,
+                Password = _encriptDecriptService.DecryptData(x.Password),
+                PrimaryAccountNumber = x.PrimaryAccountNumber,
+                RoleName = x.RoleName,
+                State = x.State,
+                City = x.City
+            }).ToList();
+            return new ResponseDto<List<UserListDto>>
+            {
+                Message = [],
+                Result = result,
+                Status = true
+            };
+        }
         public async Task<List<GetActionsByUserIdDto>> Test(int id)
         {
             var a = await _userRepository.GetActionsByUserId(id);

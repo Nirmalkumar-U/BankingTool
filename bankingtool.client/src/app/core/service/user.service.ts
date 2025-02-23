@@ -18,4 +18,7 @@ export class UserService {
   saveUser(user: SaveUserDto): Observable<any> {
     return this.httpService.post('User/SaveUser', user);
   }
+  getUserList(): Observable<any> {
+    return this.httpService.get('User/GetUserList');
+  }
 }

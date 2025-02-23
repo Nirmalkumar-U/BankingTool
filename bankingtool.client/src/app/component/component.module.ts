@@ -15,6 +15,7 @@ import { CreateAccountComponent } from './create-account/create-account.componen
 import { CreateAccountResolver } from '../core/resolver/create-account.resolver';
 import { TransactionsListComponent } from './transactions-list/transactions-list.component';
 import { TransactionListResolver } from '../core/resolver/transaction-list.resolver';
+import { UserListResolver } from '../core/resolver/user-list.resolver';
 
 const routes: Routes = [
   {
@@ -46,7 +47,8 @@ const routes: Routes = [
   {
     path: AppPaths.userList,
     title: PageTitle.userList,
-    component: UserListComponent
+    component: UserListComponent,
+    resolve: { DataResolver: UserListResolver }
   },
   {
     path: AppPaths.createAccount,
