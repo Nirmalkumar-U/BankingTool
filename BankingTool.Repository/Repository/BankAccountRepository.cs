@@ -110,7 +110,7 @@ namespace BankingTool.Repository.Repository
                 HolderName = name
             }).ToListAsync();
         }
-        public async Task<(int, string, string,string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId)
+        public async Task<(int, string, string, string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId)
         {
             var accType = await dataContext.CodeValue.FirstOrDefaultAsync(x => x.CodeValueId == accountTypeId);
             var account = await dataContext.Account.FirstOrDefaultAsync(x => x.BankId == bankId && x.AccountTypeId == accType.CodeValueId && x.CustomerId == customerId);
@@ -142,6 +142,41 @@ namespace BankingTool.Repository.Repository
                               Key = cv.CodeValueId,
                               Value = cv.CodeValue1
                           }).ToListAsync();
+        }
+
+        public bool CreateAccount(Account account, Transaction transaction, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
+            bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount)
+        {
+            using var sqlTransaction = dataContext.Database.BeginTransaction();
+            try
+            {
+                int? accountId = InsertAccount(account);
+                transaction.AccountId = accountId.Value;
+                int? transactionId = InsertTransaction(transaction);
+                debitCard.AccountId = accountId.Value;
+                InsertCard(debitCard);
+                if (IsUpdatePrimaryAccount)
+                {
+                    UpdateCustomer(customer);
+                }
+                if (CustomerWantCreditCard)
+                {
+                    creditCard.AccountId = accountId.Value;
+                    InsertCard(creditCard);
+                }
+                if (IsAnyAccountForThisCustomer) 
+                { 
+                    InsertCreditScore(cardScore); 
+                }
+                sqlTransaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                sqlTransaction.Rollback();
+                return false;
+            }
         }
         public int? InsertAccount(Account account)
         {

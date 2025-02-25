@@ -48,7 +48,7 @@ namespace BankingTool.Service.Service
             var response = new ResponseDto<bool>
             {
                 Result = false,
-                Status = true,
+                Status = false,
                 Message = []
             };
             if (model == null)
@@ -65,66 +65,70 @@ namespace BankingTool.Service.Service
                 Balance = Constants.AccountMininumBalanceForSavingsAccount,
                 BankId = model.BankId
             };
-            int? accountId = _bankAccountRepository.InsertAccount(account);
 
             Transaction transaction = new()
             {
                 TransactionType = TransactionType.Credit,
                 Amount = Constants.AccountMininumBalanceForSavingsAccount,
                 Description = "Initial Credit",
-                AccountId = accountId.Value,
                 TransactionTime = DateTime.Now,
                 StageBalance = Constants.AccountMininumBalanceForSavingsAccount
             };
-            _ = _bankAccountRepository.InsertTransaction(transaction);
 
-            await UpdatePrimaryAccountNumber(model.DoYouWantToChangeThisAccountToPrimaryAccount, account.AccountNumber, account.CustomerId);
+            var (customer, isUpdatePrimaryAccount) = await UpdatePrimaryAccountNumber(model.DoYouWantToChangeThisAccountToPrimaryAccount, account.AccountNumber, account.CustomerId);
 
             Card debitCard = new()
             {
-                AccountId = accountId.Value,
                 CardLimit = Constants.DefaultDebitCard,
                 CardType = CardType.DebitCard,
                 ExpireDate = DateTime.Now.AddMonths(48),
                 CardNumber = await GetNewDebitCardNumber(),
                 CVV = await GetNewDebitCVVNumber(),
             };
-            _ = _bankAccountRepository.InsertCard(debitCard);
+            Card creditCard = null;
             if (model.CustomerWantCreditCard)
             {
-                Card creditCard = new()
+                creditCard = new()
                 {
-                    AccountId = accountId.Value,
                     CardLimit = Constants.DefaultDebitCard,
                     CardType = CardType.CreditCard,
                     ExpireDate = DateTime.Now.AddMonths(48),
                     CardNumber = await GetNewCreditCardNumber(),
                     CVV = await GetNewCreditCVVNumber(),
                 };
-                _ = _bankAccountRepository.InsertCard(creditCard);
             }
             var IsAnyAccountForThisCustomer = false; //await _bankAccountRepository.IsAnyAccountForThisCustomer(account.CustomerId);
+            CreditScore cardScore = null;
             if (IsAnyAccountForThisCustomer)
             {
                 //TODO
             }
             else
             {
-                    CreditScore cardScore = new()
-                    {
-                        CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
-                        CustomerId = account.CustomerId,
-                        Description = null,
-                        Status = CreditScoreStatus.Active,
-                    };
-                    _bankAccountRepository.InsertCreditScore(cardScore);
-                }
-            await _commonRepository.SaveTransaction();
+                cardScore = new()
+                {
+                    CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
+                    CustomerId = model.CustomerId,
+                    Description = null,
+                    Status = CreditScoreStatus.Active,
+                };
+            }
 
-            response.Result = true;
-            response.Status = true;
-            response.Message.Add("Account Created Successfully...");
-            return response;
+            bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, debitCard, creditCard, cardScore, customer, model.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
+            if (isAccountCreated)
+            {
+                response.Result = true;
+                response.Status = true;
+                response.Message.Add("Account Created Successfully...");
+                return response;
+            }
+            else
+            {
+                response.Result = false;
+                response.Status = false;
+                response.Message.Add("Failed to create account...");
+                return response;
+            }
         }
         public async Task<ResponseDto<GetTransactionsListDto>> TransactionsListForCustomer(int bankId, int accountTypeId, int customerId)
         {
@@ -159,23 +163,24 @@ namespace BankingTool.Service.Service
                 Status = true
             };
         }
-        private async Task UpdatePrimaryAccountNumber(bool DoYouWantToChangeThisAccountToPrimaryAccount, string AccountNumber, int CustomerId)
+        private async Task<(Customer, bool)> UpdatePrimaryAccountNumber(bool DoYouWantToChangeThisAccountToPrimaryAccount, string AccountNumber, int CustomerId)
         {
             bool isAnyAccountForThisCustomer = await _bankAccountRepository.IsAnyAccountForThisCustomer(CustomerId);
-
+            Customer customer = null;
+            bool IsUpdatePrimaryAccountNumber = false;
             if (isAnyAccountForThisCustomer && DoYouWantToChangeThisAccountToPrimaryAccount)
             {
-                Customer customer = await _bankAccountRepository.GetCustomerByCustomerId(CustomerId);
+                IsUpdatePrimaryAccountNumber = true;
+                customer = await _bankAccountRepository.GetCustomerByCustomerId(CustomerId);
                 customer.PrimaryAccountNumber = AccountNumber;
-                _bankAccountRepository.UpdateCustomer(customer);
             }
             else if (!isAnyAccountForThisCustomer)
             {
-                Customer customer = await _bankAccountRepository.GetCustomerByCustomerId(CustomerId);
+                IsUpdatePrimaryAccountNumber = true;
+                customer = await _bankAccountRepository.GetCustomerByCustomerId(CustomerId);
                 customer.PrimaryAccountNumber = AccountNumber;
-                _bankAccountRepository.UpdateCustomer(customer);
             }
-
+            return (customer, IsUpdatePrimaryAccountNumber);
         }
         private async Task<string> GetNewAccountNumber()
         {
