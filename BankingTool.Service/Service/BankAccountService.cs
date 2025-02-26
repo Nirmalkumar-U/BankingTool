@@ -6,10 +6,9 @@ using BankingTool.Service.IService;
 
 namespace BankingTool.Service.Service
 {
-    public class BankAccountService(IBankAccountRepository bankAccountRepository, ICommonRepository commonRepository) : IBankAccountService
+    public class BankAccountService(IBankAccountRepository bankAccountRepository) : IBankAccountService
     {
         private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
-        private readonly ICommonRepository _commonRepository = commonRepository;
 
         public async Task<ResponseDto<CreateAccountInitialLoadDto>> GetCreateAccountInitialLoad()
         {

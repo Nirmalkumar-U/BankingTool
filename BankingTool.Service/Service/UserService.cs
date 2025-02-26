@@ -144,9 +144,9 @@ namespace BankingTool.Service
         {
             return await _userRepository.GetCityDropDownListByStateId(stateId);
         }
-        public async Task<ResponseDto<int>> InsertUser(SaveUserDto user)
+        public async Task<ResponseDto<int?>> InsertUser(SaveUserDto user)
         {
-            ResponseDto<int> response = new()
+            ResponseDto<int?> response = new()
             {
                 Status = false,
                 Message = []
@@ -164,55 +164,52 @@ namespace BankingTool.Service
                 CreatedBy = "Admin",
                 CreatedDate = DateTime.Now
             };
-            int userId = await _userRepository.InsertUser(userDetail);
 
             UserRole userRole = new()
             {
-                UserId = userId,
                 RoleId = user.Role
             };
 
-            bool isInsertedUserRole = await _userRepository.InsertUserRole(userRole);
-
             var role = await _roleRepository.GetRoleByRoleId(user.Role);
-            bool isInsertedStaff = true;
-            bool isInsertedCustomer = true;
+            bool isCustomerNeedToInsert;
+            Staff staff = null;
+            Customer customer = null;
             if (role.RoleLevel < 3)
             {
-                Staff staff = new()
+                staff = new()
                 {
-                    UserId = userId,
                     StaffLevel = 5,
                     CreatedBy = "Admin",
                     CreatedDate = DateTime.Now,
                     IsDeleted = false
                 };
-
-                isInsertedStaff = await _userRepository.InsertStaff(staff);
+                isCustomerNeedToInsert = false;
             }
             else
             {
-                Customer customer = new()
+                customer = new()
                 {
-                    UserId = userId,
                     CustomerLevel = 5,
                     PrimaryAccountNumber = null,
                     CreatedBy = "Admin",
                     CreatedDate = DateTime.Now,
                     IsDeleted = false
                 };
-
-                isInsertedCustomer = await _userRepository.InsertCustomer(customer);
+                isCustomerNeedToInsert = true;
             }
+            int? userId = _userRepository.CreateUser(userDetail, userRole, staff, customer, isCustomerNeedToInsert);
 
-            if (!isInsertedUserRole && !isInsertedStaff && !isInsertedCustomer)
+            if (userId.HasValue)
             {
-                response.Message.Add("User Creation is failed...");
+                response.Message.Add("User Created is successfully...");
+                response.Status = true;
+                response.Result = userId.Value;
             }
             else
             {
-                response.Status = true;
-                response.Result = userId;
+                response.Message.Add("User Created is failed...");
+                response.Status = false;
+                response.Result = null;
             }
 
             return response;

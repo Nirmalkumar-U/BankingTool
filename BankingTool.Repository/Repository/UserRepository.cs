@@ -99,22 +99,50 @@ namespace BankingTool.Repository
         #endregion GET
 
         #region Saving
-        public async Task<int> InsertUser(Users user)
+        public int? CreateUser(Users userDetail, UserRole userRole, Staff staff, Customer customer, bool isCustomerNeedToInsert)
+        {
+            using var sqlTransaction = dataContext.Database.BeginTransaction();
+            try
+            {
+                int? userId = InsertUser(userDetail);
+                userRole.UserId = userId.Value;
+                _ = InsertUserRole(userRole);
+                if (isCustomerNeedToInsert)
+                {
+                    customer.UserId = userId.Value;
+                    InsertCustomer(customer);
+                }
+                else
+                {
+                    staff.UserId = userId.Value;
+                    InsertStaff(staff);
+                }
+                sqlTransaction.Commit();
+                return userId.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                sqlTransaction.Rollback();
+                return null;
+            }
+        }
+        public int InsertUser(Users user)
         {
             Insert(user);
-            return await Task.FromResult(user.UserId);
+            return user.UserId;
         }
-        public async Task<bool> InsertUserRole(UserRole userRole)
+        public bool InsertUserRole(UserRole userRole)
         {
-            return await Task.FromResult(Insert(userRole));
+            return Insert(userRole);
         }
-        public async Task<bool> InsertStaff(Staff staff)
+        public bool InsertStaff(Staff staff)
         {
-            return await Task.FromResult(Insert(staff));
+            return Insert(staff);
         }
-        public async Task<bool> InsertCustomer(Customer user)
+        public bool InsertCustomer(Customer user)
         {
-            return await Task.FromResult(Insert(user));
+            return Insert(user);
         }
         #endregion Saving
     }

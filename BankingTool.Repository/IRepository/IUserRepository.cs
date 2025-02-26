@@ -12,10 +12,11 @@ namespace BankingTool.Repository
         Task<Customer> GetCustomerByUserId(int userId);
         Task<Staff> GetStaffByUserId(int userId);
         Task<List<UserListDto>> GetUserList();
-        Task<int> InsertUser(Users user);
-        Task<bool> InsertUserRole(UserRole userRole);
+        int? CreateUser(Users userDetail, UserRole userRole, Staff staff, Customer customer, bool isCustomerNeedToInsert);
+        int InsertUser(Users user);
+        bool InsertUserRole(UserRole userRole);
         Task<List<GetActionsByUserIdDto>> GetActionsByUserId(int userId);
-        Task<bool> InsertCustomer(Customer user);
-        Task<bool> InsertStaff(Staff staff);
+        bool InsertCustomer(Customer user);
+        bool InsertStaff(Staff staff);
     }
 }

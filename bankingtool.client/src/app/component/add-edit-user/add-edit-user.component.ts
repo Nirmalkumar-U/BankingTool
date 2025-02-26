@@ -18,6 +18,8 @@ export class AddEditUserComponent implements OnInit {
   stateDropDownList: DropDownDto[] = [];
   cityDropDownList: DropDownDto[] = [];
   roleDropDownList: DropDownDto[] = [];
+  messageList: string[] = [];
+
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private userService: UserService) {
     this.userForm = this.fb.group({
       userId: [],
@@ -69,8 +71,9 @@ export class AddEditUserComponent implements OnInit {
       if (isNullOrEmpty(user.city)) isValid = false;
       if (isNullOrEmpty(user.role)) isValid = false;
       if (isValid) {
-        this.userService.saveUser(user).subscribe((cityList: DropDownDto[]) => {
-          this.cityDropDownList = cityList;
+        this.messageList = [];
+        this.userService.saveUser(user).subscribe((response: ResponseDto<number | null>) => {
+          this.messageList = response.message
         });
       }
     }

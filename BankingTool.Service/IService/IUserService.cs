@@ -10,7 +10,7 @@ namespace BankingTool.Service
         Task<ResponseDto<UserInitialLoadDto>> GetUserInitialLoad(int? userId);
         Task<List<DropDownDto>> GetCityDropDownListByStateId(int stateId);
         Task<ResponseDto<List<UserListDto>>> GetUserList();
-        Task<ResponseDto<int>> InsertUser(SaveUserDto user);
+        Task<ResponseDto<int?>> InsertUser(SaveUserDto user);
         Task<List<GetActionsByUserIdDto>> Test(int id);
     }
 }
