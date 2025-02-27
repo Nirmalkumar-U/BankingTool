@@ -4,7 +4,6 @@ using System.Text;
 using BankingTool.Model;
 using BankingTool.Model.Dto.User;
 using BankingTool.Repository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
