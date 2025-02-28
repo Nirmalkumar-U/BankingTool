@@ -16,6 +16,8 @@ import { CreateAccountResolver } from '../core/resolver/create-account.resolver'
 import { TransactionsListComponent } from './transactions-list/transactions-list.component';
 import { TransactionListResolver } from '../core/resolver/transaction-list.resolver';
 import { UserListResolver } from '../core/resolver/user-list.resolver';
+import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
+import { TransferAmountResolver } from '../core/resolver/transfer-amount.resolver';
 
 const routes: Routes = [
   {
@@ -61,6 +63,12 @@ const routes: Routes = [
     title: PageTitle.transactions,
     component: TransactionsListComponent,
     resolve: { DataResolver: TransactionListResolver }
+  },
+  {
+    path: AppPaths.transfer,
+    title: PageTitle.transfer,
+    component: TransferAmountComponent,
+    resolve: { DataResolver: TransferAmountResolver }
   }
 ]; 
 
@@ -73,7 +81,8 @@ const routes: Routes = [
     AddEditUserComponent,
     UserListComponent,
     CreateAccountComponent,
-    TransactionsListComponent
+    TransactionsListComponent,
+    TransferAmountComponent
   ],
   imports: [
     RouterModule.forChild(routes),

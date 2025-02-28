@@ -30,4 +30,7 @@ export class BankAccountService {
   getAccountTypeDropDownListByCustomerIdAndBankId(customerId: number, bankId: number): Observable<any> {
     return this.httpService.get('BankAccount/GetAccountTypeDropDownListByCustomerIdAndBankId?customerId=' + customerId.toString() + "&bankId=" + bankId.toString());
   }
+  getTransferAmountInitialLoad(customerId: number): Observable<any> {
+    return this.httpService.get('BankAccount/GetTransferAmountInitialLoad?customerId=' + customerId.toString());
+  }
 }

@@ -20,6 +20,8 @@ namespace BankingTool.Repository.IRepository
         Task<(int, string, string, string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId);
         Task<List<DropDownDto>> GetBankDropDownListByCustomerId(int customerId);
         Task<List<DropDownDto>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int BankId);
+        Task<List<DropDownDto>> GetFromAccountListByCustomerId(int customerId);
+        Task<List<DropDownDto>> GetToAccountListOnWithoutCustomerId(int customerId);
 
         bool CreateAccount(Account account, Transaction transaction, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);

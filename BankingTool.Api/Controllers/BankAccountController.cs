@@ -53,5 +53,11 @@ namespace BankingTool.Api.Controllers
             var Result = await _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId);
             return new OkObjectResult(Result);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetTransferAmountInitialLoad(int customerId)
+        {
+            var Result = await _bankAccountService.GetTransferAmountInitialLoad(customerId);
+            return new OkObjectResult(Result);
+        }
     }
 }

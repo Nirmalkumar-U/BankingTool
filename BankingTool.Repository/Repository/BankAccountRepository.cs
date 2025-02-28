@@ -144,6 +144,35 @@ namespace BankingTool.Repository.Repository
                           }).ToListAsync();
         }
 
+        public async Task<List<DropDownDto>> GetFromAccountListByCustomerId(int customerId)
+        {
+            return await (from a in dataContext.Account
+                          join c in dataContext.Customer on a.CustomerId equals c.CustomerId
+                          join u in dataContext.Users on c.UserId equals u.UserId
+                          join b in dataContext.Bank on a.BankId equals b.BankId
+                          join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
+                          where a.CustomerId == customerId && a.AccountStatus == AccountStatus.Active
+                          select new DropDownDto
+                          {
+                              Key = a.AccountId,
+                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
+                          }).ToListAsync();
+        }
+        public async Task<List<DropDownDto>> GetToAccountListOnWithoutCustomerId(int customerId)
+        {
+            return await (from a in dataContext.Account
+                          join c in dataContext.Customer on a.CustomerId equals c.CustomerId
+                          join u in dataContext.Users on c.UserId equals u.UserId
+                          join b in dataContext.Bank on a.BankId equals b.BankId
+                          join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
+                          where a.CustomerId != customerId && a.AccountStatus == AccountStatus.Active
+                          select new DropDownDto
+                          {
+                              Key = a.AccountId,
+                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
+                          }).ToListAsync();
+        }
+
         public bool CreateAccount(Account account, Transaction transaction, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount)
         {
@@ -164,9 +193,9 @@ namespace BankingTool.Repository.Repository
                     creditCard.AccountId = accountId.Value;
                     InsertCard(creditCard);
                 }
-                if (IsAnyAccountForThisCustomer) 
-                { 
-                    InsertCreditScore(cardScore); 
+                if (IsAnyAccountForThisCustomer)
+                {
+                    InsertCreditScore(cardScore);
                 }
                 sqlTransaction.Commit();
                 return true;

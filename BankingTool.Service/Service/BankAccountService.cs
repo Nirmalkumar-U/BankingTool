@@ -162,6 +162,19 @@ namespace BankingTool.Service.Service
                 Status = true
             };
         }
+        public async Task<ResponseDto<TransferAmountInitialLoadDto>> GetTransferAmountInitialLoad(int customerId)
+        {
+            return new ResponseDto<TransferAmountInitialLoadDto>()
+            {
+                Message = [],
+                Result = new TransferAmountInitialLoadDto
+                {
+                    FromAccount = await _bankAccountRepository.GetFromAccountListByCustomerId(customerId),
+                    ToAccount = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId(customerId)
+                },
+                Status = true
+            };
+        }
         private async Task<(Customer, bool)> UpdatePrimaryAccountNumber(bool DoYouWantToChangeThisAccountToPrimaryAccount, string AccountNumber, int CustomerId)
         {
             bool isAnyAccountForThisCustomer = await _bankAccountRepository.IsAnyAccountForThisCustomer(CustomerId);
