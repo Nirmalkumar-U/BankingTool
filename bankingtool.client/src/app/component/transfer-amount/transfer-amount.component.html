@@ -1,1 +1,52 @@
-<p>transfer-amount works!</p>
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Transfer Amount</h1>
+      </div>
+      <div class='card-body'>
+        <form class="row g-3 was-validated" novalidate [formGroup]="transferAmountForm" (ngSubmit)="transferAmount()">
+          <div class="col-md-4">
+            <label class="form-label">From Account</label>
+            <select class="form-select" formControlName="fromAccountId" required>
+              <option value="">Select</option>
+              <option *ngFor="let fa of fromList" [ngValue]="fa.key">{{ fa.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Account...
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">To Account</label>
+            <select class="form-select" formControlName="toAccountId" required>
+              <option value="">Select</option>
+              <option *ngFor="let ta of toList" [ngValue]="ta.key">{{ ta.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Account...
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Balance</label>
+            <h6>{{balance}}</h6>
+          </div>
+          <div class="col-md-3">
+            <label for="inputPassword4" class="form-label">Amount</label>
+            <input type="text" class="form-control" formControlName="amount" required>
+            <div class="invalid-feedback">
+              Please Enter amount...
+            </div>
+          </div>
+          <div class="col-12">
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Transfer Account</button>
+          </div>
+          <div class="col-12" *ngIf="messageList && messageList.length != 0">
+            <h3 *ngFor="let msg of messageList">{{msg}}</h3>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+

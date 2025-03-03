@@ -33,4 +33,7 @@ export class BankAccountService {
   getTransferAmountInitialLoad(customerId: number): Observable<any> {
     return this.httpService.get('BankAccount/GetTransferAmountInitialLoad?customerId=' + customerId.toString());
   }
+  getAccountBalance(accountId: number): Observable<any> {
+    return this.httpService.get('BankAccount/GetAccountBalance?accountId=' + accountId.toString());
+  }
 }

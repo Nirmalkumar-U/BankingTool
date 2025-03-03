@@ -57,13 +57,13 @@ namespace BankingTool.Repository.Repository
         public async Task<Account> GetLastAccount()
         {
             if (dataContext.Account.Any())
-                return await dataContext.Account.LastOrDefaultAsync();
+                return await dataContext.Account.OrderByDescending(a => a.AccountId).FirstOrDefaultAsync();
             return null;
         }
         public async Task<Card> GetLastCard(string cardType)
         {
             if (dataContext.Card.Any())
-                return await dataContext.Card.Where(x => x.CardType == cardType).OrderBy(z => z.CardId).LastOrDefaultAsync();
+                return await dataContext.Card.Where(x => x.CardType == cardType).OrderByDescending(z => z.CardId).FirstOrDefaultAsync();
             return null;
         }
         public async Task<bool> IsAnyAccountForThisCustomer(int customerId)
@@ -171,6 +171,13 @@ namespace BankingTool.Repository.Repository
                               Key = a.AccountId,
                               Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
                           }).ToListAsync();
+        }
+
+        public async Task<int> GetAccountBalance(int accountId)
+        {
+            return await (from a in dataContext.Account
+                          where a.AccountId != accountId && a.AccountStatus == AccountStatus.Active
+                          select a.Balance).FirstOrDefaultAsync();
         }
 
         public bool CreateAccount(Account account, Transaction transaction, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,

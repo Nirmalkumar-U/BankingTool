@@ -175,6 +175,15 @@ namespace BankingTool.Service.Service
                 Status = true
             };
         }
+        public async Task<ResponseDto<int>> GetAccountBalance(int accountId)
+        {
+            return new ResponseDto<int>
+            {
+                Message = [],
+                Result = await _bankAccountRepository.GetAccountBalance(accountId),
+                Status = true
+            };
+        }
         private async Task<(Customer, bool)> UpdatePrimaryAccountNumber(bool DoYouWantToChangeThisAccountToPrimaryAccount, string AccountNumber, int CustomerId)
         {
             bool isAnyAccountForThisCustomer = await _bankAccountRepository.IsAnyAccountForThisCustomer(CustomerId);
