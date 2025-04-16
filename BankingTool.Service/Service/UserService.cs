@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using BankingTool.Model;
+using BankingTool.Model.Dto.RequestDtos;
 using BankingTool.Model.Dto.User;
 using BankingTool.Repository;
 using Microsoft.Extensions.Configuration;
@@ -24,14 +25,14 @@ namespace BankingTool.Service
             var response = new ResponseDto<LoggedInUserDto>
             {
                 Status = false,
-                Message = []
+                Errors = null
             };
+            var errors = new List<Errors>();
 
             var (user, role) = await _userRepository.GetUserAndRoleByEmailId(email);
             if (user == null)
             {
-                response.Status = false;
-                response.Message.Add("User is not Created...");
+                errors.Add(new Errors { ErrorMessage = "There is no user for this Email: " + email, PropertyName = "Email" });
             }
             else
             {
@@ -39,7 +40,7 @@ namespace BankingTool.Service
                 if (pass == password)
                 {
                     response.Status = true;
-                    response.Message.Add("Login Successfully...");
+                    response.Message = "Login Successfully...";
                     var loggedUser = new LoggedInUserDto()
                     {
                         UserId = user.UserId,
@@ -48,17 +49,21 @@ namespace BankingTool.Service
                         LastName = user.LastName,
                         RoleId = role.RoleId
                     };
-                    response.Result = loggedUser;
+                    response.Response = loggedUser;
                 }
                 else
                 {
-                    response.Status = false;
-                    response.Message.Add("Password is incorrect...");
+                    errors.Add(new Errors { ErrorMessage = "Password is incorrect: " + email, PropertyName = "Password" });
                 }
+            }
+            if (errors.Count != 0)
+            {
+                response.Status = false;
+                response.Errors = [.. errors];
             }
             return response;
         }
-        public async Task<ResponseDto<TokenDto>> CreateToken(LoggedInUserDto user)
+        public async Task<ResponseDto<TokenDto>> CreateToken(CreateTokenRequestUser user, int roleId)
         {
             var response = new ResponseDto<TokenDto> { Status = false };
 
@@ -69,7 +74,7 @@ namespace BankingTool.Service
             var expiresInSeconds = Convert.ToInt32(_configuration["AppSettings:ExpiresIn"]);
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var actions = await _userRepository.GetAllActionIdOfRole(user.RoleId);
+            var actions = await _userRepository.GetAllActionIdOfRole(roleId);
             var customer = await _userRepository.GetCustomerByUserId(user.UserId);
             Staff staff = await _userRepository.GetStaffByUserId(user.UserId);
             var act = string.Join(",", actions);
@@ -80,7 +85,7 @@ namespace BankingTool.Service
                         new() { Key = AppClaimTypes.FirstName, Value = user.FirstName},
                         new() { Key = AppClaimTypes.LastName, Value = user.LastName },
                         new() { Key = AppClaimTypes.EmailId, Value = user.Email },
-                        new() { Key = AppClaimTypes.RoleId, Value = user.RoleId.ToString()},
+                        new() { Key = AppClaimTypes.RoleId, Value = roleId.ToString()},
                         new() { Key = AppClaimTypes.Actions, Value = act},
                         new() { Key = AppClaimTypes.StaffId, Value = staff != null? staff.StaffId.ToString():""},
                         new() { Key = AppClaimTypes.CustomerId, Value = customer != null? customer.CustomerId.ToString():""}
@@ -100,7 +105,7 @@ namespace BankingTool.Service
             var actionPaths = await _userRepository.GetActionsByUserId(user.UserId);
             var accessToken = tokenHandler.WriteToken(token);
 
-            response.Result = new()
+            response.Response = new()
             {
                 AccessToken = accessToken,
                 Claims = claims,
@@ -116,10 +121,7 @@ namespace BankingTool.Service
 
             var (user, role) = userId.HasValue ? await _userRepository.GetUserAndRoleByUserId(userId.Value) : (new Users(), new Role());
 
-            var roleDropdownList = await _roleRepository.GetRoleListDropDown();
-            var stateDropdownList = await _commonRepository.GetAllStateDropDownList();
-
-            response.Result = new UserInitialLoadDto
+            response.Response = new UserInitialLoadDto
             {
                 UserDetail = new UserDetailDto
                 {
@@ -131,33 +133,45 @@ namespace BankingTool.Service
                     City = user.City,
                     State = user.State,
                     RoleId = role.RoleId
-                },
-                RoleDropDown = roleDropdownList,
-                StateDropDown = stateDropdownList
+                }
             };
+            List<DropDownListDto> dropDownListDtos = new List<DropDownListDto>()
+            {
+                new DropDownListDto { Name = "Role", DropDown = await _roleRepository.GetRoleListDropDown() },
+                new DropDownListDto { Name = "Role", DropDown = await _commonRepository.GetAllStateDropDownList() }
+            };
+            response.DropDownList.AddRange(dropDownListDtos);
 
             response.Status = true;
             return response;
         }
-        public async Task<List<DropDownDto>> GetCityDropDownListByStateId(int stateId)
+        public async Task<ResponseDto<bool?>> GetCityDropDownListByStateId(int stateId)
         {
-            return await _userRepository.GetCityDropDownListByStateId(stateId);
+
+            var response = new ResponseDto<bool?>
+            {
+                Status = true,
+                DropDownList = new List<DropDownListDto>()
+                {
+                    new DropDownListDto { Name = "City", DropDown = await _userRepository.GetCityDropDownListByStateId(stateId) }
+                }
+            };
+            return response;
         }
-        public async Task<ResponseDto<int?>> InsertUser(SaveUserDto user)
+        public async Task<ResponseDto<int?>> InsertUser(SaveUserRequestObject user)
         {
             ResponseDto<int?> response = new()
             {
-                Status = false,
-                Message = []
+                Status = false
             };
             Users userDetail = new()
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                EmailId = user.Email,
-                Password = _encriptDecriptService.EncryptData(user.Password),
-                State = user.State,
-                City = user.City,
+                FirstName = user.SaveUserRequest.User.FirstName,
+                LastName = user.SaveUserRequest.User.LastName,
+                EmailId = user.SaveUserRequest.User.Email,
+                Password = _encriptDecriptService.EncryptData(user.SaveUserRequest.User.Password),
+                State = user.SaveUserRequest.State.StateId,
+                City = user.SaveUserRequest.City.CityId,
                 IsActive = true,
                 IsDeleted = false,
                 CreatedBy = "Admin",
@@ -166,10 +180,10 @@ namespace BankingTool.Service
 
             UserRole userRole = new()
             {
-                RoleId = user.Role
+                RoleId = user.SaveUserRequest.Role.RoleId
             };
 
-            var role = await _roleRepository.GetRoleByRoleId(user.Role);
+            var role = await _roleRepository.GetRoleByRoleId(user.SaveUserRequest.Role.RoleId);
             bool isCustomerNeedToInsert;
             Staff staff = null;
             Customer customer = null;
@@ -200,15 +214,15 @@ namespace BankingTool.Service
 
             if (userId.HasValue)
             {
-                response.Message.Add("User Created is successfully...");
+                response.Message = "User Created is successfully...";
                 response.Status = true;
-                response.Result = userId.Value;
+                response.Response = userId.Value;
             }
             else
             {
-                response.Message.Add("User Created is failed...");
+                response.Message = "User Created is failed...";
                 response.Status = false;
-                response.Result = null;
+                response.Response = null;
             }
 
             return response;
@@ -230,8 +244,7 @@ namespace BankingTool.Service
             }).ToList();
             return new ResponseDto<List<UserListDto>>
             {
-                Message = [],
-                Result = result,
+                Response = result,
                 Status = true
             };
         }

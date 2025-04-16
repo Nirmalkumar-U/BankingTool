@@ -14,22 +14,20 @@ namespace BankingTool.Service.Service
         {
             return new ResponseDto<CreateAccountInitialLoadDto>
             {
-                Result = new()
+                Response = new()
                 {
                     AccountTypeList = await _bankAccountRepository.GetAccountTypeDropDown(),
                     CustomerList = await _bankAccountRepository.GetAllActiveCustomerDropDown()
                 },
-                Status = true,
-                Message = []
+                Status = true
             };
         }
         public async Task<ResponseDto<List<DropDownDto>>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
         {
             return new ResponseDto<List<DropDownDto>>
             {
-                Result = await _bankAccountRepository.GetBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId),
-                Status = true,
-                Message = []
+                Response = await _bankAccountRepository.GetBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId),
+                Status = true
             };
         }
         public async Task<ResponseDto<bool>> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
@@ -37,18 +35,16 @@ namespace BankingTool.Service.Service
             bool isCustomerHasCreditCardInThatBank = await _bankAccountRepository.IsCustomerHasCreditCardInThatBank(customerId, bankId);
             return new ResponseDto<bool>
             {
-                Result = isCustomerHasCreditCardInThatBank,
-                Status = isCustomerHasCreditCardInThatBank,
-                Message = []
+                Response = isCustomerHasCreditCardInThatBank,
+                Status = isCustomerHasCreditCardInThatBank
             };
         }
         public async Task<ResponseDto<bool>> CreateAccount(CreateAccountDto model)
         {
             var response = new ResponseDto<bool>
             {
-                Result = false,
-                Status = false,
-                Message = []
+                Response = false,
+                Status = false
             };
             if (model == null)
             {
@@ -116,16 +112,16 @@ namespace BankingTool.Service.Service
             bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, debitCard, creditCard, cardScore, customer, model.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
             if (isAccountCreated)
             {
-                response.Result = true;
+                response.Response = true;
                 response.Status = true;
-                response.Message.Add("Account Created Successfully...");
+                response.Message = "Account Created Successfully...";
                 return response;
             }
             else
             {
-                response.Result = false;
+                response.Response = false;
                 response.Status = false;
-                response.Message.Add("Failed to create account...");
+                response.Message = "Failed to create account...";
                 return response;
             }
         }
@@ -134,8 +130,7 @@ namespace BankingTool.Service.Service
             var (accountId, name, bankName, accountType) = await _bankAccountRepository.GetAccountIdByBankIdAndAccountTypeAndCustomerId(bankId, accountTypeId, customerId);
             return new ResponseDto<GetTransactionsListDto>
             {
-                Message = [],
-                Result = new GetTransactionsListDto
+                Response = new GetTransactionsListDto
                 {
                     AccountInfo = await _bankAccountRepository.GetAccountInfo(accountId, accountType, name, bankName),
                     CardInfo = await _bankAccountRepository.GetCardInfoByAccountId(accountId, name, bankName),
@@ -148,8 +143,7 @@ namespace BankingTool.Service.Service
         {
             return new ResponseDto<List<DropDownDto>>
             {
-                Message = [],
-                Result = await _bankAccountRepository.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId),
+                Response = await _bankAccountRepository.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId),
                 Status = true
             };
         }
@@ -157,8 +151,7 @@ namespace BankingTool.Service.Service
         {
             return new ResponseDto<List<DropDownDto>>
             {
-                Message = [],
-                Result = await _bankAccountRepository.GetBankDropDownListByCustomerId(customerId),
+                Response = await _bankAccountRepository.GetBankDropDownListByCustomerId(customerId),
                 Status = true
             };
         }
@@ -166,8 +159,7 @@ namespace BankingTool.Service.Service
         {
             return new ResponseDto<TransferAmountInitialLoadDto>()
             {
-                Message = [],
-                Result = new TransferAmountInitialLoadDto
+                Response = new TransferAmountInitialLoadDto
                 {
                     FromAccount = await _bankAccountRepository.GetFromAccountListByCustomerId(customerId),
                     ToAccount = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId(customerId)
@@ -179,8 +171,7 @@ namespace BankingTool.Service.Service
         {
             return new ResponseDto<int>
             {
-                Message = [],
-                Result = await _bankAccountRepository.GetAccountBalance(accountId),
+                Response = await _bankAccountRepository.GetAccountBalance(accountId),
                 Status = true
             };
         }

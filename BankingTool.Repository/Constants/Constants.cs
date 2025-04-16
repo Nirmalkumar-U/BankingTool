@@ -43,4 +43,9 @@
         public const string StaffId = nameof(StaffId);
         public const string CustomerId = nameof(CustomerId);
     }
+    public static class ErrorMessage
+    {
+        public const string LoginFailed = "Login Failed.";
+        public const string ValidationFailed = "Validation Failed.";
+    }
 }

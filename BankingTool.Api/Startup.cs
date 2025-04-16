@@ -105,7 +105,7 @@ namespace BankingTool.Api
 
             app.UseCors("AllowAllOrigins");
 
-            app.UseMiddleware<GlobalExceptionMiddleware>();
+            //app.UseMiddleware<GlobalExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

@@ -1,12 +1,20 @@
-﻿using BankingTool.Model;
+﻿using BankingTool.Api.Validators;
+using BankingTool.Model;
+using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Dto.User;
 using BankingTool.Service;
+using BankingTool.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
-    public class UserController(IEncriptDecriptService encriptDecriptService, IUserService userService) : ControllerBase
+    [Route("api/[controller]/[action]")]
+
+    public class UserController(
+        IEncriptDecriptService encriptDecriptService,
+        IUserService userService,
+        IValidatorService validatorService) : HandleRequest(validatorService)
     {
         private readonly IEncriptDecriptService _encriptDecriptService = encriptDecriptService;
         private readonly IUserService _userService = userService;
@@ -23,41 +31,76 @@ namespace BankingTool.Api.Controllers
             var Result = _encriptDecriptService.DecryptData(word);
             return new OkObjectResult(Result);
         }
-        [HttpGet]
-        public async Task<IActionResult> Login(string email, string password)
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<LoggedInUserDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<LoggedInUserDto>), 400)]
+        public Task<IActionResult> Login(LoginRequestObject model)
         {
-            var Result = await _userService.Login(email, password);
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<LoginRequestObject, LoggedInUserDto>(
+                model,
+                Ruleset.LoginRequestRules,
+                () => _userService.Login(model.LoginRequest.User.Email, model.LoginRequest.User.Password)
+            );
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        public Task<IActionResult> CreateToken(CreateTokenRequestObject model)
+        {
+            return HandleRequestAsync<CreateTokenRequestObject, TokenDto>(
+                model,
+                Ruleset.CreateTokenRequestRules,
+                () => _userService.CreateToken(model.CreateTokenRequest.User, model.CreateTokenRequest.Role.RoleId)
+            );
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<UserInitialLoadDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<UserInitialLoadDto>), 400)]
+        public Task<IActionResult> GetUserInitialLoad(GetUserInitialLoadRequestObject model)
+        {
+            return HandleRequestAsync<GetUserInitialLoadRequestObject, UserInitialLoadDto>(
+                model,
+                Ruleset.CreateTokenRequestRules,
+                () => _userService.GetUserInitialLoad(model.GetUserInitialLoadRequest.User.UserId)
+            );
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        public Task<IActionResult> GetCityDropDownListByStateId(GetCityListRequestObject model)
+        {
+            return HandleRequestAsync<GetCityListRequestObject, bool?>(
+                model,
+                Ruleset.CreateTokenRequestRules,
+                () => _userService.GetCityDropDownListByStateId(model.GetCityListRequest.State.StateId)
+            );
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        public Task<IActionResult> SaveUser(SaveUserRequestObject model)
+        {
+            return HandleRequestAsync<SaveUserRequestObject, int?>(
+                model,
+                Ruleset.CreateTokenRequestRules,
+                () => _userService.InsertUser(model)
+            );
         }
         [HttpPost]
-        public async Task<IActionResult> CreateToken(LoggedInUserDto user)
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        public Task<IActionResult> GetUserList()
         {
-            var Result = await _userService.CreateToken(user);
-            return new OkObjectResult(Result);
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetUserInitialLoad(int? userId)
-        {
-            var Result = await _userService.GetUserInitialLoad(userId);
-            return new OkObjectResult(Result);
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetCityDropDownListByStateId(int stateId)
-        {
-            var Result = await _userService.GetCityDropDownListByStateId(stateId);
-            return new OkObjectResult(Result);
-        }
-        [HttpPost]
-        public async Task<IActionResult> SaveUser(SaveUserDto user)
-        {
-            var Result = await _userService.InsertUser(user);
-            return new OkObjectResult(Result);
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetUserList()
-        {
-            var Result = await _userService.GetUserList();
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<int?, List<UserListDto>>(
+                null,
+                Ruleset.CreateTokenRequestRules,
+                () => _userService.GetUserList()
+            );
         }
         [HttpGet]
         public async Task<IActionResult> Test(int userId)
