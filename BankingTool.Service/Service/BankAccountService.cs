@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.BankAccount;
+using BankingTool.Model.Dto.RequestDtos;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
@@ -22,11 +23,12 @@ namespace BankingTool.Service.Service
                 Status = true
             };
         }
-        public async Task<ResponseDto<List<DropDownDto>>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
+        public async Task<ResponseDto<bool>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
         {
-            return new ResponseDto<List<DropDownDto>>
+            return new ResponseDto<bool>
             {
-                Response = await _bankAccountRepository.GetBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId),
+                DropDownList = [new DropDownListDto { Name = "Bank", DropDown = await _bankAccountRepository.GetBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId) }],
+                Response = true,
                 Status = true
             };
         }
@@ -39,7 +41,7 @@ namespace BankingTool.Service.Service
                 Status = isCustomerHasCreditCardInThatBank
             };
         }
-        public async Task<ResponseDto<bool>> CreateAccount(CreateAccountDto model)
+        public async Task<ResponseDto<bool>> CreateAccount(CreateAccountRequest model)
         {
             var response = new ResponseDto<bool>
             {
@@ -55,10 +57,10 @@ namespace BankingTool.Service.Service
             {
                 AccountNumber = await GetNewAccountNumber(),
                 AccountStatus = AccountStatus.Active,
-                CustomerId = model.CustomerId,
-                AccountTypeId = model.AccountTypeId,
+                CustomerId = model.Customer.CustomerId,
+                AccountTypeId = model.Account.AccountTypeId,
                 Balance = Constants.AccountMininumBalanceForSavingsAccount,
-                BankId = model.BankId
+                BankId = model.Bank.BankId
             };
 
             Transaction transaction = new()
@@ -70,7 +72,7 @@ namespace BankingTool.Service.Service
                 StageBalance = Constants.AccountMininumBalanceForSavingsAccount
             };
 
-            var (customer, isUpdatePrimaryAccount) = await UpdatePrimaryAccountNumber(model.DoYouWantToChangeThisAccountToPrimaryAccount, account.AccountNumber, account.CustomerId);
+            var (customer, isUpdatePrimaryAccount) = await UpdatePrimaryAccountNumber(model.Account.DoYouWantToChangeThisAccountToPrimaryAccount, account.AccountNumber, account.CustomerId);
 
             Card debitCard = new()
             {
@@ -81,7 +83,7 @@ namespace BankingTool.Service.Service
                 CVV = await GetNewDebitCVVNumber(),
             };
             Card creditCard = null;
-            if (model.CustomerWantCreditCard)
+            if (model.Customer.CustomerWantCreditCard)
             {
                 creditCard = new()
                 {
@@ -103,13 +105,13 @@ namespace BankingTool.Service.Service
                 cardScore = new()
                 {
                     CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
-                    CustomerId = model.CustomerId,
+                    CustomerId = model.Customer.CustomerId,
                     Description = null,
                     Status = CreditScoreStatus.Active,
                 };
             }
 
-            bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, debitCard, creditCard, cardScore, customer, model.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
+            bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, debitCard, creditCard, cardScore, customer, model.Customer.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
             if (isAccountCreated)
             {
                 response.Response = true;

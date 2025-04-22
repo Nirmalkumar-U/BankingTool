@@ -1,5 +1,7 @@
-﻿using BankingTool.Model;
+﻿using BankingTool.Api.Validators;
+using BankingTool.Model;
 using BankingTool.Model.Dto.BankAccount;
+using BankingTool.Model.Dto.RequestDtos;
 using BankingTool.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,28 +9,47 @@ namespace BankingTool.Api.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
-    public class BankAccountController(IBankAccountService bankAccountService) : ControllerBase
+    public class BankAccountController(IBankAccountService bankAccountService,
+        IValidatorService validatorService) : HandleRequest(validatorService)
     {
         private readonly IBankAccountService _bankAccountService = bankAccountService;
 
-        [HttpGet]
-        public async Task<IActionResult> GetCreateAccountInitialLoad()
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<CreateAccountInitialLoadDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<CreateAccountInitialLoadDto>), 400)]
+        public Task<IActionResult> GetCreateAccountInitialLoad()
         {
-            var Result = await _bankAccountService.GetCreateAccountInitialLoad();
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<int?, CreateAccountInitialLoadDto>(
+                null,
+                null,
+                _bankAccountService.GetCreateAccountInitialLoad
+            );
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> CreateAccount(CreateAccountRequestObject model)
+        {
+            return HandleRequestAsync<CreateAccountRequest, bool>(
+                model.CreateAccountRequest,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.CreateAccount(model.CreateAccountRequest)
+            );
         }
         [HttpPost]
-        public async Task<IActionResult> CreateAccount(CreateAccountDto model)
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> GetBankDetailsWithoutCustomerAndAccountType(GetBankDetailWithoutCustomerAndAccountTypeRequestObject model)
         {
-            var Result = await _bankAccountService.CreateAccount(model);
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<GetBankDetailWithoutCustomerAndAccountTypeRequest, bool>(
+                model.GetBankDetailWithoutCustomerAndAccountTypeRequest,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(model.GetBankDetailWithoutCustomerAndAccountTypeRequest.Customer.CustomerId,
+                model.GetBankDetailWithoutCustomerAndAccountTypeRequest.Account.AccountTypeId)
+            );
         }
-        [HttpGet]
-        public async Task<IActionResult> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
-        {
-            var Result = await _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId);
-            return new OkObjectResult(Result);
-        }
+
         [HttpGet]
         public async Task<IActionResult> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
         {

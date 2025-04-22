@@ -11,9 +11,7 @@ namespace BankingTool.Api.Controllers
     [ApiController]
     [Route("api/[controller]/[action]")]
 
-    public class UserController(
-        IEncriptDecriptService encriptDecriptService,
-        IUserService userService,
+    public class UserController(IEncriptDecriptService encriptDecriptService, IUserService userService,
         IValidatorService validatorService) : HandleRequest(validatorService)
     {
         private readonly IEncriptDecriptService _encriptDecriptService = encriptDecriptService;
@@ -63,7 +61,7 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetUserInitialLoadRequestObject, UserInitialLoadDto>(
                 model,
-                Ruleset.CreateTokenRequestRules,
+                Ruleset.CreateTokenRequestRules,//todo
                 () => _userService.GetUserInitialLoad(model.GetUserInitialLoadRequest.User.UserId)
             );
         }
@@ -75,7 +73,7 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetCityListRequestObject, bool?>(
                 model,
-                Ruleset.CreateTokenRequestRules,
+                Ruleset.CreateTokenRequestRules,//todo
                 () => _userService.GetCityDropDownListByStateId(model.GetCityListRequest.State.StateId)
             );
         }
@@ -87,7 +85,7 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<SaveUserRequestObject, int?>(
                 model,
-                Ruleset.CreateTokenRequestRules,
+                Ruleset.CreateTokenRequestRules,//todo
                 () => _userService.InsertUser(model)
             );
         }
@@ -98,8 +96,8 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<int?, List<UserListDto>>(
                 null,
-                Ruleset.CreateTokenRequestRules,
-                () => _userService.GetUserList()
+                null,
+                _userService.GetUserList
             );
         }
         [HttpGet]
