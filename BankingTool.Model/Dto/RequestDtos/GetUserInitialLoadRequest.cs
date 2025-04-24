@@ -2,15 +2,17 @@
 {
     public class GetUserInitialLoadRequestObject
     {
-        public GetUserInitialLoadRequest GetUserInitialLoadRequest { get; set; }
+        public GetUserInitialLoadRequest Request { get; set; }
     }
     public class GetUserInitialLoadRequest
     {
         public GetUserInitialLoadRequestUser User { get; set; }
     }
-    public class GetUserInitialLoadRequestUser
+    public class GetUserInitialLoadRequestUser : RequestId
     {
-        public int? UserId { get; set; }
+        public GetUserInitialLoadRequestUser() : base(true)
+        {
+        }
     }
 
 }

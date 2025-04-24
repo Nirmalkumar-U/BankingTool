@@ -46,6 +46,7 @@
     public static class ErrorMessage
     {
         public const string LoginFailed = "Login Failed.";
+        public const string InternalServerError = "Internal Server Error.";
         public const string ValidationFailed = "Validation Failed.";
     }
 }

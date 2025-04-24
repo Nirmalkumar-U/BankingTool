@@ -8,7 +8,7 @@ namespace BankingTool.Api.Validators
             {
                 new ValidationRule()
                 {
-                    PropertyPath = "LoginRequest.User.Email",
+                    PropertyPath = "Request.User.Email",
                     StringRules = new StringRules
                     {
                         EmailFormat = true,
@@ -18,7 +18,7 @@ namespace BankingTool.Api.Validators
                 },
                 new ValidationRule()
                 {
-                    PropertyPath = "LoginRequest.User.Password",
+                    PropertyPath = "Request.User.Password",
                     StringRules = new StringRules
                     {
                         NotEmpty = true,
@@ -29,12 +29,12 @@ namespace BankingTool.Api.Validators
                 },
                 new ValidationRule()
                 {
-                    PropertyPath = "LoginRequest.User",
+                    PropertyPath = "Request.User",
                     Required = true,
                 },
                 new ValidationRule()
                 {
-                    PropertyPath = "LoginRequest",
+                    PropertyPath = "Request",
                     Required = true,
                 }
             };
@@ -42,27 +42,27 @@ namespace BankingTool.Api.Validators
         {
             new ValidationRule
             {
-                PropertyPath = "CreateTokenRequest",
+                PropertyPath = "Request",
                 Required = true,
             },
             new ValidationRule
             {
-                PropertyPath = "CreateTokenRequest.User",
+                PropertyPath = "Request.User",
                 Required = true,
             },
             new ValidationRule
             {
-                PropertyPath = "CreateTokenRequest.Role",
+                PropertyPath = "Request.Role",
                 Required = true,
             },
             new ValidationRule
             {
-                PropertyPath = "CreateTokenRequest.User.UserId",
+                PropertyPath = "Request.User.Id",
                 Required = true,
             },
             new ValidationRule
             {
-                PropertyPath = "CreateTokenRequest.User.FirstName",
+                PropertyPath = "Request.User.FirstName",
                 Required = true,
                 StringRules = new StringRules
                     {
@@ -72,7 +72,7 @@ namespace BankingTool.Api.Validators
             },
             new ValidationRule
             {
-                PropertyPath = "CreateTokenRequest.User.LastName",
+                PropertyPath = "Request.User.LastName",
                 Required = true,
                 StringRules = new StringRules
                     {
@@ -82,7 +82,7 @@ namespace BankingTool.Api.Validators
             },
             new ValidationRule()
             {
-                PropertyPath = "CreateTokenRequest.User.Email",
+                PropertyPath = "Request.User.Email",
                 Required = true,
                 StringRules = new StringRules
                 {
@@ -92,7 +92,38 @@ namespace BankingTool.Api.Validators
             },
             new ValidationRule
             {
-                PropertyPath = "CreateTokenRequest.Role.RoleId",
+                PropertyPath = "Request.Role.Id",
+                Required = true,
+            }
+        };
+        public static List<ValidationRule> GetUserInitialLoadRequestRules = new List<ValidationRule>()
+        {
+            new ValidationRule
+            {
+                PropertyPath = "Request",
+                Required = true,
+            },
+            new ValidationRule
+            {
+                PropertyPath = "Request.User",
+                Required = true,
+            }
+        };
+        public static List<ValidationRule> GetCityListRequestRules = new List<ValidationRule>()
+        {
+            new ValidationRule
+            {
+                PropertyPath = "Request",
+                Required = true,
+            },
+            new ValidationRule
+            {
+                PropertyPath = "Request.State",
+                Required = true,
+            },
+            new ValidationRule
+            {
+                PropertyPath = "Request.State.Id",
                 Required = true,
             }
         };

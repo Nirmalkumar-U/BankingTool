@@ -75,13 +75,13 @@ namespace BankingTool.Service
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var actions = await _userRepository.GetAllActionIdOfRole(roleId);
-            var customer = await _userRepository.GetCustomerByUserId(user.UserId);
-            Staff staff = await _userRepository.GetStaffByUserId(user.UserId);
+            var customer = await _userRepository.GetCustomerByUserId(user.Id.Value);
+            Staff staff = await _userRepository.GetStaffByUserId(user.Id.Value);
             var act = string.Join(",", actions);
 
             var claims = new List<ClaimDto>
                     {
-                        new() { Key = AppClaimTypes.UserId, Value = user.UserId.ToString()},
+                        new() { Key = AppClaimTypes.UserId, Value = user.Id.Value.ToString()},
                         new() { Key = AppClaimTypes.FirstName, Value = user.FirstName},
                         new() { Key = AppClaimTypes.LastName, Value = user.LastName },
                         new() { Key = AppClaimTypes.EmailId, Value = user.Email },
@@ -102,7 +102,7 @@ namespace BankingTool.Service
             tokenDescriptor.Expires = DateTime.Now.AddSeconds(expiresInSeconds);
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            var actionPaths = await _userRepository.GetActionsByUserId(user.UserId);
+            var actionPaths = await _userRepository.GetActionsByUserId(user.Id.Value);
             var accessToken = tokenHandler.WriteToken(token);
 
             response.Response = new()
@@ -145,16 +145,17 @@ namespace BankingTool.Service
             response.Status = true;
             return response;
         }
-        public async Task<ResponseDto<bool?>> GetCityDropDownListByStateId(int stateId)
+        public async Task<ResponseDto<bool>> GetCityDropDownListByStateId(int stateId)
         {
 
-            var response = new ResponseDto<bool?>
+            var response = new ResponseDto<bool>
             {
                 Status = true,
                 DropDownList = new List<DropDownListDto>()
                 {
                     new DropDownListDto { Name = "City", DropDown = await _userRepository.GetCityDropDownListByStateId(stateId) }
-                }
+                },
+                Response = true
             };
             return response;
         }

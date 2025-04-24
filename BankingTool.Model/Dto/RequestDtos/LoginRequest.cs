@@ -2,7 +2,7 @@
 {
     public class LoginRequestObject
     {
-        public LoginRequest LoginRequest { get; set; }
+        public LoginRequest Request { get; set; }
     }
     public class LoginRequest
     {

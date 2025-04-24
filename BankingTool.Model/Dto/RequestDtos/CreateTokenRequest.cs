@@ -2,22 +2,20 @@
 {
     public class CreateTokenRequestObject
     {
-        public CreateTokenRequest CreateTokenRequest { get; set; }
+        public CreateTokenRequest Request { get; set; }
     }
     public class CreateTokenRequest
     {
         public CreateTokenRequestUser User { get; set; }
         public CreateTokenRequestRole Role { get; set; }
     }
-    public class CreateTokenRequestUser
+    public class CreateTokenRequestUser : RequestId
     {
-        public int UserId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
     }
-    public class CreateTokenRequestRole
+    public class CreateTokenRequestRole : RequestId
     {
-        public int RoleId { get; set; }
     }
 }

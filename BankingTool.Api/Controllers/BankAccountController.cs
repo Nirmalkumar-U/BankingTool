@@ -31,10 +31,10 @@ namespace BankingTool.Api.Controllers
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> CreateAccount(CreateAccountRequestObject model)
         {
-            return HandleRequestAsync<CreateAccountRequest, bool>(
-                model.CreateAccountRequest,
+            return HandleRequestAsync<CreateAccountRequestObject, bool>(
+                model,
                 Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.CreateAccount(model.CreateAccountRequest)
+                () => _bankAccountService.CreateAccount(model.Request)
             );
         }
         [HttpPost]
@@ -42,49 +42,83 @@ namespace BankingTool.Api.Controllers
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetBankDetailsWithoutCustomerAndAccountType(GetBankDetailWithoutCustomerAndAccountTypeRequestObject model)
         {
-            return HandleRequestAsync<GetBankDetailWithoutCustomerAndAccountTypeRequest, bool>(
-                model.GetBankDetailWithoutCustomerAndAccountTypeRequest,
+            return HandleRequestAsync<GetBankDetailWithoutCustomerAndAccountTypeRequestObject, bool>(
+                model,
                 Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(model.GetBankDetailWithoutCustomerAndAccountTypeRequest.Customer.CustomerId,
-                model.GetBankDetailWithoutCustomerAndAccountTypeRequest.Account.AccountTypeId)
+                () => _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(model.Request.Customer.Id.Value,
+                model.Request.Account.AccountTypeId)
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> IsCustomerHasCreditCardInThatBank(IsCustomerHasCreditCardInThatBankRequestObject model)
+        {
+            return HandleRequestAsync<IsCustomerHasCreditCardInThatBankRequestObject, bool>(
+                model,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.IsCustomerHasCreditCardInThatBank(model.Request.Customer.Id.Value, model.Request.Bank.Id.Value)
             );
         }
 
-        [HttpGet]
-        public async Task<IActionResult> IsCustomerHasCreditCardInThatBank(int customerId, int bankId)
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListDto>), 400)]
+        public Task<IActionResult> TransactionsListForCustomer(TransactionsListForCustomerRequestObject model)
         {
-            var Result = await _bankAccountService.IsCustomerHasCreditCardInThatBank(customerId, bankId);
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<TransactionsListForCustomerRequestObject, GetTransactionsListDto>(
+                model,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id.Value, model.Request.Account.Id.Value, model.Request.Customer.Id.Value)
+            );
         }
-        [HttpGet]
-        public async Task<IActionResult> TransactionsListForCustomer(int bankId, int accountTypeId, int customerId)
+        
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> BankDropDownList(BankDropDownListRequestObject model)
         {
-            var Result = await _bankAccountService.TransactionsListForCustomer(bankId, accountTypeId, customerId);
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<BankDropDownListRequestObject, bool>(
+                model,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.BankDropDownList(model.Request.Customer.Id.Value)
+            );
         }
-        [HttpGet]
-        public async Task<IActionResult> BankDropDownList(int customerId)
+        
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> GetAccountTypeDropDownListByCustomerIdAndBankId(GetAccountTypeDropDownListRequestObject model)
         {
-            var Result = await _bankAccountService.BankDropDownList(customerId);
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<GetAccountTypeDropDownListRequestObject, bool>(
+                model,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(model.Request.Customer.Id.Value,model.Request.Bank.Id.Value)
+            );
         }
-        [HttpGet]
-        public async Task<IActionResult> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId)
+        
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<TransferAmountInitialLoadDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<TransferAmountInitialLoadDto>), 400)]
+        public Task<IActionResult> GetTransferAmountInitialLoad(GetTransferAmountInitialLoadRequestObject model)
         {
-            var Result = await _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId);
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<GetTransferAmountInitialLoadRequestObject, TransferAmountInitialLoadDto>(
+                model,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.GetTransferAmountInitialLoad(model.Request.Customer.Id.Value)
+            );
         }
-        [HttpGet]
-        public async Task<IActionResult> GetTransferAmountInitialLoad(int customerId)
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<int>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<int>), 400)]
+        public Task<IActionResult> GetAccountBalance(GetAccountBalanceRequestObject model)
         {
-            var Result = await _bankAccountService.GetTransferAmountInitialLoad(customerId);
-            return new OkObjectResult(Result);
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetAccountBalance(int accountId)
-        {
-            var Result = await _bankAccountService.GetAccountBalance(accountId);
-            return new OkObjectResult(Result);
+            return HandleRequestAsync<GetAccountBalanceRequestObject, int>(
+                model,
+                Ruleset.LoginRequestRules,//todo
+                () => _bankAccountService.GetAccountBalance(model.Request.Account.Id.Value)
+            );
         }
     }
 }

@@ -1,16 +1,15 @@
 ﻿namespace BankingTool.Model.Dto.RequestDtos;
 public class GetBankDetailWithoutCustomerAndAccountTypeRequestObject
 {
-    public GetBankDetailWithoutCustomerAndAccountTypeRequest GetBankDetailWithoutCustomerAndAccountTypeRequest { get; set; }
+    public GetBankDetailWithoutCustomerAndAccountTypeRequest Request { get; set; }
 }
 public class GetBankDetailWithoutCustomerAndAccountTypeRequest
 {
     public GetBankDetailWithoutCustomerAndAccountTypeRequestCustomer Customer { get; set; }
     public GetBankDetailWithoutCustomerAndAccountTypeRequestAccount Account { get; set; }
 }
-public class GetBankDetailWithoutCustomerAndAccountTypeRequestCustomer
+public class GetBankDetailWithoutCustomerAndAccountTypeRequestCustomer : RequestId
 {
-    public int CustomerId { get; set; }
 
 }
 public class GetBankDetailWithoutCustomerAndAccountTypeRequestAccount

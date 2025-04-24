@@ -37,8 +37,8 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<LoginRequestObject, LoggedInUserDto>(
                 model,
-                Ruleset.LoginRequestRules,
-                () => _userService.Login(model.LoginRequest.User.Email, model.LoginRequest.User.Password)
+                ValidationRules.LoginRequestRules,
+                () => _userService.Login(model.Request.User.Email, model.Request.User.Password)
             );
         }
 
@@ -49,8 +49,8 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<CreateTokenRequestObject, TokenDto>(
                 model,
-                Ruleset.CreateTokenRequestRules,
-                () => _userService.CreateToken(model.CreateTokenRequest.User, model.CreateTokenRequest.Role.RoleId)
+                ValidationRules.CreateTokenRequestRules,
+                () => _userService.CreateToken(model.Request.User, model.Request.Role.Id.Value)
             );
         }
 
@@ -61,20 +61,20 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetUserInitialLoadRequestObject, UserInitialLoadDto>(
                 model,
-                Ruleset.CreateTokenRequestRules,//todo
-                () => _userService.GetUserInitialLoad(model.GetUserInitialLoadRequest.User.UserId)
+                Ruleset.GetUserInitialLoadRequestRules,
+                () => _userService.GetUserInitialLoad(model.Request.User.Id)
             );
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetCityDropDownListByStateId(GetCityListRequestObject model)
         {
-            return HandleRequestAsync<GetCityListRequestObject, bool?>(
+            return HandleRequestAsync<GetCityListRequestObject, bool>(
                 model,
-                Ruleset.CreateTokenRequestRules,//todo
-                () => _userService.GetCityDropDownListByStateId(model.GetCityListRequest.State.StateId)
+                Ruleset.GetCityListRequestRules,
+                () => _userService.GetCityDropDownListByStateId(model.Request.State.Id.Value)
             );
         }
 

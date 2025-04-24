@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using BankingTool.Model;
+﻿using BankingTool.Model;
 using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Repository;
 using BankingTool.Service.IService;
@@ -46,7 +45,7 @@ namespace BankingTool.Api.Controllers
                 errors.Add(new Errors
                 {
                     ErrorMessage = ex.Message,
-                    PropertyName = "" //serviceMethod.Method.Name
+                    PropertyName = serviceMethod.Method.Name
                 });
             }
 
@@ -54,7 +53,7 @@ namespace BankingTool.Api.Controllers
 
             if (result.Errors.Count > 0)
             {
-                result.Message = ErrorMessage.LoginFailed;
+                result.Message = ErrorMessage.InternalServerError;
                 result.StatuCode = 400;
                 return BadRequest(result);
             }

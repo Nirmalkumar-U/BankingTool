@@ -57,10 +57,10 @@ namespace BankingTool.Service.Service
             {
                 AccountNumber = await GetNewAccountNumber(),
                 AccountStatus = AccountStatus.Active,
-                CustomerId = model.Customer.CustomerId,
+                CustomerId = model.Customer.Id.Value,
                 AccountTypeId = model.Account.AccountTypeId,
                 Balance = Constants.AccountMininumBalanceForSavingsAccount,
-                BankId = model.Bank.BankId
+                BankId = model.Bank.Id.Value
             };
 
             Transaction transaction = new()
@@ -105,7 +105,7 @@ namespace BankingTool.Service.Service
                 cardScore = new()
                 {
                     CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
-                    CustomerId = model.Customer.CustomerId,
+                    CustomerId = model.Customer.Id.Value,
                     Description = null,
                     Status = CreditScoreStatus.Active,
                 };
@@ -141,19 +141,21 @@ namespace BankingTool.Service.Service
                 Status = true
             };
         }
-        public async Task<ResponseDto<List<DropDownDto>>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId)
+        public async Task<ResponseDto<bool>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId)
         {
-            return new ResponseDto<List<DropDownDto>>
+            return new ResponseDto<bool>
             {
-                Response = await _bankAccountRepository.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId),
+                DropDownList = [new DropDownListDto { Name = "AccountType", DropDown = await _bankAccountRepository.GetAccountTypeDropDownListByCustomerIdAndBankId(customerId, bankId) }],
+                Response = true,
                 Status = true
             };
         }
-        public async Task<ResponseDto<List<DropDownDto>>> BankDropDownList(int customerId)
+        public async Task<ResponseDto<bool>> BankDropDownList(int customerId)
         {
-            return new ResponseDto<List<DropDownDto>>
+            return new ResponseDto<bool>
             {
-                Response = await _bankAccountRepository.GetBankDropDownListByCustomerId(customerId),
+                DropDownList = [new DropDownListDto { Name = "Bank", DropDown = await _bankAccountRepository.GetBankDropDownListByCustomerId(customerId) }],
+                Response = true,
                 Status = true
             };
         }

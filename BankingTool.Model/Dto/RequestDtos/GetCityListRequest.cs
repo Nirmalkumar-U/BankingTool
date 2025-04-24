@@ -2,14 +2,13 @@
 {
     public class GetCityListRequestObject
     {
-        public GetCityListRequest GetCityListRequest { get; set; }
+        public GetCityListRequest Request { get; set; }
     }
     public class GetCityListRequest
     {
         public GetCityListRequestState State { get; set; }
     }
-    public class GetCityListRequestState
+    public class GetCityListRequestState : RequestId
     {
-        public int StateId { get; set; }
     }
 }
