@@ -1,8 +1,10 @@
-﻿namespace BankingTool.Model
+﻿using BankingTool.Model.Dto.RequestDtos;
+
+namespace BankingTool.Model
 {
     public class SaveUserRequestObject
     {
-        public SaveUserRequest SaveUserRequest { get; set; }
+        public SaveUserRequest Request { get; set; }
     }
     public class SaveUserRequest
     {
@@ -18,16 +20,13 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
-    public class SaveUserRequestState
+    public class SaveUserRequestState : RequestId
     {
-        public int StateId { get; set; }
     }
-    public class SaveUserRequestCity
+    public class SaveUserRequestCity : RequestId
     {
-        public int CityId { get; set; }
     }
-    public class SaveUserRequestRole
+    public class SaveUserRequestRole : RequestId
     {
-        public int RoleId { get; set; }
     }
 }

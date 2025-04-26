@@ -19,9 +19,9 @@ namespace BankingTool.Api.Controllers
             ResponseDto<TResponse> result = new()
             {
                 Status = false,
-                Errors = null,
-                ValidationErrors = null,
-                DropDownList = null
+                Errors = [],
+                ValidationErrors = [],
+                DropDownList = []
             };
             if (model is not null && ruleSet?.Any() == true)
             {
@@ -49,18 +49,50 @@ namespace BankingTool.Api.Controllers
                 });
             }
 
-            result.Errors = [.. (errors ?? []), .. (result.Errors ?? [])];
 
             if (result.Errors.Count > 0)
             {
-                result.Message = ErrorMessage.InternalServerError;
+                result.Errors = [.. (errors ?? []), .. (result.Errors ?? [])];
+                result.Message = ErrorMessage.BadRequest;
                 result.StatuCode = 400;
                 return BadRequest(result);
             }
+            result.Errors = [.. (errors ?? []), .. (result.Errors ?? [])];
 
-            result.StatuCode = 200;
-            return Ok(result);
+            if (result.StatuCode == 500 || errors.Any())
+            {
+                result.Message = ErrorMessage.InternalServerError;
+                return StatusCode(500, result);
+            }
+            else if (result.StatuCode == 404)
+            {
+                result.Message = ErrorMessage.NotFound;
+                return NotFound(result);
+            }
+            else if (result.StatuCode == 200)
+            {
+                result.Message = ErrorMessage.Sucess;
+                return Ok(result);
+            }
+            else if (result.StatuCode == 201)
+            {
+                result.Message = ErrorMessage.Created;
+                return CreatedAtAction(serviceMethod.Method.Name, result);
+            }
+            else if (result.StatuCode == 204)
+            {
+                return NoContent();
+            }
+            else if (result.StatuCode == 207)
+            {
+                result.Message = ErrorMessage.MultiStatus;
+                return StatusCode(207, result); ;
+            }
+            else
+            {
+                result.Message = ErrorMessage.Sucess;
+                return Ok(result);
+            }
         }
-
     }
 }

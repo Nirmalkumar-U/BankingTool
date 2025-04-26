@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using BankingTool.Model.Dto.BaseDto;
 
-namespace BankingTool.Api.Validators
+namespace BankingTool.Service.Validator
 {
     public static class CustomValidators
     {

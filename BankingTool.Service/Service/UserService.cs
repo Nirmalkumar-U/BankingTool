@@ -24,6 +24,7 @@ namespace BankingTool.Service
         {
             var response = new ResponseDto<LoggedInUserDto>
             {
+                StatuCode = 200,
                 Status = false,
                 Errors = null
             };
@@ -58,6 +59,7 @@ namespace BankingTool.Service
             }
             if (errors.Count != 0)
             {
+                response.StatuCode = 400;
                 response.Status = false;
                 response.Errors = [.. errors];
             }
@@ -75,13 +77,13 @@ namespace BankingTool.Service
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var actions = await _userRepository.GetAllActionIdOfRole(roleId);
-            var customer = await _userRepository.GetCustomerByUserId(user.Id.Value);
-            Staff staff = await _userRepository.GetStaffByUserId(user.Id.Value);
+            var customer = await _userRepository.GetCustomerByUserId(user.Id);
+            Staff staff = await _userRepository.GetStaffByUserId(user.Id);
             var act = string.Join(",", actions);
 
             var claims = new List<ClaimDto>
                     {
-                        new() { Key = AppClaimTypes.UserId, Value = user.Id.Value.ToString()},
+                        new() { Key = AppClaimTypes.UserId, Value = user.Id.ToString()},
                         new() { Key = AppClaimTypes.FirstName, Value = user.FirstName},
                         new() { Key = AppClaimTypes.LastName, Value = user.LastName },
                         new() { Key = AppClaimTypes.EmailId, Value = user.Email },
@@ -102,7 +104,7 @@ namespace BankingTool.Service
             tokenDescriptor.Expires = DateTime.Now.AddSeconds(expiresInSeconds);
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            var actionPaths = await _userRepository.GetActionsByUserId(user.Id.Value);
+            var actionPaths = await _userRepository.GetActionsByUserId(user.Id);
             var accessToken = tokenHandler.WriteToken(token);
 
             response.Response = new()
@@ -112,6 +114,7 @@ namespace BankingTool.Service
                 ExpireIn = expiresInSeconds.ToString(),
                 ActionPaths = actionPaths
             };
+            response.StatuCode = 200;
             response.Status = true;
             return response;
         }
@@ -142,6 +145,7 @@ namespace BankingTool.Service
             };
             response.DropDownList.AddRange(dropDownListDtos);
 
+            response.StatuCode = 200;
             response.Status = true;
             return response;
         }
@@ -150,6 +154,7 @@ namespace BankingTool.Service
 
             var response = new ResponseDto<bool>
             {
+                StatuCode = 200,
                 Status = true,
                 DropDownList = new List<DropDownListDto>()
                 {
@@ -167,12 +172,12 @@ namespace BankingTool.Service
             };
             Users userDetail = new()
             {
-                FirstName = user.SaveUserRequest.User.FirstName,
-                LastName = user.SaveUserRequest.User.LastName,
-                EmailId = user.SaveUserRequest.User.Email,
-                Password = _encriptDecriptService.EncryptData(user.SaveUserRequest.User.Password),
-                State = user.SaveUserRequest.State.StateId,
-                City = user.SaveUserRequest.City.CityId,
+                FirstName = user.Request.User.FirstName,
+                LastName = user.Request.User.LastName,
+                EmailId = user.Request.User.Email,
+                Password = _encriptDecriptService.EncryptData(user.Request.User.Password),
+                State = user.Request.State.Id,
+                City = user.Request.City.Id,
                 IsActive = true,
                 IsDeleted = false,
                 CreatedBy = "Admin",
@@ -181,10 +186,10 @@ namespace BankingTool.Service
 
             UserRole userRole = new()
             {
-                RoleId = user.SaveUserRequest.Role.RoleId
+                RoleId = user.Request.Role.Id
             };
 
-            var role = await _roleRepository.GetRoleByRoleId(user.SaveUserRequest.Role.RoleId);
+            var role = await _roleRepository.GetRoleByRoleId(user.Request.Role.Id);
             bool isCustomerNeedToInsert;
             Staff staff = null;
             Customer customer = null;
@@ -216,11 +221,13 @@ namespace BankingTool.Service
             if (userId.HasValue)
             {
                 response.Message = "User Created is successfully...";
+                response.StatuCode = 200;
                 response.Status = true;
                 response.Response = userId.Value;
             }
             else
             {
+                response.StatuCode = 400;
                 response.Message = "User Created is failed...";
                 response.Status = false;
                 response.Response = null;
@@ -245,6 +252,7 @@ namespace BankingTool.Service
             }).ToList();
             return new ResponseDto<List<UserListDto>>
             {
+                StatuCode = 200,
                 Response = result,
                 Status = true
             };

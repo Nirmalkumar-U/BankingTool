@@ -1,6 +1,6 @@
-﻿using BankingTool.Api.Validators;
-using BankingTool.Model.Dto.BaseDto;
+﻿using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Service.IService;
+using BankingTool.Service.Validator;
 
 namespace BankingTool.Service.Service
 {

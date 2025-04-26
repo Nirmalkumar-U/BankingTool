@@ -4,9 +4,9 @@ namespace BankingTool.Model
 {
     public class ResponseDto<T>
     {
-        public List<DropDownListDto> DropDownList { get; set; }
-        public List<Errors> Errors { get; set; }
-        public List<ValidationResults> ValidationErrors { get; set; }
+        public List<DropDownListDto> DropDownList { get; set; } = [];
+        public List<Errors> Errors { get; set; } = [];
+        public List<ValidationResults> ValidationErrors { get; set; } = [];
         public T Response { get; set; }
         public bool Status { get; set; }
         public int StatuCode { get; set; }

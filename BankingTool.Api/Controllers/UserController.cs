@@ -50,7 +50,7 @@ namespace BankingTool.Api.Controllers
             return HandleRequestAsync<CreateTokenRequestObject, TokenDto>(
                 model,
                 ValidationRules.CreateTokenRequestRules,
-                () => _userService.CreateToken(model.Request.User, model.Request.Role.Id.Value)
+                () => _userService.CreateToken(model.Request.User, model.Request.Role.Id)
             );
         }
 
@@ -61,7 +61,7 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetUserInitialLoadRequestObject, UserInitialLoadDto>(
                 model,
-                Ruleset.GetUserInitialLoadRequestRules,
+                ValidationRules.GetUserInitialLoadRequestRules,
                 () => _userService.GetUserInitialLoad(model.Request.User.Id)
             );
         }
@@ -73,8 +73,8 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetCityListRequestObject, bool>(
                 model,
-                Ruleset.GetCityListRequestRules,
-                () => _userService.GetCityDropDownListByStateId(model.Request.State.Id.Value)
+                ValidationRules.GetCityListRequestRules,
+                () => _userService.GetCityDropDownListByStateId(model.Request.State.Id)
             );
         }
 
@@ -85,7 +85,7 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<SaveUserRequestObject, int?>(
                 model,
-                Ruleset.CreateTokenRequestRules,//todo
+                ValidationRules.SaveUserRequestRules,
                 () => _userService.InsertUser(model)
             );
         }

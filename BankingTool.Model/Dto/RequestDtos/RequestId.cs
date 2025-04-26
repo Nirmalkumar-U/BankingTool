@@ -1,21 +1,11 @@
 ﻿namespace BankingTool.Model.Dto.RequestDtos
 {
-    public class RequestId(bool allowNull = false)
+    public class RequestId
     {
-        private int? _id;
-        private bool _allowNull = allowNull;
-
-        public int? Id
-        {
-            get => _id;
-            set
-            {
-                if (!_allowNull && value == null)
-                {
-                    throw new InvalidOperationException("Id cannot be null.");
-                }
-                _id = value;
-            }
-        }
+        public int Id { get; set; }
+    }
+    public class RequestNullableId
+    {
+        public int? Id { get; set; }
     }
 }

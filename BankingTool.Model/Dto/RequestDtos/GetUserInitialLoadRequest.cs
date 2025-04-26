@@ -8,11 +8,8 @@
     {
         public GetUserInitialLoadRequestUser User { get; set; }
     }
-    public class GetUserInitialLoadRequestUser : RequestId
+    public class GetUserInitialLoadRequestUser : RequestNullableId
     {
-        public GetUserInitialLoadRequestUser() : base(true)
-        {
-        }
     }
 
 }

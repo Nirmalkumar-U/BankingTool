@@ -47,6 +47,11 @@
     {
         public const string LoginFailed = "Login Failed.";
         public const string InternalServerError = "Internal Server Error.";
+        public const string BadRequest = "Bad Request.";
+        public const string Sucess = "Sucess.";
+        public const string Created = "Created.";
+        public const string MultiStatus = "Multi Status.";
+        public const string NotFound = "Not Found.";
         public const string ValidationFailed = "Validation Failed.";
     }
 }

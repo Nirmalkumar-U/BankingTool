@@ -15,11 +15,11 @@ namespace BankingTool.Api.Controllers
         private readonly IBankAccountService _bankAccountService = bankAccountService;
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<CreateAccountInitialLoadDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<CreateAccountInitialLoadDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetCreateAccountInitialLoad()
         {
-            return HandleRequestAsync<int?, CreateAccountInitialLoadDto>(
+            return HandleRequestAsync<int?, bool>(
                 null,
                 null,
                 _bankAccountService.GetCreateAccountInitialLoad
@@ -33,7 +33,7 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<CreateAccountRequestObject, bool>(
                 model,
-                Ruleset.LoginRequestRules,//todo
+                ValidationRules.CreateAccountRequestRules,
                 () => _bankAccountService.CreateAccount(model.Request)
             );
         }
@@ -44,8 +44,8 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetBankDetailWithoutCustomerAndAccountTypeRequestObject, bool>(
                 model,
-                Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(model.Request.Customer.Id.Value,
+                ValidationRules.GetBankDetailWithoutCustomerAndAccountTypeRequestRules,
+                () => _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(model.Request.Customer.Id,
                 model.Request.Account.AccountTypeId)
             );
         }
@@ -56,8 +56,8 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<IsCustomerHasCreditCardInThatBankRequestObject, bool>(
                 model,
-                Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.IsCustomerHasCreditCardInThatBank(model.Request.Customer.Id.Value, model.Request.Bank.Id.Value)
+                ValidationRules.IsCustomerHasCreditCardInThatBankRequestRules,
+                () => _bankAccountService.IsCustomerHasCreditCardInThatBank(model.Request.Customer.Id, model.Request.Bank.Id)
             );
         }
 
@@ -68,11 +68,11 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<TransactionsListForCustomerRequestObject, GetTransactionsListDto>(
                 model,
-                Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id.Value, model.Request.Account.Id.Value, model.Request.Customer.Id.Value)
+                ValidationRules.TransactionsListForCustomerRequestRules,
+                () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id, model.Request.Account.Id, model.Request.Customer.Id)
             );
         }
-        
+
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
@@ -80,11 +80,11 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<BankDropDownListRequestObject, bool>(
                 model,
-                Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.BankDropDownList(model.Request.Customer.Id.Value)
+                ValidationRules.BankDropDownListRequestRules,
+                () => _bankAccountService.BankDropDownList(model.Request.Customer.Id)
             );
         }
-        
+
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
@@ -92,20 +92,20 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetAccountTypeDropDownListRequestObject, bool>(
                 model,
-                Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(model.Request.Customer.Id.Value,model.Request.Bank.Id.Value)
+                ValidationRules.GetAccountTypeDropDownListRequestRules,
+                () => _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(model.Request.Customer.Id, model.Request.Bank.Id)
             );
         }
-        
+
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<TransferAmountInitialLoadDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<TransferAmountInitialLoadDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetTransferAmountInitialLoad(GetTransferAmountInitialLoadRequestObject model)
         {
-            return HandleRequestAsync<GetTransferAmountInitialLoadRequestObject, TransferAmountInitialLoadDto>(
+            return HandleRequestAsync<GetTransferAmountInitialLoadRequestObject, bool>(
                 model,
-                Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.GetTransferAmountInitialLoad(model.Request.Customer.Id.Value)
+                ValidationRules.GetTransferAmountInitialLoadRequestRules,
+                () => _bankAccountService.GetTransferAmountInitialLoad(model.Request.Customer.Id)
             );
         }
 
@@ -116,8 +116,8 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetAccountBalanceRequestObject, int>(
                 model,
-                Ruleset.LoginRequestRules,//todo
-                () => _bankAccountService.GetAccountBalance(model.Request.Account.Id.Value)
+                ValidationRules.LoginRequestRules,//todo
+                () => _bankAccountService.GetAccountBalance(model.Request.Account.Id)
             );
         }
     }
