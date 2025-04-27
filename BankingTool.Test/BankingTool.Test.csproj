@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,6 +8,12 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="UserTest\**" />
+    <EmbeddedResource Remove="UserTest\**" />
+    <None Remove="UserTest\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
@@ -22,7 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UserTest\" />
+    <Folder Include="Controller\" />
+    <Folder Include="Repository\" />
+    <Folder Include="Service\" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 ﻿using BankingTool.Api.Validators;
 using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDtos;
-using BankingTool.Model.Dto.User;
+using BankingTool.Model.Dto.Response;
 using BankingTool.Service;
 using BankingTool.Service.IService;
 using Microsoft.AspNetCore.Mvc;
@@ -31,11 +31,11 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<LoggedInUserDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<LoggedInUserDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<LoggedInUserResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<LoggedInUserResponse>), 400)]
         public Task<IActionResult> Login(LoginRequestObject model)
         {
-            return HandleRequestAsync<LoginRequestObject, LoggedInUserDto>(
+            return HandleRequestAsync<LoginRequestObject, LoggedInUserResponse>(
                 model,
                 ValidationRules.LoginRequestRules,
                 () => _userService.Login(model.Request.User.Email, model.Request.User.Password)
@@ -43,11 +43,11 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<TokenResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<TokenResponse>), 400)]
         public Task<IActionResult> CreateToken(CreateTokenRequestObject model)
         {
-            return HandleRequestAsync<CreateTokenRequestObject, TokenDto>(
+            return HandleRequestAsync<CreateTokenRequestObject, TokenResponse>(
                 model,
                 ValidationRules.CreateTokenRequestRules,
                 () => _userService.CreateToken(model.Request.User, model.Request.Role.Id)
@@ -55,11 +55,11 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<UserInitialLoadDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<UserInitialLoadDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<UserInitialLoadResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<UserInitialLoadResponse>), 400)]
         public Task<IActionResult> GetUserInitialLoad(GetUserInitialLoadRequestObject model)
         {
-            return HandleRequestAsync<GetUserInitialLoadRequestObject, UserInitialLoadDto>(
+            return HandleRequestAsync<GetUserInitialLoadRequestObject, UserInitialLoadResponse>(
                 model,
                 ValidationRules.GetUserInitialLoadRequestRules,
                 () => _userService.GetUserInitialLoad(model.Request.User.Id)
@@ -79,8 +79,8 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<int?>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<int?>), 400)]
         public Task<IActionResult> SaveUser(SaveUserRequestObject model)
         {
             return HandleRequestAsync<SaveUserRequestObject, int?>(
@@ -90,11 +90,11 @@ namespace BankingTool.Api.Controllers
             );
         }
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<TokenDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 400)]
         public Task<IActionResult> GetUserList()
         {
-            return HandleRequestAsync<int?, List<UserListDto>>(
+            return HandleRequestAsync<int?, List<UserListResponse>>(
                 null,
                 null,
                 _userService.GetUserList

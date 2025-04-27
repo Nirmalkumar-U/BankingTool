@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDtos;
-using BankingTool.Model.Dto.User;
+using BankingTool.Model.Dto.Response;
 using BankingTool.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -20,9 +20,9 @@ namespace BankingTool.Service
         private readonly ICommonRepository _commonRepository = commonRepository;
         private readonly IConfiguration _configuration = configuration;
 
-        public async Task<ResponseDto<LoggedInUserDto>> Login(string email, string password)
+        public async Task<ResponseDto<LoggedInUserResponse>> Login(string email, string password)
         {
-            var response = new ResponseDto<LoggedInUserDto>
+            var response = new ResponseDto<LoggedInUserResponse>
             {
                 StatuCode = 200,
                 Status = false,
@@ -42,7 +42,7 @@ namespace BankingTool.Service
                 {
                     response.Status = true;
                     response.Message = "Login Successfully...";
-                    var loggedUser = new LoggedInUserDto()
+                    var loggedUser = new LoggedInUserResponse()
                     {
                         UserId = user.UserId,
                         Email = email,
@@ -65,9 +65,9 @@ namespace BankingTool.Service
             }
             return response;
         }
-        public async Task<ResponseDto<TokenDto>> CreateToken(CreateTokenRequestUser user, int roleId)
+        public async Task<ResponseDto<TokenResponse>> CreateToken(CreateTokenRequestUser user, int roleId)
         {
-            var response = new ResponseDto<TokenDto> { Status = false };
+            var response = new ResponseDto<TokenResponse> { Status = false };
 
             var securityKey = _configuration["AppSettings:SecurityKey"];
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(securityKey));
@@ -118,15 +118,15 @@ namespace BankingTool.Service
             response.Status = true;
             return response;
         }
-        public async Task<ResponseDto<UserInitialLoadDto>> GetUserInitialLoad(int? userId)
+        public async Task<ResponseDto<UserInitialLoadResponse>> GetUserInitialLoad(int? userId)
         {
-            var response = new ResponseDto<UserInitialLoadDto> { Status = false };
+            var response = new ResponseDto<UserInitialLoadResponse> { Status = false };
 
             var (user, role) = userId.HasValue ? await _userRepository.GetUserAndRoleByUserId(userId.Value) : (new Users(), new Role());
 
-            response.Response = new UserInitialLoadDto
+            response.Response = new UserInitialLoadResponse
             {
-                UserDetail = new UserDetailDto
+                UserDetail = new UserDetailResponse
                 {
                     UserId = user.UserId,
                     FirstName = user.FirstName,
@@ -235,10 +235,10 @@ namespace BankingTool.Service
 
             return response;
         }
-        public async Task<ResponseDto<List<UserListDto>>> GetUserList()
+        public async Task<ResponseDto<List<UserListResponse>>> GetUserList()
         {
             var userList = await _userRepository.GetUserList();
-            var result = userList.Select(x => new UserListDto
+            var result = userList.Select(x => new UserListResponse
             {
                 UserId = x.UserId,
                 UserName = x.UserName,
@@ -250,7 +250,7 @@ namespace BankingTool.Service
                 State = x.State,
                 City = x.City
             }).ToList();
-            return new ResponseDto<List<UserListDto>>
+            return new ResponseDto<List<UserListResponse>>
             {
                 StatuCode = 200,
                 Response = result,

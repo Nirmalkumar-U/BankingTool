@@ -1,16 +1,16 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDtos;
-using BankingTool.Model.Dto.User;
+using BankingTool.Model.Dto.Response;
 
 namespace BankingTool.Service
 {
     public interface IUserService
     {
-        Task<ResponseDto<LoggedInUserDto>> Login(string email, string password);
-        Task<ResponseDto<TokenDto>> CreateToken(CreateTokenRequestUser user, int roleId);
-        Task<ResponseDto<UserInitialLoadDto>> GetUserInitialLoad(int? userId);
+        Task<ResponseDto<LoggedInUserResponse>> Login(string email, string password);
+        Task<ResponseDto<TokenResponse>> CreateToken(CreateTokenRequestUser user, int roleId);
+        Task<ResponseDto<UserInitialLoadResponse>> GetUserInitialLoad(int? userId);
         Task<ResponseDto<bool>> GetCityDropDownListByStateId(int stateId);
-        Task<ResponseDto<List<UserListDto>>> GetUserList();
+        Task<ResponseDto<List<UserListResponse>>> GetUserList();
         Task<ResponseDto<int?>> InsertUser(SaveUserRequestObject user);
         Task<List<GetActionsByUserIdDto>> Test(int id);
     }

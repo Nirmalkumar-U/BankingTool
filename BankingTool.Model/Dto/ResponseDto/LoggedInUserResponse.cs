@@ -1,6 +1,6 @@
-﻿namespace BankingTool.Model
+﻿namespace BankingTool.Model.Dto.Response
 {
-    public class LoggedInUserDto
+    public class LoggedInUserResponse
     {
         public int UserId { get; set; }
         public string FirstName { get; set; }

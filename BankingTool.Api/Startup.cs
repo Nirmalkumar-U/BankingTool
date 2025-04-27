@@ -1,10 +1,11 @@
-﻿using System.Text;
+﻿using System.IO.Compression;
+using System.Text;
 using Autofac;
 using BankingTool.Api.CustomeDI;
-using BankingTool.Api.Middleware;
 using BankingTool.Model;
 using BankingTool.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -59,16 +60,16 @@ namespace BankingTool.Api
                 options.AllowEmptyInputInBodyModelBinding = true;
             });
 
-            //services.Configure<GzipCompressionProviderOptions>(options =>
-            //{
-            //    options.Level = CompressionLevel.Optimal;
-            //});
+            services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
 
-            //services.AddResponseCompression(options =>
-            //{
-            //    options.EnableForHttps = true;
-            //    options.Providers.Add<GzipCompressionProvider>();
-            //});
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<GzipCompressionProvider>();
+            });
 
             // Configure JWT authentication
             var securityKey = Configuration["AppSettings:SecurityKey"];
@@ -100,7 +101,7 @@ namespace BankingTool.Api
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c => c.DefaultModelsExpandDepth(-1));
             }
 
             app.UseCors("AllowAllOrigins");

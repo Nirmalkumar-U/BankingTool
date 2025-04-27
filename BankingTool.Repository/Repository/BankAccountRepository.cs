@@ -1,5 +1,5 @@
 ﻿using BankingTool.Model;
-using BankingTool.Model.Dto.BankAccount;
+using BankingTool.Model.Dto.Response;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -74,9 +74,9 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.Customer.FirstOrDefaultAsync(x => x.CustomerId == customerId);
         }
-        public async Task<List<TransactionsListDto>> GetTransactionByAccountId(int accountId)
+        public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId)
         {
-            return await dataContext.Transaction.Where(x => x.AccountId == accountId).Select(z => new TransactionsListDto
+            return await dataContext.Transaction.Where(x => x.AccountId == accountId).Select(z => new GetTransactionsListResponseTransactionList
             {
                 Amount = z.Amount,
                 StageBalance = z.StageBalance,
@@ -86,9 +86,9 @@ namespace BankingTool.Repository.Repository
                 TransactionId = z.TransactionId
             }).ToListAsync();
         }
-        public async Task<TransactionsListAccountInfoDto> GetAccountInfo(int accountId, string accountType, string name, string bankName)
+        public async Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName)
         {
-            return await dataContext.Account.Where(x => x.AccountId == accountId).Select(z => new TransactionsListAccountInfoDto
+            return await dataContext.Account.Where(x => x.AccountId == accountId).Select(z => new GetTransactionsListResponseAccountInfo
             {
                 AccountHolderName = name,
                 AccountNumber = z.AccountNumber,
@@ -97,9 +97,9 @@ namespace BankingTool.Repository.Repository
                 BankName = bankName
             }).FirstOrDefaultAsync();
         }
-        public async Task<List<TransactionsListCardInfoDto>> GetCardInfoByAccountId(int accountId, string name, string bankName)
+        public async Task<List<GetTransactionsListResponseCardInfo>> GetCardInfoByAccountId(int accountId, string name, string bankName)
         {
-            return await dataContext.Card.Where(x => x.AccountId == accountId).Select(z => new TransactionsListCardInfoDto
+            return await dataContext.Card.Where(x => x.AccountId == accountId).Select(z => new GetTransactionsListResponseCardInfo
             {
                 BankName = bankName,
                 BalanceLimit = z.CardType == CardType.CreditCard ? z.CardLimit : null,

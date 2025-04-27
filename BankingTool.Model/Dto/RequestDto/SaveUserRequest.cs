@@ -1,6 +1,4 @@
-﻿using BankingTool.Model.Dto.RequestDtos;
-
-namespace BankingTool.Model
+﻿namespace BankingTool.Model.Dto.RequestDtos
 {
     public class SaveUserRequestObject
     {

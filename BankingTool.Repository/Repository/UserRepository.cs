@@ -1,5 +1,5 @@
 ﻿using BankingTool.Model;
-using BankingTool.Model.Dto.User;
+using BankingTool.Model.Dto.Response;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankingTool.Repository
@@ -74,7 +74,7 @@ namespace BankingTool.Repository
 
             return actions;
         }
-        public async Task<List<UserListDto>> GetUserList()
+        public async Task<List<UserListResponse>> GetUserList()
         {
             return await (from u in dataContext.Users.AsNoTracking()
                           join ur in dataContext.UserRole.AsNoTracking() on u.UserId equals ur.UserId
@@ -83,7 +83,7 @@ namespace BankingTool.Repository
                           join s in dataContext.State on u.State equals s.StateId
                           join ci in dataContext.City on u.City equals ci.CityId
                           where u.IsDeleted == false
-                          select new UserListDto
+                          select new UserListResponse
                           {
                               UserId = u.UserId,
                               UserName = u.FirstName + " " + u.LastName,

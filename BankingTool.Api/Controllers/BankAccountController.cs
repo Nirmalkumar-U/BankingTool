@@ -1,7 +1,7 @@
 ﻿using BankingTool.Api.Validators;
 using BankingTool.Model;
-using BankingTool.Model.Dto.BankAccount;
 using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Dto.Response;
 using BankingTool.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,11 +62,11 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListDto>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 400)]
         public Task<IActionResult> TransactionsListForCustomer(TransactionsListForCustomerRequestObject model)
         {
-            return HandleRequestAsync<TransactionsListForCustomerRequestObject, GetTransactionsListDto>(
+            return HandleRequestAsync<TransactionsListForCustomerRequestObject, GetTransactionsListResponse>(
                 model,
                 ValidationRules.TransactionsListForCustomerRequestRules,
                 () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id, model.Request.Account.Id, model.Request.Customer.Id)

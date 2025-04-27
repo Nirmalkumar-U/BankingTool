@@ -1,5 +1,5 @@
 ﻿using BankingTool.Model;
-using BankingTool.Model.Dto.BankAccount;
+using BankingTool.Model.Dto.Response;
 
 namespace BankingTool.Repository.IRepository
 {
@@ -14,9 +14,9 @@ namespace BankingTool.Repository.IRepository
         Task<Customer> GetCustomerByCustomerId(int customerId);
         Task<List<DropDownDto>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId);
         Task<bool> IsCustomerHasCreditCardInThatBank(int customerId, int bankId);
-        Task<List<TransactionsListDto>> GetTransactionByAccountId(int accountId);
-        Task<TransactionsListAccountInfoDto> GetAccountInfo(int accountId, string accountType, string name, string bankName);
-        Task<List<TransactionsListCardInfoDto>> GetCardInfoByAccountId(int accountId, string name, string bankName);
+        Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId);
+        Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName);
+        Task<List<GetTransactionsListResponseCardInfo>> GetCardInfoByAccountId(int accountId, string name, string bankName);
         Task<(int, string, string, string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId);
         Task<List<DropDownDto>> GetBankDropDownListByCustomerId(int customerId);
         Task<List<DropDownDto>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int BankId);

@@ -1,6 +1,6 @@
 ﻿using BankingTool.Model;
-using BankingTool.Model.Dto.BankAccount;
 using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Dto.Response;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
@@ -134,12 +134,12 @@ namespace BankingTool.Service.Service
                 return response;
             }
         }
-        public async Task<ResponseDto<GetTransactionsListDto>> TransactionsListForCustomer(int bankId, int accountTypeId, int customerId)
+        public async Task<ResponseDto<GetTransactionsListResponse>> TransactionsListForCustomer(int bankId, int accountTypeId, int customerId)
         {
             var (accountId, name, bankName, accountType) = await _bankAccountRepository.GetAccountIdByBankIdAndAccountTypeAndCustomerId(bankId, accountTypeId, customerId);
-            return new ResponseDto<GetTransactionsListDto>
+            return new ResponseDto<GetTransactionsListResponse>
             {
-                Response = new GetTransactionsListDto
+                Response = new GetTransactionsListResponse
                 {
                     AccountInfo = await _bankAccountRepository.GetAccountInfo(accountId, accountType, name, bankName),
                     CardInfo = await _bankAccountRepository.GetCardInfoByAccountId(accountId, name, bankName),

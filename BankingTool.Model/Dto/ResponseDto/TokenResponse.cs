@@ -1,6 +1,6 @@
-﻿namespace BankingTool.Model
+﻿namespace BankingTool.Model.Dto.Response
 {
-    public class TokenDto
+    public class TokenResponse
     {
         public string AccessToken { get; set; }
         public List<ClaimDto> Claims { get; set; }
