@@ -1,4 +1,4 @@
-﻿namespace BankingTool.Model.Dto.RequestDtos
+﻿namespace BankingTool.Model.Dto.RequestDto.User
 {
     public class LoginRequestObject
     {

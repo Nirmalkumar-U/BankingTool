@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model.Dto.RequestDtos
+﻿using BankingTool.Model.Dto.RequestDtos;
+
+namespace BankingTool.Model.Dto.RequestDto.BankAccount
 {
     public class GetAccountBalanceRequestObject
     {

@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using BankingTool.Model;
-using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Dto.RequestDto.User;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Repository;
 using Microsoft.Extensions.Configuration;

@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateAccountDto } from '../../dto/create-account-dto';
+import { BankDropDownListRequestObject } from '../../dto/request/bank-account/bank-drop-down-list-request';
+import { CreateAccountRequestObject } from '../../dto/request/bank-account/create-account-request';
+import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
+import { GetAccountTypeDropDownListRequestObject } from '../../dto/request/bank-account/get-account-type-drop-down-list-request';
+import { GetBankDetailWithoutCustomerAndAccountTypeRequestObject } from '../../dto/request/bank-account/get-bank-detail-without-customer-and-account-type-request';
+import { GetTransferAmountInitialLoadRequestObject } from '../../dto/request/bank-account/get-transfer-amount-initial-load-request';
+import { IsCustomerHasCreditCardInThatBankRequestObject } from '../../dto/request/bank-account/is-customer-has-credit-card-in-that-bank-request';
+import { TransactionsListForCustomerRequestObject } from '../../dto/request/bank-account/transactions-list-for-customer-request';
 import { HttpService } from '../http/http.service';
 
 @Injectable({
@@ -10,30 +17,35 @@ export class BankAccountService {
   constructor(private httpService: HttpService) { }
 
   getCreateAccountInitialLoad(): Observable<any> {
-    return this.httpService.get('BankAccount/GetCreateAccountInitialLoad');
+    return this.httpService.post('BankAccount/GetCreateAccountInitialLoad', null);
   }
-  createAccount(model: CreateAccountDto): Observable<any> {
+  createAccount(model: CreateAccountRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/CreateAccount', model);
   }
-  getBankDetailsDropDownWithoutCustomerAndAccountType(customerId: number, accountTypeId: number): Observable<any> {
-    return this.httpService.get('BankAccount/GetBankDetailsDropDownWithoutCustomerAndAccountType?customerId=' + customerId.toString() + "&accountTypeId=" + accountTypeId.toString());
+  getBankDetailsDropDownWithoutCustomerAndAccountType(model: GetBankDetailWithoutCustomerAndAccountTypeRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/GetBankDetailsDropDownWithoutCustomerAndAccountType', model);
   }
-  isCustomerHasCreditCardInThatBank(customerId: number, bankId: number): Observable<any> {
-    return this.httpService.get('BankAccount/IsCustomerHasCreditCardInThatBank?customerId=' + customerId.toString() + "&bankId=" + bankId.toString());
+  isCustomerHasCreditCardInThatBank(model: IsCustomerHasCreditCardInThatBankRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/IsCustomerHasCreditCardInThatBank', model);
   }
-  transactionsListForCustomer(bankId: number, accountTypeId: number, customerId: number): Observable<any> {
-    return this.httpService.get('BankAccount/TransactionsListForCustomer?customerId=' + customerId.toString() + "&accountTypeId=" + accountTypeId.toString() + "&bankId=" + bankId.toString());
+  transactionsListForCustomer(model: TransactionsListForCustomerRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/TransactionsListForCustomer', model);
   }
-  bankDropDownList(customerId: number): Observable<any> {
-    return this.httpService.get('BankAccount/BankDropDownList?customerId=' + customerId.toString());
+  bankDropDownList(model: BankDropDownListRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/BankDropDownList', model);
   }
-  getAccountTypeDropDownListByCustomerIdAndBankId(customerId: number, bankId: number): Observable<any> {
-    return this.httpService.get('BankAccount/GetAccountTypeDropDownListByCustomerIdAndBankId?customerId=' + customerId.toString() + "&bankId=" + bankId.toString());
+  getAccountTypeDropDownListByCustomerIdAndBankId(model: GetAccountTypeDropDownListRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/GetAccountTypeDropDownListByCustomerIdAndBankId', model);
   }
-  getTransferAmountInitialLoad(customerId: number): Observable<any> {
-    return this.httpService.get('BankAccount/GetTransferAmountInitialLoad?customerId=' + customerId.toString());
+  getTransferAmountInitialLoad(model: GetTransferAmountInitialLoadRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/GetTransferAmountInitialLoad', model);
   }
-  getAccountBalance(accountId: number): Observable<any> {
-    return this.httpService.get('BankAccount/GetAccountBalance?accountId=' + accountId.toString());
+  getAccountBalance(model: GetAccountBalanceRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/GetAccountBalance', model);
   }
 }
+
+
+//transactionsListForCustomer(bankId: number, accountTypeId: number, customerId: number): Observable < any > {
+//  return this.httpService.get('BankAccount/TransactionsListForCustomer?customerId=' + customerId.toString() + "&accountTypeId=" + accountTypeId.toString() + "&bankId=" + bankId.toString());
+//}

@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model.Dto.BaseDto;
-using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Dto.RequestDto.BankAccount;
+using BankingTool.Model.Dto.RequestDto.User;
 
 namespace BankingTool.Api.Validators
 {

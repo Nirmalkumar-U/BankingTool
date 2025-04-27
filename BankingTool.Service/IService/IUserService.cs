@@ -1,5 +1,5 @@
 ﻿using BankingTool.Model;
-using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Dto.RequestDto.User;
 using BankingTool.Model.Dto.Response;
 
 namespace BankingTool.Service

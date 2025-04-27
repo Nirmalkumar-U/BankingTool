@@ -9,8 +9,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\app\constant\" />
-    <Folder Include="src\app\core\apiService\" />
     <Folder Include="src\app\core\commonFunction\" />
     <Folder Include="src\app\core\indexedDBService\" />
+    <Folder Include="src\app\dto\response\" />
+    <Folder Include="src\app\dto\request\user\" />
   </ItemGroup>
 </Project>

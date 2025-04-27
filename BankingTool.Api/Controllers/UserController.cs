@@ -1,6 +1,6 @@
 ﻿using BankingTool.Api.Validators;
 using BankingTool.Model;
-using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Dto.RequestDto.User;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Service;
 using BankingTool.Service.IService;
