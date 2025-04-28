@@ -4,9 +4,11 @@ import { ActivatedRoute } from '@angular/router';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { UserService } from '../../core/service/user.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
+import { GetCityListRequestObject } from '../../dto/request/user/get-city-list-request';
+import { SaveUserRequestObject } from '../../dto/request/user/save-user-request';
 import { ResponseDto } from '../../dto/response-dto';
+import { UserInitialLoadResponse } from '../../dto/response/user-initial-load-response';
 import { SaveUserDto } from '../../dto/save-user-dto';
-import { UserInitialLoadDto } from '../../dto/user-initial-load-dto';
 
 @Component({
   selector: 'app-add-edit-user',
@@ -33,25 +35,32 @@ export class AddEditUserComponent implements OnInit {
     });
   }
   ngOnInit() {
-    const initialData: ResponseDto<UserInitialLoadDto> = this.activatedRoute.snapshot.data['DataResolver'];
-    this.stateDropDownList = initialData.result.stateDropDown;
-    this.roleDropDownList = initialData.result.roleDropDown;
+    const initialData: ResponseDto<UserInitialLoadResponse> = this.activatedRoute.snapshot.data['DataResolver'];
+    this.stateDropDownList = initialData.dropDownList.find(x => x.name == "State")!.dropDown;
+    this.roleDropDownList = initialData.dropDownList.find(x => x.name == "Role")!.dropDown;
 
     this.userForm.setValue({
-      userId: initialData.result.userDetail.userId == 0 ? '' : initialData.result.userDetail.userId,
-      email: initialData.result.userDetail.emailId,
-      password: initialData.result.userDetail.password,
-      firstName: initialData.result.userDetail.firstName,
-      lastName: initialData.result.userDetail.lastName,
-      state: initialData.result.userDetail.state == 0 ? '' : initialData.result.userDetail.state,
-      city: initialData.result.userDetail.city == 0 ? '' : initialData.result.userDetail.city,
-      role: initialData.result.userDetail.roleId == 0 ? '' : initialData.result.userDetail.roleId
+      userId: initialData.response.userDetail.userId == 0 ? '' : initialData.response.userDetail.userId,
+      email: initialData.response.userDetail.emailId,
+      password: initialData.response.userDetail.password,
+      firstName: initialData.response.userDetail.firstName,
+      lastName: initialData.response.userDetail.lastName,
+      state: initialData.response.userDetail.state == 0 ? '' : initialData.response.userDetail.state,
+      city: initialData.response.userDetail.city == 0 ? '' : initialData.response.userDetail.city,
+      role: initialData.response.userDetail.roleId == 0 ? '' : initialData.response.userDetail.roleId
     });
 
     this.userForm.get('state')?.valueChanges.subscribe(stateValue => {
       if (stateValue && stateValue != null) {
-        this.userService.getCityDropDownListByStateId(stateValue).subscribe((cityList: DropDownDto[]) => {
-          this.cityDropDownList = cityList;
+        let model: GetCityListRequestObject = {
+          request: {
+            state: {
+              id: stateValue
+            }
+          }
+        }
+        this.userService.getCityDropDownListByStateId(model).subscribe((cityList: ResponseDto<boolean>) => {
+          this.cityDropDownList = cityList.dropDownList.find(x => x.name == "City")!.dropDown;;
         });
       } else {
         this.cityDropDownList = [];
@@ -72,8 +81,28 @@ export class AddEditUserComponent implements OnInit {
       if (isNullOrEmpty(user.role)) isValid = false;
       if (isValid) {
         this.messageList = [];
-        this.userService.saveUser(user).subscribe((response: ResponseDto<number | null>) => {
-          this.messageList = response.message
+        let model: SaveUserRequestObject = {
+          request: {
+            user: {
+              email: user.email,
+              password: user.password,
+              firstName: user.firstName,
+              lastName: user.lastName
+            },
+            state: {
+              id: user.state
+            },
+            city: {
+              id: user.city
+            },
+            role: {
+              id: user.role
+            }
+          }
+        };
+
+        this.userService.saveUser(model).subscribe((response: ResponseDto<number | null>) => {
+          this.messageList = [...response.errors.map(error => error.errorMessage), ...response.validationErrors.map(error => error.errorMessage)];
         });
       }
     }

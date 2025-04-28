@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
+import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
 import { ResponseDto } from '../../dto/response-dto';
 import { TransferAmountInitialLoadDto } from '../../dto/transfer-amount-initial-load-dto';
 
@@ -28,13 +29,20 @@ export class TransferAmountComponent {
   }
   ngOnInit() {
     const initialData: ResponseDto<TransferAmountInitialLoadDto> = this.activatedRoute.snapshot.data['DataResolver'];
-    this.toList = initialData.result.toAccount;
-    this.fromList = initialData.result.fromAccount;
+    this.toList = initialData.dropDownList.find(x => x.name == "ToAccount")!.dropDown;
+    this.fromList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
 
     this.transferAmountForm.get('fromAccountId')?.valueChanges.subscribe(fromAccountId => {
       if (!isNullOrEmpty(fromAccountId)) {
-        this.bankAccountService.getAccountBalance(fromAccountId).subscribe((response: ResponseDto<number>) => {
-          this.balance = response.result;
+        let model: GetAccountBalanceRequestObject = {
+          request: {
+            account: {
+              id: fromAccountId
+            }
+          }
+        }
+        this.bankAccountService.getAccountBalance(model).subscribe((response: ResponseDto<number>) => {
+          this.balance = response.response;
         });
       } else {
         this.balance = 0;

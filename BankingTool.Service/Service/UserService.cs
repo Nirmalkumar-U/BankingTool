@@ -26,7 +26,8 @@ namespace BankingTool.Service
             {
                 StatuCode = 200,
                 Status = false,
-                Errors = null
+                Errors = [],
+                ValidationErrors = []
             };
             var errors = new List<Errors>();
 
@@ -141,7 +142,7 @@ namespace BankingTool.Service
             List<DropDownListDto> dropDownListDtos = new List<DropDownListDto>()
             {
                 new DropDownListDto { Name = "Role", DropDown = await _roleRepository.GetRoleListDropDown() },
-                new DropDownListDto { Name = "Role", DropDown = await _commonRepository.GetAllStateDropDownList() }
+                new DropDownListDto { Name = "State", DropDown = await _commonRepository.GetAllStateDropDownList() }
             };
             response.DropDownList.AddRange(dropDownListDtos);
 

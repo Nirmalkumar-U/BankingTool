@@ -15,8 +15,9 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
     public class TransactionsListForCustomerRequestBank : RequestId
     {
     }
-    public class TransactionsListForCustomerRequestAccount : RequestId
+    public class TransactionsListForCustomerRequestAccount
     {
+        public int AccountTypeId { get; set; }
     }
     public class TransactionsListForCustomerRequestCustomer : RequestId
     {

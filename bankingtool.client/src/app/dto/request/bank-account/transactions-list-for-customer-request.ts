@@ -14,8 +14,8 @@ export interface TransactionsListForCustomerRequestBank extends RequestId {
 
 }
 
-export interface TransactionsListForCustomerRequestAccount extends RequestId {
-
+export interface TransactionsListForCustomerRequestAccount {
+  accountTypeId: number;
 }
 
 export interface TransactionsListForCustomerRequestCustomer extends RequestId {

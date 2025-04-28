@@ -23,7 +23,7 @@ export class BankAccountService {
     return this.httpService.post('BankAccount/CreateAccount', model);
   }
   getBankDetailsDropDownWithoutCustomerAndAccountType(model: GetBankDetailWithoutCustomerAndAccountTypeRequestObject): Observable<any> {
-    return this.httpService.post('BankAccount/GetBankDetailsDropDownWithoutCustomerAndAccountType', model);
+    return this.httpService.post('BankAccount/GetBankDetailsWithoutCustomerAndAccountType', model);
   }
   isCustomerHasCreditCardInThatBank(model: IsCustomerHasCreditCardInThatBankRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/IsCustomerHasCreditCardInThatBank', model);

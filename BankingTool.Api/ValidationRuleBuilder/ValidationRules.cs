@@ -128,7 +128,7 @@ namespace BankingTool.Api.Validators
             RuleBuilder<TransactionsListForCustomerRequestObject>.For(x => x.Request.Account).Required(),
             RuleBuilder<TransactionsListForCustomerRequestObject>.For(x => x.Request.Bank).Required(),
             RuleBuilder<TransactionsListForCustomerRequestObject>.For(x => x.Request.Customer.Id).Required(),
-            RuleBuilder<TransactionsListForCustomerRequestObject>.For(x => x.Request.Account.Id).Required(),
+            RuleBuilder<TransactionsListForCustomerRequestObject>.For(x => x.Request.Account.AccountTypeId).Required(),
             RuleBuilder<TransactionsListForCustomerRequestObject>.For(x => x.Request.Bank.Id).Required()
         };
         public static List<ValidationRule> BankDropDownListRequestRules = new()

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     public class BankAccountController(IBankAccountService bankAccountService,
         IValidatorService validatorService) : HandleRequest(validatorService)
     {
@@ -69,7 +69,7 @@ namespace BankingTool.Api.Controllers
             return HandleRequestAsync<TransactionsListForCustomerRequestObject, GetTransactionsListResponse>(
                 model,
                 ValidationRules.TransactionsListForCustomerRequestRules,
-                () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id, model.Request.Account.Id, model.Request.Customer.Id)
+                () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id, model.Request.Account.AccountTypeId, model.Request.Customer.Id)
             );
         }
 
@@ -116,7 +116,7 @@ namespace BankingTool.Api.Controllers
         {
             return HandleRequestAsync<GetAccountBalanceRequestObject, int>(
                 model,
-                ValidationRules.LoginRequestRules,//todo
+                ValidationRules.GetAccountBalanceRequestRules,
                 () => _bankAccountService.GetAccountBalance(model.Request.Account.Id)
             );
         }

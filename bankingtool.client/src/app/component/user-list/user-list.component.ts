@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ResponseDto } from '../../dto/response-dto';
-import { UserListDto } from '../../dto/user-list-dto';
+import { UserListResponse } from '../../dto/response/user-list-response';
 
 @Component({
   selector: 'app-user-list',
@@ -9,11 +9,11 @@ import { UserListDto } from '../../dto/user-list-dto';
   styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent {
-  userList: UserListDto[] = [];
+  userList: UserListResponse[] = [];
   constructor(private readonly activatedRoute: ActivatedRoute) {
   }
   ngOnInit() {
-    const initialData: ResponseDto<UserListDto[]> = this.activatedRoute.snapshot.data['DataResolver'];
-    this.userList = initialData.result;
+    const initialData: ResponseDto<UserListResponse[]> = this.activatedRoute.snapshot.data['DataResolver'];
+    this.userList = initialData.response;
   }
 }

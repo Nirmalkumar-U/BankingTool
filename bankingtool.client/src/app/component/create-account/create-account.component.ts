@@ -4,9 +4,11 @@ import { ActivatedRoute } from '@angular/router';
 import { Constant } from '../../constant/constant';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { BankAccountService } from '../../core/service/bank-account.service';
-import { CreateAccountDto } from '../../dto/create-account-dto';
 import { CreateAccountInitialLoadDto } from '../../dto/create-account-initial-load-dto';
 import { DropDownDto, YesOrNoDto } from '../../dto/drop-down-dto';
+import { CreateAccountRequestObject } from '../../dto/request/bank-account/create-account-request';
+import { GetBankDetailWithoutCustomerAndAccountTypeRequestObject } from '../../dto/request/bank-account/get-bank-detail-without-customer-and-account-type-request';
+import { IsCustomerHasCreditCardInThatBankRequestObject } from '../../dto/request/bank-account/is-customer-has-credit-card-in-that-bank-request';
 import { ResponseDto } from '../../dto/response-dto';
 
 @Component({
@@ -46,8 +48,8 @@ export class CreateAccountComponent {
   }
   ngOnInit() {
     const initialData: ResponseDto<CreateAccountInitialLoadDto> = this.activatedRoute.snapshot.data['DataResolver'];
-    this.customerList = initialData.result.customerList;
-    this.accountTypeList = initialData.result.accountTypeList;
+    this.customerList = initialData.dropDownList.find(x => x.name == "Customer")!.dropDown;
+    this.accountTypeList = initialData.dropDownList.find(x => x.name == "AccountType")!.dropDown;
 
     this.accountForm.get('customerId')?.valueChanges.subscribe(customerId => {
       this.getBankDetailsDropDownWithoutCustomerAndAccountType(customerId, this.accountTypeId);
@@ -68,11 +70,21 @@ export class CreateAccountComponent {
 
     this.accountForm.get('bankId')?.valueChanges.subscribe(bankId => {
       if (!isNullOrEmpty(this.accountTypeId) && !isNullOrEmpty(this.customerId) && !isNullOrEmpty(bankId)) {
-        this.bankAccountService.isCustomerHasCreditCardInThatBank(this.customerId, bankId).subscribe((response: ResponseDto<boolean>) => {
+        let model: IsCustomerHasCreditCardInThatBankRequestObject = {
+          request: {
+            customer: {
+              id: this.customerId
+            },
+            bank: {
+              id: bankId
+            }
+          }
+        }
+        this.bankAccountService.isCustomerHasCreditCardInThatBank(model).subscribe((response: ResponseDto<boolean>) => {
           this.accountForm.setValue({
-            customerWantCreditCard: response.result
+            customerWantCreditCard: response.response
           });
-          this.isCustAsCC = response.result;
+          this.isCustAsCC = response.response;
         });
       } else {
         this.isCustAsCC = false;
@@ -82,8 +94,18 @@ export class CreateAccountComponent {
 
   getBankDetailsDropDownWithoutCustomerAndAccountType(customerId: number, accountTypeId: number) {
     if (!isNullOrEmpty(accountTypeId) && !isNullOrEmpty(customerId)) {
-      this.bankAccountService.getBankDetailsDropDownWithoutCustomerAndAccountType(customerId, accountTypeId).subscribe((bankList: ResponseDto<DropDownDto[]>) => {
-        this.bankList = bankList.result;
+      let model: GetBankDetailWithoutCustomerAndAccountTypeRequestObject = {
+        request: {
+          account: {
+            accountTypeId: accountTypeId,
+          },
+          customer: {
+            id: customerId
+          }
+        }
+      }
+      this.bankAccountService.getBankDetailsDropDownWithoutCustomerAndAccountType(model).subscribe((bankList: ResponseDto<DropDownDto[]>) => {
+        this.bankList = bankList.dropDownList.find(x => x.name == "Bank")!.dropDown;
       });
     } else {
       this.bankList = [];
@@ -94,15 +116,30 @@ export class CreateAccountComponent {
     if (!this.accountForm.invalid) {
       this.messageList = [];
       let isValid: boolean = true;
-      let values: CreateAccountDto = this.accountForm.value;
+      let values = this.accountForm.value;
       if (isNullOrEmpty(values.accountTypeId)) isValid = false;
       if (isNullOrEmpty(values.bankId)) isValid = false;
       if (isNullOrEmpty(values.customerId)) isValid = false;
       if (isNullOrEmpty(this.accountForm.get('customerWantCreditCard')?.value)) isValid = false;
       if (isNullOrEmpty(this.accountForm.get('doYouWantToChangeThisAccountToPrimaryAccount')?.value)) isValid = false;
-
-      this.bankAccountService.createAccount(values).subscribe((responce: ResponseDto<boolean>) => {
-        this.messageList.push(...responce.message);
+      //Check
+      let model: CreateAccountRequestObject = {
+        request: {
+          account: {
+            accountTypeId: values.accountTypeId,
+            doYouWantToChangeThisAccountToPrimaryAccount: values.doYouWantToChangeThisAccountToPrimaryAccount
+          },
+          bank: {
+            id: values.bankId
+          },
+          customer: {
+            customerWantCreditCard: values.customerWantCreditCard,
+            id: values.customerId
+          }
+        }
+      };
+      this.bankAccountService.createAccount(model).subscribe((responce: ResponseDto<boolean>) => {
+        this.messageList = [...responce.errors.map(x => x.errorMessage), ...responce.validationErrors.map(x => x.errorMessage)]
         this.isSubmitted = true;
       });
     }
