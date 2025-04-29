@@ -68,7 +68,12 @@ namespace BankingTool.Service
         }
         public async Task<ResponseDto<TokenResponse>> CreateToken(CreateTokenRequestUser user, int roleId)
         {
-            var response = new ResponseDto<TokenResponse> { Status = false };
+            var response = new ResponseDto<TokenResponse>
+            {
+                Status = false,
+                Errors = [],
+                ValidationErrors = []
+            };
 
             var securityKey = _configuration["AppSettings:SecurityKey"];
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(securityKey));
@@ -121,7 +126,12 @@ namespace BankingTool.Service
         }
         public async Task<ResponseDto<UserInitialLoadResponse>> GetUserInitialLoad(int? userId)
         {
-            var response = new ResponseDto<UserInitialLoadResponse> { Status = false };
+            var response = new ResponseDto<UserInitialLoadResponse>
+            {
+                Status = false,
+                ValidationErrors = [],
+                Errors = []
+            };
 
             var (user, role) = userId.HasValue ? await _userRepository.GetUserAndRoleByUserId(userId.Value) : (new Users(), new Role());
 
@@ -161,7 +171,9 @@ namespace BankingTool.Service
                 {
                     new DropDownListDto { Name = "City", DropDown = await _userRepository.GetCityDropDownListByStateId(stateId) }
                 },
-                Response = true
+                Response = true,
+                Errors = [],
+                ValidationErrors = []
             };
             return response;
         }
@@ -169,7 +181,9 @@ namespace BankingTool.Service
         {
             ResponseDto<int?> response = new()
             {
-                Status = false
+                Status = false,
+                ValidationErrors = [],
+                Errors = []
             };
             Users userDetail = new()
             {
@@ -229,6 +243,7 @@ namespace BankingTool.Service
             else
             {
                 response.StatuCode = 400;
+                response.Errors.Add(new Errors { PropertyName = "Create User", ErrorMessage = "User Created is failed" });
                 response.Message = "User Created is failed...";
                 response.Status = false;
                 response.Response = null;
@@ -255,7 +270,9 @@ namespace BankingTool.Service
             {
                 StatuCode = 200,
                 Response = result,
-                Status = true
+                Status = true,
+                Errors = [],
+                ValidationErrors = []
             };
         }
         public async Task<List<GetActionsByUserIdDto>> Test(int id)
