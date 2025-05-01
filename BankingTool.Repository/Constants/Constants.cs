@@ -28,12 +28,24 @@
     {
         public const string Debit = "Debit";
         public const string Credit = "Credit";
-        public const string Pending = "Pending";
-        public const string Returned = "Returned";
     }
+    public class TransactionRole
+    {
+        public const string Sender = "Sender";
+        public const string Receiver = "Receiver";
+    }
+    public class TransactionCatagory
+    {
+        public const string Cash = "Cash";
+        public const string Transfer = "Transfer";
+        public const string Cheque = "Cheque";
+        public const string Deposit = "Deposit";
+        public const string Withdraw = "Withdraw";
+    }
+
     public static class AppClaimTypes
     {
-        public const string FirstName = nameof(FirstName);
+        public const string UserName = nameof(UserName);
         public const string LastName = nameof(LastName);
         public const string UserId = nameof(UserId);
         public const string EmailId = nameof(EmailId);

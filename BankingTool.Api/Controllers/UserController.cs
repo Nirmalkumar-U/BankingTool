@@ -1,4 +1,5 @@
-﻿using BankingTool.Api.Validators;
+﻿using BankingTool.Api.Filter;
+using BankingTool.Api.Validators;
 using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.User;
 using BankingTool.Model.Dto.Response;
@@ -55,6 +56,7 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
+        [TokenAuthorization]
         [ProducesResponseType(typeof(ResponseDto<UserInitialLoadResponse>), 200)]
         [ProducesResponseType(typeof(ResponseDto<UserInitialLoadResponse>), 400)]
         public Task<IActionResult> GetUserInitialLoad(GetUserInitialLoadRequestObject model)
@@ -67,6 +69,7 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
+        [TokenAuthorization]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetCityDropDownListByStateId(GetCityListRequestObject model)
@@ -79,6 +82,7 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
+        [TokenAuthorization]
         [ProducesResponseType(typeof(ResponseDto<int?>), 200)]
         [ProducesResponseType(typeof(ResponseDto<int?>), 400)]
         public Task<IActionResult> SaveUser(SaveUserRequestObject model)
@@ -90,6 +94,7 @@ namespace BankingTool.Api.Controllers
             );
         }
         [HttpPost]
+        [TokenAuthorization]
         [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 200)]
         [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 400)]
         public Task<IActionResult> GetUserList()

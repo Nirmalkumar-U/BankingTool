@@ -1,4 +1,5 @@
-﻿using BankingTool.Api.Validators;
+﻿using BankingTool.Api.Filter;
+using BankingTool.Api.Validators;
 using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
+    [TokenAuthorization]
     [Route("api/[controller]/[action]")]
     public class BankAccountController(IBankAccountService bankAccountService,
         IValidatorService validatorService) : HandleRequest(validatorService)
@@ -76,12 +78,12 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> BankDropDownList(BankDropDownListRequestObject model)
+        public Task<IActionResult> BankDropDownList()
         {
-            return HandleRequestAsync<BankDropDownListRequestObject, bool>(
-                model,
-                ValidationRules.BankDropDownListRequestRules,
-                () => _bankAccountService.BankDropDownList(model.Request.Customer.Id)
+            return HandleRequestAsync<int?, bool>(
+                null,
+                null,
+                _bankAccountService.BankDropDownList
             );
         }
 
@@ -100,12 +102,12 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> GetTransferAmountInitialLoad(GetTransferAmountInitialLoadRequestObject model)
+        public Task<IActionResult> GetTransferAmountInitialLoad()
         {
-            return HandleRequestAsync<GetTransferAmountInitialLoadRequestObject, bool>(
-                model,
-                ValidationRules.GetTransferAmountInitialLoadRequestRules,
-                () => _bankAccountService.GetTransferAmountInitialLoad(model.Request.Customer.Id)
+            return HandleRequestAsync<int?, bool>(
+                null,
+                null,
+                () => _bankAccountService.GetTransferAmountInitialLoad()
             );
         }
 

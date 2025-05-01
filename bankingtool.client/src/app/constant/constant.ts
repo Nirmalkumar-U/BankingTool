@@ -67,8 +67,7 @@ export class PageTitle {
 export class ClaimKey {
   public static accessToken: string = 'accessToken';
   public static isLoggedIn: string = 'isLoggedIn';
-  public static firstName: string = 'FirstName';
-  public static lastName: string = 'LastName';
+  public static userName: string = 'UserName';
   public static idb: string = 'idb';
   public static customerId: string = 'CustomerId';
   public static staffId: string = 'StaffId';

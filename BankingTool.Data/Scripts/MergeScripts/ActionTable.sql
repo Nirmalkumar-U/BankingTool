@@ -12,6 +12,8 @@ USING (VALUES
  ,(8,N'Create Account',N'/createAccount',N'Menu',N'RW',2,6,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(9,N'Transactions List',N'/transactions',N'Menu',N'R',2,6,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(10,N'Transactions List',N'/transactions',N'Menu',N'RW',2,6,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(11,N'Transfer Amount',N'/transfer',N'Menu',N'R',2,6,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(12,N'Transfer Amount',N'/transfer',N'Menu',N'RW',2,6,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
 ) AS Source ([ActionId],[ActionName],[ActionPath],[ActionType],[Access],[MenuLevel],[ParrentMenuId],[Sequence],[CreatedDate],[CreatedBy],[ModifiedDate],[ModifiedBy],[IsDeleted])
 ON (Target.[ActionId] = Source.[ActionId])
 WHEN MATCHED AND (
@@ -70,4 +72,5 @@ Values (1,1),
 (1,6),
 (1,8),
 (2,6),
-(2,10)
+(2,10),
+(2,12)

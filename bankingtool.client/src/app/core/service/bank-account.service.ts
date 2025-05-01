@@ -31,14 +31,14 @@ export class BankAccountService {
   transactionsListForCustomer(model: TransactionsListForCustomerRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/TransactionsListForCustomer', model);
   }
-  bankDropDownList(model: BankDropDownListRequestObject): Observable<any> {
-    return this.httpService.post('BankAccount/BankDropDownList', model);
+  bankDropDownList(): Observable<any> {
+    return this.httpService.post('BankAccount/BankDropDownList', null);
   }
   getAccountTypeDropDownListByCustomerIdAndBankId(model: GetAccountTypeDropDownListRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetAccountTypeDropDownListByCustomerIdAndBankId', model);
   }
-  getTransferAmountInitialLoad(model: GetTransferAmountInitialLoadRequestObject): Observable<any> {
-    return this.httpService.post('BankAccount/GetTransferAmountInitialLoad', model);
+  getTransferAmountInitialLoad(): Observable<any> {
+    return this.httpService.post('BankAccount/GetTransferAmountInitialLoad', null);
   }
   getAccountBalance(model: GetAccountBalanceRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetAccountBalance', model);

@@ -1,6 +1,7 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
@@ -75,11 +76,16 @@ namespace BankingTool.Service.Service
 
             Transaction transaction = new()
             {
-                TransactionType = TransactionType.Credit,
                 Amount = Constants.AccountMininumBalanceForSavingsAccount,
                 Description = "Initial Credit",
                 TransactionTime = DateTime.Now,
-                StageBalance = Constants.AccountMininumBalanceForSavingsAccount
+                TransactionCategory = TransactionCatagory.Deposit
+            };
+            TransactionDetail transactionDetails = new()
+            {
+                TransactionType = TransactionType.Credit,
+                StageBalance = Constants.AccountMininumBalanceForSavingsAccount,
+                TransactionRole = TransactionRole.Receiver,
             };
 
             var (customer, isUpdatePrimaryAccount) = await UpdatePrimaryAccountNumber(model.Account.DoYouWantToChangeThisAccountToPrimaryAccount, account.AccountNumber, account.CustomerId);
@@ -121,7 +127,7 @@ namespace BankingTool.Service.Service
                 };
             }
 
-            bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, debitCard, creditCard, cardScore, customer, model.Customer.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
+            bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, transactionDetails, debitCard, creditCard, cardScore, customer, model.Customer.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
             if (isAccountCreated)
             {
                 response.Response = true;
@@ -169,11 +175,11 @@ namespace BankingTool.Service.Service
                 ValidationErrors = []
             };
         }
-        public async Task<ResponseDto<bool>> BankDropDownList(int customerId)
+        public async Task<ResponseDto<bool>> BankDropDownList()
         {
             return new ResponseDto<bool>
             {
-                DropDownList = [new DropDownListDto { Name = "Bank", DropDown = await _bankAccountRepository.GetBankDropDownListByCustomerId(customerId) }],
+                DropDownList = [new DropDownListDto { Name = "Bank", DropDown = await _bankAccountRepository.GetBankDropDownListByCustomerId() }],
                 Response = true,
                 StatuCode = 200,
                 Status = true,
@@ -181,15 +187,15 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> GetTransferAmountInitialLoad(int customerId)
+        public async Task<ResponseDto<bool>> GetTransferAmountInitialLoad()
         {
             return new ResponseDto<bool>
             {
                 Response = true,
                 DropDownList = new List<DropDownListDto>
                 {
-                    new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId(customerId) },
-                    new DropDownListDto{ Name = "ToAccount", DropDown = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId(customerId) }
+                    new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() },
+                    new DropDownListDto{ Name = "ToAccount", DropDown = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId() }
                 },
                 StatuCode = 200,
                 Status = true,
@@ -207,6 +213,50 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
+        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description)
+        {
+            Account fromAccount = await _bankAccountRepository.GetAccount(fromAccountId);
+            Account toAccount = await _bankAccountRepository.GetAccount(toAccountId);
+            fromAccount.Balance = fromAccount.Balance - amount;
+            toAccount.Balance = toAccount.Balance + amount;
+            Transaction fromTransaction = new Transaction
+            {
+                TransactionTime = DateTime.Now,
+                Amount = amount,
+                Description = description,
+                TransactionCategory = TransactionCatagory.Transfer
+            };
+            TransactionDetail fromTransactionDetail = new TransactionDetail
+            {
+                AccountId = fromAccountId,
+                StageBalance = fromAccount.Balance,
+                TransactionType = TransactionType.Debit,
+                TransactionRole = TransactionRole.Sender
+            };
+            Transaction toTransaction = new Transaction
+            {
+                TransactionTime = DateTime.Now,
+                Amount = amount,
+                Description = description,
+                TransactionCategory = TransactionCatagory.Transfer
+            };
+            TransactionDetail toTransactionDetail = new TransactionDetail
+            {
+                AccountId = toAccountId,
+                StageBalance = toAccount.Balance,
+                TransactionType = TransactionType.Credit,
+                TransactionRole = TransactionRole.Receiver
+            };
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
+
+        #region Private
         private async Task<(Customer, bool)> UpdatePrimaryAccountNumber(bool DoYouWantToChangeThisAccountToPrimaryAccount, string AccountNumber, int CustomerId)
         {
             bool isAnyAccountForThisCustomer = await _bankAccountRepository.IsAnyAccountForThisCustomer(CustomerId);
@@ -272,5 +322,6 @@ namespace BankingTool.Service.Service
             // Ensure score stays within valid range (300 - 850)
             return Math.Clamp(score, 300, 850);
         }
+        #endregion Private
     }
 }

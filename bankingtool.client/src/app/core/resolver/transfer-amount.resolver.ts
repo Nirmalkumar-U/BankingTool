@@ -16,15 +16,15 @@ import { BankAccountService } from '../service/bank-account.service';
 export class TransferAmountResolver implements Resolve<boolean> {
   constructor(private bankAccountService: BankAccountService, private localStorageService: LocalStorageService) { }
   resolve(): Observable<any> {
-    let customerId: number = Number(this.localStorageService.getItem(ClaimKey.customerId));
-    let model: GetTransferAmountInitialLoadRequestObject = {
-      request: {
-        customer: {
-          id: customerId
-        }
-      }
-    }
-    return this.bankAccountService.getTransferAmountInitialLoad(model).pipe(
+    //let customerId: number = Number(this.localStorageService.getItem(ClaimKey.customerId));
+    //let model: GetTransferAmountInitialLoadRequestObject = {
+    //  request: {
+    //    customer: {
+    //      id: customerId
+    //    }
+    //  }
+    //}
+    return this.bankAccountService.getTransferAmountInitialLoad().pipe(
       catchError((error) => { return of(error) }));
   }
 }

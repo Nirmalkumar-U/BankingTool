@@ -1,4 +1,6 @@
-﻿using BankingTool.Model;
+﻿using System.Security.Claims;
+using System.Text.Json;
+using BankingTool.Model;
 using BankingTool.Model.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -11,15 +13,20 @@ namespace BankingTool.Repository
         public readonly int UserId;
         public readonly int RoleId;
         public readonly string UserEmail;
-        public readonly int RoleLevel;
+        public readonly string UserName;
+        public readonly int StaffId;
+        public readonly int CustomerId;
         public DataContext(DbContextOptions<DataContext> dbContextOptions, IHttpContextAccessor httpContextAccessor) : base(dbContextOptions)
         {
             if (httpContextAccessor.HttpContext.User.Claims.Any())
             {
-                this.UserId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.UserId)?.Value);
-                this.RoleId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.RoleId)?.Value);
-                this.RoleLevel = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.RoleLevel)?.Value);
-                this.UserEmail = httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == AppClaimTypes.EmailId)?.Value;
+                List<ClaimDto> claims = JsonSerializer.Deserialize<List<ClaimDto>>(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(ClaimTypes.Email))?.Value);
+                UserId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.UserId).Value);
+                RoleId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.RoleId).Value);
+                StaffId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.StaffId)?.Value);
+                CustomerId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.CustomerId).Value);
+                UserEmail = claims.FirstOrDefault(x => x.Key == AppClaimTypes.EmailId).Value;
+                UserName = claims.FirstOrDefault(x => x.Key == AppClaimTypes.UserName).Value;
             }
         }
 
@@ -35,6 +42,7 @@ namespace BankingTool.Repository
         public DbSet<Customer> Customer { get; set; }
         public DbSet<State> State { get; set; }
         public DbSet<Transaction> Transaction { get; set; }
+        public DbSet<TransactionDetail> TransactionDetail { get; set; }
         public DbSet<Staff> Staff { get; set; }
         public DbSet<Bank> Bank { get; set; }
         public DbSet<CodeValue> CodeValue { get; set; }
@@ -95,6 +103,10 @@ namespace BankingTool.Repository
             modelBuilder.Entity<Transaction>(entity =>
             {
                 entity.HasKey(ur => ur.TransactionId);
+            });
+            modelBuilder.Entity<TransactionDetail>(entity =>
+            {
+                entity.HasKey(ur => ur.TransactionDetailsId);
             });
             modelBuilder.Entity<Bank>(entity =>
             {

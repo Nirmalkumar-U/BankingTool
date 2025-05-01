@@ -6,11 +6,14 @@ export interface GetTransactionsListResponse {
 
 export interface GetTransactionsListResponseTransactionList {
   transactionId: number;
-  transactionDate: string;
   amount: number;
-  transactionType: string;
-  description: string;
   stageBalance: number;
+  transactionDate: Date;
+  description: string;
+  transactionType: string;
+  transactionCategory: string;
+  fromAccountId: string;
+  toAccountId: string;
 }
 
 export interface GetTransactionsListResponseAccountInfo {

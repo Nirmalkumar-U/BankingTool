@@ -9,11 +9,14 @@
     public class GetTransactionsListResponseTransactionList
     {
         public int TransactionId { get; set; }
-        public DateTime TransactionDate { get; set; }
         public int Amount { get; set; }
-        public string TransactionType { get; set; }
-        public string Description { get; set; }
         public int StageBalance { get; set; }
+        public DateTime TransactionDate { get; set; }
+        public string Description { get; set; }
+        public string TransactionType { get; set; }
+        public string TransactionCategory { get; set; }
+        public string FromAccountId { get; set; }  // Nullable for Deposit/Withdrawal
+        public string ToAccountId { get; set; }
     }
     public class GetTransactionsListResponseAccountInfo
     {

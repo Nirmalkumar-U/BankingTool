@@ -12,15 +12,15 @@ import { BankAccountService } from '../service/bank-account.service';
 export class TransactionListResolver implements Resolve<boolean> {
   constructor(private bankAccountService: BankAccountService, private localStorageService: LocalStorageService) { }
   resolve(): Observable<any> {
-    let customerId: number = Number(this.localStorageService.getItem(ClaimKey.customerId));
-    let model: BankDropDownListRequestObject = {
-      request: {
-        customer: {
-          id: customerId
-        }
-      }
-    }
-    return this.bankAccountService.bankDropDownList(model).pipe(
+    //let customerId: number = Number(this.localStorageService.getItem(ClaimKey.customerId));
+    //let model: BankDropDownListRequestObject = {
+    //  request: {
+    //    customer: {
+    //      id: customerId
+    //    }
+    //  }
+    //}
+    return this.bankAccountService.bankDropDownList().pipe(
       catchError((error) => { return of(error) }));
   }
 }

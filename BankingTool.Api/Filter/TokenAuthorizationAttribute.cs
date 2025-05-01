@@ -10,7 +10,7 @@ namespace BankingTool.Api.Filter
 
     public class TokenAuthorizationAttribute : Attribute, IAuthorizationFilter
     {
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public void OnAuthorization1(AuthorizationFilterContext context)
         {
             bool isValidToken = ApplicationAppContext.HttpContext != null && ApplicationAppContext.HttpContext.User.Claims.Any();
             if (isValidToken)
@@ -23,8 +23,8 @@ namespace BankingTool.Api.Filter
                 return;
             }
         }
-        public void OnAuthorization1(AuthorizationFilterContext context)
-        { 
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
             var authHeader = context.HttpContext.Request.Headers.Authorization.FirstOrDefault();
             if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
             {
@@ -44,24 +44,23 @@ namespace BankingTool.Api.Filter
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(securityKey));
             var issuer = ApplicationAppContext.GetConfigValue("Issuer");
             var audience = ApplicationAppContext.GetConfigValue("Audience");
-
+            
             var validateParameters = new TokenValidationParameters
             {
-                ValidateIssuer = false,
+                ValidateIssuer = true,
                 ValidIssuer = issuer,
-                ValidateAudience = true,
+                ValidateAudience = false,
                 ValidAudience = audience,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = mySecurityKey,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ValidateLifetime = false,
+                ClockSkew = TimeSpan.FromMinutes(10)
             };
 
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var principal = tokenHandler.ValidateToken(token, validateParameters, out var tok);
-                tok = tok;
+                var principal = tokenHandler.ValidateToken(token, validateParameters, out var validatedToken);
                 context.HttpContext.User = principal;
             }
             catch (SecurityTokenException ex)

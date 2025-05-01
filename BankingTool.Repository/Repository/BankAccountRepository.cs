@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -76,16 +77,39 @@ namespace BankingTool.Repository.Repository
         }
         public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId)
         {
-            return await dataContext.Transaction.Where(x => x.AccountId == accountId).Select(z => new GetTransactionsListResponseTransactionList
-            {
-                Amount = z.Amount,
-                StageBalance = z.StageBalance,
-                TransactionDate = z.TransactionTime,
-                Description = z.Description,
-                TransactionType = z.TransactionType,
-                TransactionId = z.TransactionId
-            }).ToListAsync();
+            var transactions = await (
+                    from tp in dataContext.TransactionDetail
+                    join t in dataContext.Transaction on tp.TransactionId equals t.TransactionId
+                    join tpOtherJoin in dataContext.TransactionDetail on t.TransactionId equals tpOtherJoin.TransactionId into tpOtherGroup
+                    from tpOther in tpOtherGroup.DefaultIfEmpty()
+                    join a in dataContext.Account on tp.AccountId equals a.AccountId
+                    join aOtherJoin in dataContext.Account on tpOther.AccountId equals aOtherJoin.AccountId into aOtherGroup
+                    from aOther in aOtherGroup.DefaultIfEmpty()
+                    where tp.AccountId == accountId
+                    select new GetTransactionsListResponseTransactionList
+                    {
+                        TransactionId = t.TransactionId,
+                        Amount = t.Amount,
+                        StageBalance = tp.StageBalance,
+                        TransactionDate = t.TransactionTime,
+                        Description = t.Description,
+                        TransactionType = tp.TransactionType,
+                        TransactionCategory = t.TransactionCategory,
+
+                        FromAccountId = t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Receiver" ? aOther.AccountNumber :
+                                        t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Sender" ? a.AccountNumber :
+                                        t.TransactionCategory == TransactionCatagory.Withdraw || t.TransactionCategory == TransactionCatagory.Deposit ? a.AccountNumber : null,
+
+                        ToAccountId = t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Sender" ? aOther.AccountNumber :
+                                      t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Receiver" ? a.AccountNumber : null
+                    }
+                ).OrderByDescending(x => x.TransactionDate).ToListAsync();
+
+
+            return transactions;
         }
+
+
         public async Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName)
         {
             return await dataContext.Account.Where(x => x.AccountId == accountId).Select(z => new GetTransactionsListResponseAccountInfo
@@ -121,11 +145,11 @@ namespace BankingTool.Repository.Repository
             var bankName = await dataContext.Bank.FirstOrDefaultAsync(x => x.BankId == bankId);
             return (account.AccountId, name.FirstName + " " + name.LastName, bankName.BankName, accType.CodeValue1);
         }
-        public async Task<List<DropDownDto>> GetBankDropDownListByCustomerId(int customerId)
+        public async Task<List<DropDownDto>> GetBankDropDownListByCustomerId()
         {
             return await (from a in dataContext.Account.AsNoTracking()
                           join b in dataContext.Bank.AsNoTracking() on a.BankId equals b.BankId
-                          where a.CustomerId == customerId
+                          where a.CustomerId == dataContext.CustomerId
                           select new DropDownDto
                           {
                               Key = b.BankId,
@@ -144,28 +168,28 @@ namespace BankingTool.Repository.Repository
                           }).ToListAsync();
         }
 
-        public async Task<List<DropDownDto>> GetFromAccountListByCustomerId(int customerId)
+        public async Task<List<DropDownDto>> GetFromAccountListByCustomerId()
         {
             return await (from a in dataContext.Account
                           join c in dataContext.Customer on a.CustomerId equals c.CustomerId
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == customerId && a.AccountStatus == AccountStatus.Active
+                          where a.CustomerId == dataContext.CustomerId && a.AccountStatus == AccountStatus.Active
                           select new DropDownDto
                           {
                               Key = a.AccountId,
                               Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
                           }).ToListAsync();
         }
-        public async Task<List<DropDownDto>> GetToAccountListOnWithoutCustomerId(int customerId)
+        public async Task<List<DropDownDto>> GetToAccountListOnWithoutCustomerId()
         {
             return await (from a in dataContext.Account
                           join c in dataContext.Customer on a.CustomerId equals c.CustomerId
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId != customerId && a.AccountStatus == AccountStatus.Active
+                          where a.CustomerId != dataContext.CustomerId && a.AccountStatus == AccountStatus.Active
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -180,15 +204,17 @@ namespace BankingTool.Repository.Repository
                           select a.Balance).FirstOrDefaultAsync();
         }
 
-        public bool CreateAccount(Account account, Transaction transaction, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
+        public bool CreateAccount(Account account, Transaction transaction, TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
             {
                 int? accountId = InsertAccount(account);
-                transaction.AccountId = accountId.Value;
                 int? transactionId = InsertTransaction(transaction);
+                transactionDetail.AccountId = accountId.Value;
+                transactionDetail.TransactionId = transactionId.Value;
+                InsertTransactionDetail(transactionDetail);
                 debitCard.AccountId = accountId.Value;
                 InsertCard(debitCard);
                 if (IsUpdatePrimaryAccount)
@@ -214,9 +240,43 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
+
+        public bool TransferAmount(Account fromAccount, Account toAccount, Transaction fromTransaction, Transaction toTransaction, TransactionDetail fromTransactionDetail,
+            TransactionDetail toTransactionDetail)
+        {
+            using var sqlTransaction = dataContext.Database.BeginTransaction();
+            try
+            {
+                UpdateAccount(fromAccount);
+                UpdateAccount(toAccount);
+                var fromTransactionId = InsertTransaction(fromTransaction);
+                var toTransactionId = InsertTransaction(toTransaction);
+                fromTransactionDetail.TransactionId = fromTransactionId.Value;
+                toTransactionDetail.TransactionId = toTransactionId.Value;
+                InsertTransactionDetail(toTransactionDetail);
+                InsertTransactionDetail(fromTransactionDetail);
+                sqlTransaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                sqlTransaction.Rollback();
+                return false;
+            }
+        }
+        public async Task<Account> GetAccount(int AccountId)
+        {
+            return await dataContext.Account.FirstOrDefaultAsync(x => x.AccountId == AccountId);
+        }
+        public async Task<Transaction> GetTransaction(int TransactionId)
+        {
+            return await dataContext.Transaction.FirstOrDefaultAsync(x => x.TransactionId == TransactionId);
+        }
+
         public int? InsertAccount(Account account)
         {
-            account.CreatedBy = "Admin";
+            account.CreatedBy = dataContext.UserEmail;
             account.CreatedDate = DateTime.Now;
             account.ModifiedBy = null;
             account.ModifiedDate = null;
@@ -224,9 +284,15 @@ namespace BankingTool.Repository.Repository
             var isInserted = Insert(account);
             return isInserted ? account.AccountId : null;
         }
+        public void UpdateAccount(Account account)
+        {
+            account.ModifiedBy = dataContext.UserEmail;
+            account.ModifiedDate = DateTime.Now;
+            Update(account);
+        }
         public int? InsertTransaction(Transaction transaction)
         {
-            transaction.CreatedBy = "Admin";
+            transaction.CreatedBy = dataContext.UserEmail;
             transaction.CreatedDate = DateTime.Now;
             transaction.ModifiedBy = null;
             transaction.ModifiedDate = null;
@@ -234,9 +300,13 @@ namespace BankingTool.Repository.Repository
             var isInserted = Insert(transaction);
             return isInserted ? transaction.TransactionId : null;
         }
+        public void InsertTransactionDetail(TransactionDetail transactionDetail)
+        {
+            var isInserted = Insert(transactionDetail);
+        }
         public int? InsertCard(Card card)
         {
-            card.CreatedBy = "Admin";
+            card.CreatedBy = dataContext.UserEmail;
             card.CreatedDate = DateTime.Now;
             card.ModifiedBy = null;
             card.ModifiedDate = null;
@@ -246,7 +316,7 @@ namespace BankingTool.Repository.Repository
         }
         public int? InsertCreditScore(CreditScore creditScore)
         {
-            creditScore.CreatedBy = "Admin";
+            creditScore.CreatedBy = dataContext.UserEmail;
             creditScore.CreatedDate = DateTime.Now;
             creditScore.ModifiedBy = null;
             creditScore.ModifiedDate = null;
@@ -256,7 +326,7 @@ namespace BankingTool.Repository.Repository
         }
         public void UpdateCustomer(Customer customer)
         {
-            customer.ModifiedBy = "Admin";
+            customer.ModifiedBy = dataContext.UserEmail;
             customer.ModifiedDate = DateTime.Now;
             Update(customer);
         }

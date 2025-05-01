@@ -112,11 +112,12 @@ namespace BankingTool.Api
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
             app.UseAuthentication();
-
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
             ApplicationAppContext.Configure(httpContextAccessor, Configuration);
         }
     }

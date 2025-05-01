@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
     });
     this.emitService.loginEmitter.subscribe(us => {
       this.isLogined = us;
-      this.logggedInUserName = this.localStorageService.getItem(ClaimKey.firstName) + ' ' + this.localStorageService.getItem(ClaimKey.lastName)
+      this.logggedInUserName = this.localStorageService.getItem(ClaimKey.userName)!;
       this.cdr.detectChanges();
       this.indexedDbService.getAllData(Constant.actionTableName).then((data: GetActionsByUserIdDto[]) => {
         console.log(data);
@@ -60,7 +60,7 @@ export class AppComponent implements OnInit {
         });
       });
     });
-    this.logggedInUserName = this.localStorageService.getItem(ClaimKey.firstName) + ' ' + this.localStorageService.getItem(ClaimKey.lastName)
+    this.logggedInUserName = this.localStorageService.getItem(ClaimKey.userName)!;
 
     this.indexedDbService.initDb(Constant.actionDBName, Constant.dbVersion,
       Constant.actionTablePrimaryKey, Constant.actionTableName, Constant.actionCoumns).then(() => {

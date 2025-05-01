@@ -46,9 +46,15 @@ BEGIN
 END
 GO
 
-If(OBJECT_ID('FK_Transaction_AccountId') Is Not Null)
+If(OBJECT_ID('FK_TransactionDetail_AccountId') Is Not Null)
 BEGIN
-	ALTER TABLE [Transaction] DROP CONSTRAINT [FK_Transaction_AccountId]
+	ALTER TABLE [TransactionDetail] DROP CONSTRAINT [FK_TransactionDetail_AccountId]
+END
+GO
+
+If(OBJECT_ID('FK_TransactionDetail_TransactionId') Is Not Null)
+BEGIN
+	ALTER TABLE [TransactionDetail] DROP CONSTRAINT [FK_TransactionDetail_TransactionId]
 END
 GO
 
@@ -128,6 +134,12 @@ GO
 IF EXISTS (SELECT * FROM sys.tables where name = N'Transaction')
 BEGIN
 	DROP TABLE [Transaction]
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.tables where name = N'TransactionDetail')
+BEGIN
+	DROP TABLE [TransactionDetail]
 END
 GO
 
@@ -259,18 +271,26 @@ CREATE TABLE [Account] (
 	IsDeleted BIT DEFAULT 0)
 
 CREATE TABLE [Transaction] (
-	TransactionId INT CONSTRAINT [PK_Transaction] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
-	AccountId INT NOT NULL CONSTRAINT [FK_Transaction_AccountId] FOREIGN KEY REFERENCES Account(AccountId),
-	Description VARCHAR(500) NULL,
-	TransactionType VARCHAR(15) NOT NULL,
-	Amount INT NOT NULL,
-	StageBalance INT NULL,
-	TransactionTime DATETIME NOT NULL,
-	CreatedDate DATETIME NOT NULL,
-	CreatedBy VARCHAR(30) NOT NULL,
-	ModifiedDate DATETIME NULL,
-	ModifiedBy VARCHAR(30) NULL,
-	IsDeleted BIT DEFAULT 0)
+    TransactionId INT CONSTRAINT [PK_Transaction] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
+    TransactionCategory VARCHAR(20) NOT NULL,
+    Amount INT NOT NULL,
+    Description VARCHAR(500),
+    TransactionTime DATETIME NOT NULL DEFAULT GETDATE(),
+    CreatedBy VARCHAR(30) NOT NULL,
+    CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
+    ModifiedBy VARCHAR(30) NULL,
+    ModifiedDate DATETIME NULL,
+    IsDeleted BIT DEFAULT 0
+);
+
+CREATE TABLE [TransactionDetail] (
+    TransactionDetailsId INT PRIMARY KEY IDENTITY(1,1),
+    TransactionId INT NOT NULL CONSTRAINT [FK_TransactionDetail_TransactionId] FOREIGN KEY REFERENCES [Transaction](TransactionId),
+    AccountId INT NOT NULL CONSTRAINT [FK_TransactionDetail_AccountId] FOREIGN KEY REFERENCES Account(AccountId),
+    TransactionRole VARCHAR(10) NOT NULL,
+    TransactionType VARCHAR(10) NOT NULL,
+    StageBalance INT NOT NULL
+);
 
 CREATE TABLE [Card] (
 	CardId INT CONSTRAINT [PK_Card] PRIMARY KEY IDENTITY(1, 1) NOT NULL,

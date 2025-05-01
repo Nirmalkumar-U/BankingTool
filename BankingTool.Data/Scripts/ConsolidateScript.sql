@@ -1,4 +1,4 @@
-﻿:setvar Path "D:\Nirmal Learning Projects\Bank\BankingTool\BankingTool.Data\Scripts"
+﻿:setvar Path "D:\Nirmal Learning Projects\BankingTool\BankingTool.Data\Scripts"
 :setvar DBName BankingTool
 
 SET NOCOUNT ON
