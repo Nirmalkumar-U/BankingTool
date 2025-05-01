@@ -5,6 +5,7 @@ import { isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
+import { getTransferAmountRequestObject, TransferAmountRequestObject } from '../../dto/request/bank-account/transfer-amount-request';
 import { ResponseDto } from '../../dto/response-dto';
 import { TransferAmountInitialLoadDto } from '../../dto/transfer-amount-initial-load-dto';
 
@@ -24,7 +25,8 @@ export class TransferAmountComponent {
     this.transferAmountForm = this.fb.group({
       toAccountId: ['', [Validators.required]],
       fromAccountId: ['', [Validators.required]],
-      amount: ['', [Validators.required]]
+      amount: ['', [Validators.required]],
+      description: ['', [Validators.required]]
     });
   }
   ngOnInit() {
@@ -50,6 +52,17 @@ export class TransferAmountComponent {
     });
   }
   transferAmount() {
-
+    this.messageList = [];
+    if (!this.transferAmountForm.invalid) {
+      let model = getTransferAmountRequestObject(this.transferAmountForm.get('fromAccountId')?.value, this.transferAmountForm.get('toAccountId')?.value,
+        this.transferAmountForm.get('amount')?.value, this.transferAmountForm.get('description')?.value);
+      this.bankAccountService.transferAmount(model).subscribe((response: ResponseDto<boolean>) => {
+        if (response.response) {
+          this.isSubmitted = true;
+        } else {
+          this.messageList.push("Transfer failed");
+        }
+      });
+    }
   }
 }

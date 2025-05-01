@@ -37,6 +37,13 @@
               Please Enter amount...
             </div>
           </div>
+          <div class="col-md-3">
+            <label for="inputPassword4" class="form-label">Description</label>
+            <input type="text" class="form-control" formControlName="description" required>
+            <div class="invalid-feedback">
+              Please Enter Description...
+            </div>
+          </div>
           <div class="col-12">
             <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Transfer Account</button>
           </div>

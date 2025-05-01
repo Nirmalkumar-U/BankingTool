@@ -122,5 +122,18 @@ namespace BankingTool.Api.Controllers
                 () => _bankAccountService.GetAccountBalance(model.Request.Account.Id)
             );
         }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> TransferAmount(TransferAmountRequestObject model)
+        {
+            return HandleRequestAsync<TransferAmountRequestObject, bool>(
+                model,
+                ValidationRules.TransferAmountRequestRules,
+                () => _bankAccountService.TransferAmount(model.Request.Account.FromAccountId, model.Request.Account.ToAccountId,
+                model.Request.Transaction.Amount, model.Request.Transaction.Description)
+            );
+        }
     }
 }

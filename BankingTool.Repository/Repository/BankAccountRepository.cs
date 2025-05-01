@@ -95,7 +95,6 @@ namespace BankingTool.Repository.Repository
                         Description = t.Description,
                         TransactionType = tp.TransactionType,
                         TransactionCategory = t.TransactionCategory,
-
                         FromAccountId = t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Receiver" ? aOther.AccountNumber :
                                         t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Sender" ? a.AccountNumber :
                                         t.TransactionCategory == TransactionCatagory.Withdraw || t.TransactionCategory == TransactionCatagory.Deposit ? a.AccountNumber : null,

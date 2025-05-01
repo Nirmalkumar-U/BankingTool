@@ -8,6 +8,7 @@ import { GetBankDetailWithoutCustomerAndAccountTypeRequestObject } from '../../d
 import { GetTransferAmountInitialLoadRequestObject } from '../../dto/request/bank-account/get-transfer-amount-initial-load-request';
 import { IsCustomerHasCreditCardInThatBankRequestObject } from '../../dto/request/bank-account/is-customer-has-credit-card-in-that-bank-request';
 import { TransactionsListForCustomerRequestObject } from '../../dto/request/bank-account/transactions-list-for-customer-request';
+import { TransferAmountRequestObject } from '../../dto/request/bank-account/transfer-amount-request';
 import { HttpService } from '../http/http.service';
 
 @Injectable({
@@ -42,6 +43,9 @@ export class BankAccountService {
   }
   getAccountBalance(model: GetAccountBalanceRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetAccountBalance', model);
+  }
+  transferAmount(model: TransferAmountRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/transferAmount', model);
   }
 }
 

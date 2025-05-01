@@ -247,6 +247,7 @@ namespace BankingTool.Service.Service
                 TransactionType = TransactionType.Credit,
                 TransactionRole = TransactionRole.Receiver
             };
+            _bankAccountRepository.TransferAmount(fromAccount, toAccount, fromTransaction, toTransaction, fromTransactionDetail, toTransactionDetail);
             return new ResponseDto<bool>
             {
                 Response = true,

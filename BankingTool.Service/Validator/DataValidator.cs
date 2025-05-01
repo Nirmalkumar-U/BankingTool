@@ -1,7 +1,10 @@
 ﻿using System.Collections;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.IO;
 using System.Text.RegularExpressions;
 using BankingTool.Model.Dto.BaseDto;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BankingTool.Service.Validator
 {
@@ -68,30 +71,76 @@ namespace BankingTool.Service.Validator
 
                     }
 
-                    if (rule.NumericRules != null && value is IComparable comp)
+                    if (rule.NumericRules != null && value is IComparable comp && rule.NumericRules.GetType().GetProperties().Any(p => p.GetValue(rule.NumericRules) != null))
                     {
-                        if (rule.NumericRules.GreaterThan.HasValue && comp.CompareTo(rule.NumericRules.GreaterThan.Value) <= 0)
-                            results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must be greater than {rule.NumericRules.GreaterThan}." });
+                        var valueType = value.GetType();
 
-                        if (rule.NumericRules.GreaterThanOrEqualTo.HasValue && comp.CompareTo(rule.NumericRules.GreaterThanOrEqualTo.Value) < 0)
-                            results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must be greater than or equal to {rule.NumericRules.GreaterThanOrEqualTo}." });
+                        object ConvertRuleValue(object ruleValue)
+                        {
+                            try
+                            {
+                                return Convert.ChangeType(ruleValue, valueType);
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        }
 
-                        if (rule.NumericRules.LessThan.HasValue && comp.CompareTo(rule.NumericRules.LessThan.Value) >= 0)
-                            results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must be less than {rule.NumericRules.LessThan}." });
+                        void AddResult(string message) => results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = message });
 
-                        if (rule.NumericRules.LessThanOrEqualTo.HasValue && comp.CompareTo(rule.NumericRules.LessThanOrEqualTo.Value) > 0)
-                            results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must be less than or equal to {rule.NumericRules.LessThanOrEqualTo}." });
+                        if (rule.NumericRules.GreaterThan.HasValue)
+                        {
+                            var ruleVal = ConvertRuleValue(rule.NumericRules.GreaterThan.Value);
+                            if (ruleVal is IComparable ruleComp && comp.CompareTo(ruleComp) <= 0)
+                                AddResult($"{propertyName} must be greater than {rule.NumericRules.GreaterThan}.");
+                        }
 
-                        if (rule.NumericRules.EqualTo.HasValue && !Equals(value, rule.NumericRules.EqualTo))
-                            results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must be equal to {rule.NumericRules.EqualTo}." });
+                        if (rule.NumericRules.GreaterThanOrEqualTo.HasValue)
+                        {
+                            var ruleVal = ConvertRuleValue(rule.NumericRules.GreaterThanOrEqualTo.Value);
+                            if (ruleVal is IComparable ruleComp && comp.CompareTo(ruleComp) < 0)
+                                AddResult($"{propertyName} must be greater than or equal to {rule.NumericRules.GreaterThanOrEqualTo}.");
+                        }
 
-                        if (rule.NumericRules.NotEqualTo.HasValue && Equals(value, rule.NumericRules.NotEqualTo))
-                            results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must not be equal to {rule.NumericRules.NotEqualTo}." });
+                        if (rule.NumericRules.LessThan.HasValue)
+                        {
+                            var ruleVal = ConvertRuleValue(rule.NumericRules.LessThan.Value);
+                            if (ruleVal is IComparable ruleComp && comp.CompareTo(ruleComp) >= 0)
+                                AddResult($"{propertyName} must be less than {rule.NumericRules.LessThan}.");
+                        }
 
-                        if (rule.NumericRules.BetweenMin.HasValue && rule.NumericRules.BetweenMax.HasValue &&
-                            (comp.CompareTo(rule.NumericRules.BetweenMin.Value) < 0 || comp.CompareTo(rule.NumericRules.BetweenMax.Value) > 0))
-                            results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must be between {rule.NumericRules.BetweenMin} and {rule.NumericRules.BetweenMax}." });
+                        if (rule.NumericRules.LessThanOrEqualTo.HasValue)
+                        {
+                            var ruleVal = ConvertRuleValue(rule.NumericRules.LessThanOrEqualTo.Value);
+                            if (ruleVal is IComparable ruleComp && comp.CompareTo(ruleComp) > 0)
+                                AddResult($"{propertyName} must be less than or equal to {rule.NumericRules.LessThanOrEqualTo}.");
+                        }
+
+                        if (rule.NumericRules.EqualTo.HasValue)
+                        {
+                            var ruleVal = ConvertRuleValue(rule.NumericRules.EqualTo.Value);
+                            if (!object.Equals(value, ruleVal))
+                                AddResult($"{propertyName} must be equal to {rule.NumericRules.EqualTo}.");
+                        }
+
+                        if (rule.NumericRules.NotEqualTo.HasValue)
+                        {
+                            var ruleVal = ConvertRuleValue(rule.NumericRules.NotEqualTo.Value);
+                            if (object.Equals(value, ruleVal))
+                                AddResult($"{propertyName} must not be equal to {rule.NumericRules.NotEqualTo}.");
+                        }
+
+                        if (rule.NumericRules.BetweenMin.HasValue && rule.NumericRules.BetweenMax.HasValue)
+                        {
+                            var min = ConvertRuleValue(rule.NumericRules.BetweenMin.Value);
+                            var max = ConvertRuleValue(rule.NumericRules.BetweenMax.Value);
+                            if (min is IComparable minComp && max is IComparable maxComp &&
+                                (comp.CompareTo(minComp) < 0 || comp.CompareTo(maxComp) > 0))
+                                AddResult($"{propertyName} must be between {rule.NumericRules.BetweenMin} and {rule.NumericRules.BetweenMax}.");
+                        }
                     }
+
 
                     if (rule.DateRules != null && value is DateTime dateVal)
                     {
@@ -178,5 +227,16 @@ namespace BankingTool.Service.Validator
 
             return paths;
         }
+        //object ConvertRuleValue(object ruleValue)
+        //{
+        //    try
+        //    {
+        //        return Convert.ChangeType(ruleValue, valueType);
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
     }
 }
