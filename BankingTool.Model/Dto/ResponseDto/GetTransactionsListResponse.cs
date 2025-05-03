@@ -15,7 +15,7 @@
         public string Description { get; set; }
         public string TransactionType { get; set; }
         public string TransactionCategory { get; set; }
-        public string FromAccountId { get; set; }  // Nullable for Deposit/Withdrawal
+        public string FromAccountId { get; set; } 
         public string ToAccountId { get; set; }
     }
     public class GetTransactionsListResponseAccountInfo

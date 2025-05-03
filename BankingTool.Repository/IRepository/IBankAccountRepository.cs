@@ -29,7 +29,7 @@ namespace BankingTool.Repository.IRepository
 
         bool CreateAccount(Account account, Transaction transaction,TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);
-        bool TransferAmount(Account fromAccount, Account toAccount, Transaction fromTransaction, Transaction toTransaction, TransactionDetail fromTransactionDetail, TransactionDetail toTransactionDetail);
+        bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail, TransactionDetail toTransactionDetail);
         void UpdateCustomer(Customer customer);
         int? InsertTransaction(Transaction transaction);
         Task<Card> GetLastCard(string cardType);

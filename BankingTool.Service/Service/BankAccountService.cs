@@ -219,7 +219,7 @@ namespace BankingTool.Service.Service
             Account toAccount = await _bankAccountRepository.GetAccount(toAccountId);
             fromAccount.Balance = fromAccount.Balance - amount;
             toAccount.Balance = toAccount.Balance + amount;
-            Transaction fromTransaction = new Transaction
+            Transaction transaction = new Transaction
             {
                 TransactionTime = DateTime.Now,
                 Amount = amount,
@@ -233,13 +233,6 @@ namespace BankingTool.Service.Service
                 TransactionType = TransactionType.Debit,
                 TransactionRole = TransactionRole.Sender
             };
-            Transaction toTransaction = new Transaction
-            {
-                TransactionTime = DateTime.Now,
-                Amount = amount,
-                Description = description,
-                TransactionCategory = TransactionCatagory.Transfer
-            };
             TransactionDetail toTransactionDetail = new TransactionDetail
             {
                 AccountId = toAccountId,
@@ -247,7 +240,7 @@ namespace BankingTool.Service.Service
                 TransactionType = TransactionType.Credit,
                 TransactionRole = TransactionRole.Receiver
             };
-            _bankAccountRepository.TransferAmount(fromAccount, toAccount, fromTransaction, toTransaction, fromTransactionDetail, toTransactionDetail);
+            _bankAccountRepository.TransferAmount(fromAccount, toAccount, transaction, fromTransactionDetail, toTransactionDetail);
             return new ResponseDto<bool>
             {
                 Response = true,

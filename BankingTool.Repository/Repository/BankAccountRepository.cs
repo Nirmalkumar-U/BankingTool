@@ -77,33 +77,15 @@ namespace BankingTool.Repository.Repository
         }
         public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId)
         {
-            var transactions = await (
-                    from tp in dataContext.TransactionDetail
-                    join t in dataContext.Transaction on tp.TransactionId equals t.TransactionId
-                    join tpOtherJoin in dataContext.TransactionDetail on t.TransactionId equals tpOtherJoin.TransactionId into tpOtherGroup
-                    from tpOther in tpOtherGroup.DefaultIfEmpty()
-                    join a in dataContext.Account on tp.AccountId equals a.AccountId
-                    join aOtherJoin in dataContext.Account on tpOther.AccountId equals aOtherJoin.AccountId into aOtherGroup
-                    from aOther in aOtherGroup.DefaultIfEmpty()
-                    where tp.AccountId == accountId
-                    select new GetTransactionsListResponseTransactionList
-                    {
-                        TransactionId = t.TransactionId,
-                        Amount = t.Amount,
-                        StageBalance = tp.StageBalance,
-                        TransactionDate = t.TransactionTime,
-                        Description = t.Description,
-                        TransactionType = tp.TransactionType,
-                        TransactionCategory = t.TransactionCategory,
-                        FromAccountId = t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Receiver" ? aOther.AccountNumber :
-                                        t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Sender" ? a.AccountNumber :
-                                        t.TransactionCategory == TransactionCatagory.Withdraw || t.TransactionCategory == TransactionCatagory.Deposit ? a.AccountNumber : null,
+            var sql = "EXEC GetAccountTransactions @AccountId";
+            var parameters = new[]
+                            {
+                                new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString())
+                            };
 
-                        ToAccountId = t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Sender" ? aOther.AccountNumber :
-                                      t.TransactionCategory == TransactionCatagory.Transfer && tp.TransactionRole == "Receiver" ? a.AccountNumber : null
-                    }
-                ).OrderByDescending(x => x.TransactionDate).ToListAsync();
-
+            var transactions = await dataContext.Set<GetTransactionsListResponseTransactionList>()
+                .FromSqlRaw(sql, parameters)
+                .ToListAsync();
 
             return transactions;
         }
@@ -240,7 +222,7 @@ namespace BankingTool.Repository.Repository
             }
         }
 
-        public bool TransferAmount(Account fromAccount, Account toAccount, Transaction fromTransaction, Transaction toTransaction, TransactionDetail fromTransactionDetail,
+        public bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
             TransactionDetail toTransactionDetail)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
@@ -248,10 +230,9 @@ namespace BankingTool.Repository.Repository
             {
                 UpdateAccount(fromAccount);
                 UpdateAccount(toAccount);
-                var fromTransactionId = InsertTransaction(fromTransaction);
-                var toTransactionId = InsertTransaction(toTransaction);
-                fromTransactionDetail.TransactionId = fromTransactionId.Value;
-                toTransactionDetail.TransactionId = toTransactionId.Value;
+                var transactionId = InsertTransaction(transaction);
+                toTransactionDetail.TransactionId = transactionId.Value;
+                fromTransactionDetail.TransactionId = transactionId.Value;
                 InsertTransactionDetail(toTransactionDetail);
                 InsertTransactionDetail(fromTransactionDetail);
                 sqlTransaction.Commit();
