@@ -203,6 +203,36 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
+        public async Task<ResponseDto<bool>> GetSelfTransferInitialLoad()
+        {
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                DropDownList = new List<DropDownListDto>
+                {
+                    new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() }
+                },
+                StatuCode = 200,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
+        public async Task<ResponseDto<bool>> GetToAccountListExcludedByAccountId(int accountId)
+        {
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                DropDownList = new List<DropDownListDto>
+                {
+                    new DropDownListDto{ Name = "ToAccount", DropDown = await _bankAccountRepository.GetToAccountListExcludedByAccountId(accountId) }
+                },
+                StatuCode = 200,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
         public async Task<ResponseDto<int>> GetAccountBalance(int accountId)
         {
             return new ResponseDto<int>

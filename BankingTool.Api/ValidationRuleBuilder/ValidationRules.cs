@@ -156,6 +156,12 @@ namespace BankingTool.Api.Validators
             RuleBuilder<GetAccountBalanceRequestObject>.For(x => x.Request).Required(),
             RuleBuilder<GetAccountBalanceRequestObject>.For(x => x.Request.Account).Required(),
             RuleBuilder<GetAccountBalanceRequestObject>.For(x => x.Request.Account.Id).Required()
+        }; 
+        public static List<ValidationRule> GetToAccountListExcludedByAccountIdRequestRules = new()
+        {
+            RuleBuilder<GetToAccountListExcludedByAccountIdRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<GetToAccountListExcludedByAccountIdRequestObject>.For(x => x.Request.Account).Required(),
+            RuleBuilder<GetToAccountListExcludedByAccountIdRequestObject>.For(x => x.Request.Account.Id).Required()
         };
         public static List<ValidationRule> TransferAmountRequestRules = new()
         {

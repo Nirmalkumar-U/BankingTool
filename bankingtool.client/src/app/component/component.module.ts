@@ -18,6 +18,7 @@ import { TransactionListResolver } from '../core/resolver/transaction-list.resol
 import { UserListResolver } from '../core/resolver/user-list.resolver';
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
 import { TransferAmountResolver } from '../core/resolver/transfer-amount.resolver';
+import { SelfTransferResolver } from '../core/resolver/self-transfer.resolver';
 
 const routes: Routes = [
   {
@@ -67,10 +68,18 @@ const routes: Routes = [
   {
     path: AppPaths.transfer,
     title: PageTitle.transfer,
+    data: { reportName: PageTitle.transfer },
     component: TransferAmountComponent,
     resolve: { DataResolver: TransferAmountResolver }
+  },
+  {
+    path: AppPaths.selfTransfer,
+    title: PageTitle.selfTransfer,
+    data: { reportName: PageTitle.selfTransfer },
+    component: TransferAmountComponent,
+    resolve: { DataResolver: SelfTransferResolver }
   }
-]; 
+];
 
 @NgModule({
   declarations: [

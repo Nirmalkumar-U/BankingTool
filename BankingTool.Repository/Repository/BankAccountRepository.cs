@@ -163,6 +163,20 @@ namespace BankingTool.Repository.Repository
                               Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
                           }).ToListAsync();
         }
+        public async Task<List<DropDownDto>> GetToAccountListExcludedByAccountId(int accountId)
+        {
+            return await (from a in dataContext.Account
+                          join c in dataContext.Customer on a.CustomerId equals c.CustomerId
+                          join u in dataContext.Users on c.UserId equals u.UserId
+                          join b in dataContext.Bank on a.BankId equals b.BankId
+                          join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
+                          where a.CustomerId == dataContext.CustomerId && a.AccountId != accountId && a.AccountStatus == AccountStatus.Active
+                          select new DropDownDto
+                          {
+                              Key = a.AccountId,
+                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
+                          }).ToListAsync();
+        }
         public async Task<List<DropDownDto>> GetToAccountListOnWithoutCustomerId()
         {
             return await (from a in dataContext.Account

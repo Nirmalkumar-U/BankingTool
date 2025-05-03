@@ -26,6 +26,7 @@ namespace BankingTool.Repository.IRepository
         Task<int> GetAccountBalance(int accountId);
         Task<Account> GetAccount(int AccountId);
         Task<Transaction> GetTransaction(int TransactionId);
+        Task<List<DropDownDto>> GetToAccountListExcludedByAccountId(int accountId);
 
         bool CreateAccount(Account account, Transaction transaction,TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);

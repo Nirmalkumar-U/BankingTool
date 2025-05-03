@@ -135,5 +135,27 @@ namespace BankingTool.Api.Controllers
                 model.Request.Transaction.Amount, model.Request.Transaction.Description)
             );
         }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> GetSelfTransferInitialLoad()
+        {
+            return HandleRequestAsync<int?, bool>(
+                null,
+                null,
+                _bankAccountService.GetSelfTransferInitialLoad
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> GetToAccountListExcludedByAccountId(GetToAccountListExcludedByAccountIdRequestObject model)
+        {
+            return HandleRequestAsync<GetToAccountListExcludedByAccountIdRequestObject, bool>(
+                model,
+                ValidationRules.GetToAccountListExcludedByAccountIdRequestRules,
+                () => _bankAccountService.GetToAccountListExcludedByAccountId(model.Request.Account.Id)
+            );
+        }
     }
 }
