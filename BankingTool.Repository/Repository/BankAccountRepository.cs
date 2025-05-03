@@ -174,14 +174,14 @@ namespace BankingTool.Repository.Repository
                           select new DropDownDto
                           {
                               Key = a.AccountId,
-                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
+                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(a.AccountNumber.Length - 4) + "/" + cv.CodeValue1
                           }).ToListAsync();
         }
 
         public async Task<int> GetAccountBalance(int accountId)
         {
             return await (from a in dataContext.Account
-                          where a.AccountId != accountId && a.AccountStatus == AccountStatus.Active
+                          where a.AccountId == accountId && a.AccountStatus == AccountStatus.Active
                           select a.Balance).FirstOrDefaultAsync();
         }
 

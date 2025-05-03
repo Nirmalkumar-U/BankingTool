@@ -57,7 +57,7 @@ export class TransferAmountComponent {
       let model = getTransferAmountRequestObject(this.transferAmountForm.get('fromAccountId')?.value, this.transferAmountForm.get('toAccountId')?.value,
         this.transferAmountForm.get('amount')?.value, this.transferAmountForm.get('description')?.value);
       this.bankAccountService.transferAmount(model).subscribe((response: ResponseDto<boolean>) => {
-        if (response.response) {
+        if (response.status) {
           this.isSubmitted = true;
         } else {
           this.messageList.push("Transfer failed");

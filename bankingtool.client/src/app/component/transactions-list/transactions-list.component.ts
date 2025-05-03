@@ -61,6 +61,7 @@ export class TransactionsListComponent {
           this.accountTypeList = response.dropDownList.find(x => x.name == "AccountType")!.dropDown;
         });
       }
+      this.transactionForm.controls["accountTypeId"].setValue('');
     });
     this.transactionForm.get('accountTypeId')?.valueChanges.subscribe(accountTypeId => {
       if (!isNullOrEmpty(accountTypeId) && !isNullOrEmpty(this.bankId) && !isNullOrEmpty(this.customerId)) {
