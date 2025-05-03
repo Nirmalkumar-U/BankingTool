@@ -93,7 +93,7 @@ namespace BankingTool.Api.Controllers
                 () => _userService.InsertUser(model)
             );
         }
-        [HttpPost]
+        [HttpGet]
         [TokenAuthorization]
         [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 200)]
         [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 400)]

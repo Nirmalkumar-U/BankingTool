@@ -16,7 +16,7 @@ namespace BankingTool.Api.Controllers
     {
         private readonly IBankAccountService _bankAccountService = bankAccountService;
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetCreateAccountInitialLoad()
@@ -75,7 +75,7 @@ namespace BankingTool.Api.Controllers
             );
         }
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> BankDropDownList()
@@ -99,7 +99,7 @@ namespace BankingTool.Api.Controllers
             );
         }
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetTransferAmountInitialLoad()
@@ -135,7 +135,7 @@ namespace BankingTool.Api.Controllers
                 model.Request.Transaction.Amount, model.Request.Transaction.Description)
             );
         }
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public Task<IActionResult> GetSelfTransferInitialLoad()

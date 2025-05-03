@@ -17,7 +17,7 @@ export class BankAccountService {
   constructor(private httpService: HttpService) { }
 
   getCreateAccountInitialLoad(): Observable<any> {
-    return this.httpService.post('BankAccount/GetCreateAccountInitialLoad', null);
+    return this.httpService.get('BankAccount/GetCreateAccountInitialLoad');
   }
   createAccount(model: CreateAccountRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/CreateAccount', model);
@@ -32,13 +32,13 @@ export class BankAccountService {
     return this.httpService.post('BankAccount/TransactionsListForCustomer', model);
   }
   bankDropDownList(): Observable<any> {
-    return this.httpService.post('BankAccount/BankDropDownList', null);
+    return this.httpService.get('BankAccount/BankDropDownList');
   }
   getAccountTypeDropDownListByCustomerIdAndBankId(model: GetAccountTypeDropDownListRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetAccountTypeDropDownListByCustomerIdAndBankId', model);
   }
   getTransferAmountInitialLoad(): Observable<any> {
-    return this.httpService.post('BankAccount/GetTransferAmountInitialLoad', null);
+    return this.httpService.get('BankAccount/GetTransferAmountInitialLoad');
   }
   getAccountBalance(model: GetAccountBalanceRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetAccountBalance', model);
@@ -47,7 +47,7 @@ export class BankAccountService {
     return this.httpService.post('BankAccount/transferAmount', model);
   }
   getSelfTransferInitialLoad(): Observable<any> {
-    return this.httpService.post('BankAccount/GetSelfTransferInitialLoad', null);
+    return this.httpService.get('BankAccount/GetSelfTransferInitialLoad');
   }
   getToAccountListExcludedByAccountId(model: GetToAccountListExcludedByAccountIdRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetToAccountListExcludedByAccountId', model);
