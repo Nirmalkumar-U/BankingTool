@@ -69,6 +69,7 @@
     <None Include="Scripts\Schema\Schema.sql" />
     <None Include="Scripts\Schema\StoreProcedure.sql" />
     <None Include="Scripts\ConsolidateScript.sql" />
+    <None Include="Scripts\Schema\ScalarFunction.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\MergeScripts\ConsolidateMergeScripts.sql" />

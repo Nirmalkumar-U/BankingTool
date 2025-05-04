@@ -68,20 +68,20 @@
         <table *ngIf="transactionsList && transactionsList != null && transactionsList.length != 0" class="table caption-top">
           <thead>
             <tr>
-              <th scope="col" width="12%">Transfer From</th>
-              <th scope="col" width="10%">Transfer To</th>
+              <th scope="col" width="15%">Transfer From</th>
+              <th scope="col" width="15%">Transfer To</th>
               <th scope="col" width="10%">Category</th>
               <th scope="col" width="11%">Date</th>
               <th scope="col" width="22%">Description</th>
               <th scope="col" width="8%">Credit</th>
               <th scope="col" width="8%">Debit</th>
-              <th scope="col" width="20%">Stage Balance</th>
+              <th scope="col" width="12%">Stage Balance</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let trans of transactionsList">
-              <td>{{ trans.fromAccountId?.slice(-6) }}</td>
-              <td>{{ trans.toAccountId?.slice(-6) }}</td>
+              <td>{{ trans.fromAccountId }}</td>
+              <td>{{ trans.toAccountId }}</td>
               <td>{{ trans.transactionCategory }}</td>
               <td>{{ trans.transactionDate | date:'dd-MM-yyyy' }}</td>
               <td>{{ trans.description }}</td>

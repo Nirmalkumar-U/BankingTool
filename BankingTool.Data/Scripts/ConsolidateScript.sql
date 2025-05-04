@@ -12,6 +12,9 @@ GO
 :r  $(Path)\Schema\Schema.sql
 PRINT 'Schema.sql'
 GO
+:r  $(Path)\Schema\ScalarFunction.sql
+PRINT 'ScalarFunction.sql'
+GO
 :r  $(Path)\Schema\StoreProcedure.sql
 PRINT 'StoreProcedure.sql'
 GO

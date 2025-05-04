@@ -41,19 +41,19 @@ BEGIN
 		t.Description,
 		td.TransactionType,
 		t.TransactionCategory,
-        ISNULL(sender_acc.AccountNumber, Null) AS FromAccountId,
-        ISNULL(receiver_acc.AccountNumber, NULL) AS ToAccountId
+        CASE WHEN sender_acc.AccountNumber IS NULL THEN NULL ELSE dbo.GetCombinedInfoByAccountId(sender_acc.AccountId) END AS FromAccountId,
+        CASE WHEN receiver_acc.AccountNumber  IS NULL THEN NULL ELSE dbo.GetCombinedInfoByAccountId(receiver_acc.AccountId) END AS ToAccountId
    FROM TransactionDetail td
     JOIN [Transaction] t ON td.TransactionId = t.TransactionId
     JOIN Account acc ON td.AccountId = acc.AccountId
     LEFT JOIN (
-        SELECT td2.TransactionId, a2.AccountNumber
+        SELECT td2.TransactionId, a2.AccountNumber, a2.AccountId
         FROM TransactionDetail td2
         JOIN Account a2 ON td2.AccountId = a2.AccountId
         WHERE td2.TransactionRole = 'Sender'
     ) sender_acc ON sender_acc.TransactionId = t.TransactionId
     LEFT JOIN (
-        SELECT td3.TransactionId, a3.AccountNumber
+        SELECT td3.TransactionId, a3.AccountNumber, a3.AccountId
         FROM TransactionDetail td3
         JOIN Account a3 ON td3.AccountId = a3.AccountId
         WHERE td3.TransactionRole = 'Receiver'
