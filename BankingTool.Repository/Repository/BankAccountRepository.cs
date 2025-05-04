@@ -198,8 +198,13 @@ namespace BankingTool.Repository.Repository
                           where a.AccountId == accountId && a.AccountStatus == AccountStatus.Active
                           select a.Balance).FirstOrDefaultAsync();
         }
-
-        public bool CreateAccount(Account account, Transaction transaction, TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
+        public async Task<CreditScore> GetCreditScoreOfCustomer(int customerId)
+        {
+            return await (from cs in dataContext.CreditScore
+                          where cs.CustomerId == customerId
+                          select cs).FirstOrDefaultAsync();
+        }
+        public bool CreateAccount(Account account, Transaction transaction, TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore creditScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
@@ -223,7 +228,11 @@ namespace BankingTool.Repository.Repository
                 }
                 if (IsAnyAccountForThisCustomer)
                 {
-                    InsertCreditScore(cardScore);
+                    UpdateCreditScore(creditScore);
+                }
+                else
+                {
+                    InsertCreditScore(creditScore);
                 }
                 sqlTransaction.Commit();
                 return true;
@@ -336,6 +345,12 @@ namespace BankingTool.Repository.Repository
             creditScore.IsDeleted = false;
             var isInserted = Insert(creditScore);
             return isInserted ? creditScore.CreditScoreId : null;
+        }
+        public void UpdateCreditScore(CreditScore creditScore)
+        {
+            creditScore.ModifiedBy = dataContext.UserEmail;
+            creditScore.ModifiedDate = DateTime.Now;
+            Update(creditScore);
         }
         public void UpdateCustomer(Customer customer)
         {

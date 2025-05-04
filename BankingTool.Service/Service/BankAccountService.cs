@@ -110,15 +110,16 @@ namespace BankingTool.Service.Service
                     CVV = await GetNewCreditCVVNumber(),
                 };
             }
-            var IsAnyAccountForThisCustomer = false; //await _bankAccountRepository.IsAnyAccountForThisCustomer(account.CustomerId);
-            CreditScore cardScore = null;
+            var IsAnyAccountForThisCustomer = await _bankAccountRepository.IsAnyAccountForThisCustomer(account.CustomerId);
+            CreditScore creditScore = null;
             if (IsAnyAccountForThisCustomer)
             {
-                //TODO
+                creditScore = await _bankAccountRepository.GetCreditScoreOfCustomer(account.CustomerId);
+                creditScore.CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0);//TODO
             }
             else
             {
-                cardScore = new()
+                creditScore = new()
                 {
                     CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
                     CustomerId = model.Customer.Id,
@@ -127,7 +128,7 @@ namespace BankingTool.Service.Service
                 };
             }
 
-            bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, transactionDetails, debitCard, creditCard, cardScore, customer, model.Customer.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
+            bool isAccountCreated = _bankAccountRepository.CreateAccount(account, transaction, transactionDetails, debitCard, creditCard, creditScore, customer, model.Customer.CustomerWantCreditCard, IsAnyAccountForThisCustomer, isUpdatePrimaryAccount);
             if (isAccountCreated)
             {
                 response.Response = true;
@@ -345,12 +346,12 @@ namespace BankingTool.Service.Service
         private async Task<int> GetNewDebitCVVNumber()
         {
             var lastCard = await _bankAccountRepository.GetLastCard(CardType.DebitCard);
-            return (lastCard != null) ? lastCard.CVV + 1 : 001;
+            return (lastCard != null) ? lastCard.CVV + 1 : 100;
         }
         private async Task<int> GetNewCreditCVVNumber()
         {
             var lastCard = await _bankAccountRepository.GetLastCard(CardType.CreditCard);
-            return (lastCard != null) ? lastCard.CVV + 1 : 001;
+            return (lastCard != null) ? lastCard.CVV + 1 : 100;
         }
         private static int CalculateCreditScore(int onTimePayments, int totalPayments, double creditUtilization, int creditAge, int inquiries)
         {
