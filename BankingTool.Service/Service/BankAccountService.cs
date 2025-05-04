@@ -279,7 +279,34 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
+        public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description)
+        {
+            Account account = await _bankAccountRepository.GetAccount(accountId);
+            account.Balance = account.Balance + amount;
 
+            Transaction transaction = new()
+            {
+                Amount = amount,
+                Description = description,
+                TransactionTime = DateTime.Now,
+                TransactionCategory = TransactionCatagory.Deposit
+            };
+            TransactionDetail transactionDetails = new()
+            {
+                AccountId = account.AccountId,
+                TransactionType = TransactionType.Credit,
+                StageBalance = account.Balance,
+                TransactionRole = TransactionRole.Receiver,
+            };
+            _bankAccountRepository.DespositAmount(account, transaction, transactionDetails);
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
         #region Private
         private async Task<(Customer, bool)> UpdatePrimaryAccountNumber(bool DoYouWantToChangeThisAccountToPrimaryAccount, string AccountNumber, int CustomerId)
         {

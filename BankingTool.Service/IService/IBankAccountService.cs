@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using BankingTool.Model;
+﻿using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
 
@@ -19,5 +18,6 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description);
         Task<ResponseDto<bool>> GetSelfTransferInitialLoad();
         Task<ResponseDto<bool>> GetToAccountListExcludedByAccountId(int accountId);
+        Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description);
     }
 }

@@ -157,5 +157,16 @@ namespace BankingTool.Api.Controllers
                 () => _bankAccountService.GetToAccountListExcludedByAccountId(model.Request.Account.Id)
             );
         }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> DepositAmount(DepositAmountRequestObject model)
+        {
+            return HandleRequestAsync<DepositAmountRequestObject, bool>(
+                model,
+                ValidationRules.DepositAmountRequestObjectRules,
+                () => _bankAccountService.DepositAmount(model.Request.Account.Id, model.Request.Transaction.Amount, model.Request.Transaction.Description)
+            );
+        }
     }
 }

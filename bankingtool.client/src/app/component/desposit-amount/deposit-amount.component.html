@@ -1,0 +1,45 @@
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Deposit Amount</h1>
+      </div>
+      <div class='card-body'>
+        <form class="row g-3 was-validated" novalidate [formGroup]="depositAmountForm" (ngSubmit)="depositAmount()">
+          <div class="col-md-4">
+            <label class="form-label">Account</label>
+            <select class="form-select" formControlName="accountId" required>
+              <option value="">Select</option>
+              <option *ngFor="let fa of accountList" [ngValue]="fa.key">{{ fa.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Account...
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="inputPassword4" class="form-label">Amount</label>
+            <input type="text" class="form-control" formControlName="amount" required>
+            <div class="invalid-feedback">
+              Please Enter amount...
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="inputPassword4" class="form-label">Description</label>
+            <input type="text" class="form-control" formControlName="description" required>
+            <div class="invalid-feedback">
+              Please Enter Description...
+            </div>
+          </div>
+          <div class="col-12">
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Deposit Amount</button>
+          </div>
+          <div class="col-12" *ngIf="messageList && messageList.length != 0">
+            <h3 *ngFor="let msg of messageList">{{msg}}</h3>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+

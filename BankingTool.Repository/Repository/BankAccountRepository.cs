@@ -259,6 +259,25 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
+        public bool DespositAmount(Account account, Transaction transaction, TransactionDetail transactionDetail)
+        {
+            using var sqlTransaction = dataContext.Database.BeginTransaction();
+            try
+            {
+                UpdateAccount(account);
+                var transactionId = InsertTransaction(transaction);
+                transactionDetail.TransactionId = transactionId.Value;
+                InsertTransactionDetail(transactionDetail);
+                sqlTransaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                sqlTransaction.Rollback();
+                return false;
+            }
+        }
         public async Task<Account> GetAccount(int AccountId)
         {
             return await dataContext.Account.FirstOrDefaultAsync(x => x.AccountId == AccountId);

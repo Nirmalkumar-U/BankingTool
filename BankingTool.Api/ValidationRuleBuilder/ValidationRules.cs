@@ -183,6 +183,25 @@ namespace BankingTool.Api.Validators
                     r.MaxLength = 100;
                 }),
         };
+        public static List<ValidationRule> DepositAmountRequestObjectRules = new()
+        {
+            RuleBuilder<DepositAmountRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<DepositAmountRequestObject>.For(x => x.Request.Account).Required(),
+            RuleBuilder<DepositAmountRequestObject>.For(x => x.Request.Transaction).Required(),
+            RuleBuilder<DepositAmountRequestObject>.For(x => x.Request.Account.Id).Required(),
+            RuleBuilder<DepositAmountRequestObject>.For(x => x.Request.Transaction.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+            RuleBuilder<DepositAmountRequestObject>.For(x => x.Request.Transaction.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+        };
         #endregion BankAccountController
     }
 }

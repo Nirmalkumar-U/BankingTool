@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CreateAccountRequestObject } from '../../dto/request/bank-account/create-account-request';
+import { DepositAmountRequestObject } from '../../dto/request/bank-account/deposit-amount-request';
 import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
 import { GetAccountTypeDropDownListRequestObject } from '../../dto/request/bank-account/get-account-type-drop-down-list-request';
 import { GetBankDetailWithoutCustomerAndAccountTypeRequestObject } from '../../dto/request/bank-account/get-bank-detail-without-customer-and-account-type-request';
@@ -51,6 +52,9 @@ export class BankAccountService {
   }
   getToAccountListExcludedByAccountId(model: GetToAccountListExcludedByAccountIdRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetToAccountListExcludedByAccountId', model);
+  }
+  depositAmount(model: DepositAmountRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/DepositAmount', model);
   }
 }
 

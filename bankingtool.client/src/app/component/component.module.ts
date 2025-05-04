@@ -19,6 +19,7 @@ import { UserListResolver } from '../core/resolver/user-list.resolver';
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
 import { TransferAmountResolver } from '../core/resolver/transfer-amount.resolver';
 import { SelfTransferResolver } from '../core/resolver/self-transfer.resolver';
+import { DepositAmountComponent } from './desposit-amount/deposit-amount.component';
 
 const routes: Routes = [
   {
@@ -78,6 +79,12 @@ const routes: Routes = [
     data: { reportName: PageTitle.selfTransfer },
     component: TransferAmountComponent,
     resolve: { DataResolver: SelfTransferResolver }
+  },
+  {
+    path: AppPaths.depositAmount,
+    title: PageTitle.depositAmount,
+    component: DepositAmountComponent,
+    resolve: { DataResolver: SelfTransferResolver }
   }
 ];
 
@@ -91,7 +98,8 @@ const routes: Routes = [
     UserListComponent,
     CreateAccountComponent,
     TransactionsListComponent,
-    TransferAmountComponent
+    TransferAmountComponent,
+    DepositAmountComponent
   ],
   imports: [
     RouterModule.forChild(routes),

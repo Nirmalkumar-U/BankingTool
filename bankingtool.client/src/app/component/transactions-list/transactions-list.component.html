@@ -33,7 +33,7 @@
           <div class="atm-card" *ngFor="let card of cardInfo">
             <h5 class="card-title">{{card.bankName}}</h5>
             <h6 class="card-number">{{card.cardNumber}}</h6>
-            <h6>CVV: {{card.cVV}}</h6>
+            <h6>CVV: {{card.cvv}}</h6>
             <div style="position: relative;top: 67px;">
               <h6 class="mt-2" *ngIf="card.balanceLimit != null">{{card.balanceLimit}}</h6>
               <h6 class="card-holder">{{card.holderName}}</h6>

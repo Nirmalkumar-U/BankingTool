@@ -30,6 +30,6 @@ export interface GetTransactionsListResponseCardInfo {
   bankName: string;
   holderName: string;
   expirationDate: string;
-  cVV: number;
+  cvv: number;
   balanceLimit: number | null;
 }
