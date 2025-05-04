@@ -202,6 +202,25 @@ namespace BankingTool.Api.Validators
                     r.MaxLength = 100;
                 }),
         };
+        public static List<ValidationRule> CashWithdrawRequestObjectRules = new()
+        {
+            RuleBuilder<CashWithdrawRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<CashWithdrawRequestObject>.For(x => x.Request.Account).Required(),
+            RuleBuilder<CashWithdrawRequestObject>.For(x => x.Request.Transaction).Required(),
+            RuleBuilder<CashWithdrawRequestObject>.For(x => x.Request.Account.Id).Required(),
+            RuleBuilder<CashWithdrawRequestObject>.For(x => x.Request.Transaction.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+            RuleBuilder<CashWithdrawRequestObject>.For(x => x.Request.Transaction.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+        };
         #endregion BankAccountController
     }
 }

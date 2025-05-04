@@ -73,9 +73,11 @@ export class TransferAmountComponent {
       let model = getTransferAmountRequestObject(this.transferAmountForm.get('fromAccountId')?.value, this.transferAmountForm.get('toAccountId')?.value,
         this.transferAmountForm.get('amount')?.value, this.transferAmountForm.get('description')?.value);
       this.bankAccountService.transferAmount(model).subscribe((response: ResponseDto<boolean>) => {
-        if (response.status) {
+        if (response.status == true) {
           this.isSubmitted = true;
         } else {
+          if (Array.isArray(response?.errors) && response?.errors)
+            this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
           this.messageList.push("Transfer failed");
         }
       });

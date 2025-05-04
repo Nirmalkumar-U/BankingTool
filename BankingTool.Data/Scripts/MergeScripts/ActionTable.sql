@@ -18,6 +18,8 @@ USING (VALUES
  ,(14,N'Self Transfer',N'/selfTransfer',N'Menu',N'RW',2,6,4,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(15,N'Deposit Amount',N'/depositAmount',N'Menu',N'R',2,6,5,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(16,N'Deposit Amount',N'/depositAmount',N'Menu',N'RW',2,6,5,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(17,N'Cash Withdraw',N'/cashWithdraw',N'Menu',N'R',2,6,6,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(18,N'Cash Withdraw',N'/cashWithdraw',N'Menu',N'RW',2,6,6,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
 ) AS Source ([ActionId],[ActionName],[ActionPath],[ActionType],[Access],[MenuLevel],[ParrentMenuId],[Sequence],[CreatedDate],[CreatedBy],[ModifiedDate],[ModifiedBy],[IsDeleted])
 ON (Target.[ActionId] = Source.[ActionId])
 WHEN MATCHED AND (
@@ -79,4 +81,5 @@ Values (1,1),
 (2,10),
 (2,12),
 (2,14),
-(2,16)
+(2,16),
+(2,18)

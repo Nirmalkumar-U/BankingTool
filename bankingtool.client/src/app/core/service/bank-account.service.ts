@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { CashWithdrawRequestObject } from '../../dto/request/bank-account/cash-withdraw-request';
 import { CreateAccountRequestObject } from '../../dto/request/bank-account/create-account-request';
 import { DepositAmountRequestObject } from '../../dto/request/bank-account/deposit-amount-request';
 import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
@@ -55,6 +56,9 @@ export class BankAccountService {
   }
   depositAmount(model: DepositAmountRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/DepositAmount', model);
+  }
+  cashWithdraw(model: CashWithdrawRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/CashWithdraw', model);
   }
 }
 

@@ -268,7 +268,7 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
-        public bool DespositAmount(Account account, Transaction transaction, TransactionDetail transactionDetail)
+        public bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try

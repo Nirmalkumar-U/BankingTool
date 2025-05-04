@@ -32,7 +32,7 @@ namespace BankingTool.Repository.IRepository
         bool CreateAccount(Account account, Transaction transaction,TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);
         bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail, TransactionDetail toTransactionDetail);
-        bool DespositAmount(Account account, Transaction transaction, TransactionDetail transactionDetail);
+        bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail);
 
         void UpdateCustomer(Customer customer);
         int? InsertTransaction(Transaction transaction);

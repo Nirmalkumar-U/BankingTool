@@ -299,7 +299,35 @@ namespace BankingTool.Service.Service
                 StageBalance = account.Balance,
                 TransactionRole = TransactionRole.Receiver,
             };
-            _bankAccountRepository.DespositAmount(account, transaction, transactionDetails);
+            _bankAccountRepository.CashTransfer(account, transaction, transactionDetails);
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
+        public async Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description)
+        {
+            Account account = await _bankAccountRepository.GetAccount(accountId);
+            account.Balance = account.Balance - amount;
+
+            Transaction transaction = new()
+            {
+                Amount = amount,
+                Description = description,
+                TransactionTime = DateTime.Now,
+                TransactionCategory = TransactionCatagory.Withdraw
+            };
+            TransactionDetail transactionDetails = new()
+            {
+                AccountId = account.AccountId,
+                TransactionType = TransactionType.Debit,
+                StageBalance = account.Balance,
+                TransactionRole = TransactionRole.Sender,
+            };
+            _bankAccountRepository.CashTransfer(account, transaction, transactionDetails);
             return new ResponseDto<bool>
             {
                 Response = true,

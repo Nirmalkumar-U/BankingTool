@@ -138,9 +138,13 @@ export class CreateAccountComponent {
           }
         }
       };
-      this.bankAccountService.createAccount(model).subscribe((responce: ResponseDto<boolean>) => {
-        this.messageList = [...responce.errors.map(x => x.errorMessage), ...responce.validationErrors.map(x => x.errorMessage)]
-        this.isSubmitted = true;
+      this.bankAccountService.createAccount(model).subscribe((response: ResponseDto<boolean>) => {
+        if (response.status == true) {
+          this.isSubmitted = true;
+        } else {
+          if (Array.isArray(response?.errors) && response?.errors)
+            this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+        }
       });
     }
   }

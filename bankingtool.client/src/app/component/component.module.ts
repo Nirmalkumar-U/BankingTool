@@ -20,6 +20,8 @@ import { TransferAmountComponent } from './transfer-amount/transfer-amount.compo
 import { TransferAmountResolver } from '../core/resolver/transfer-amount.resolver';
 import { SelfTransferResolver } from '../core/resolver/self-transfer.resolver';
 import { DepositAmountComponent } from './desposit-amount/deposit-amount.component';
+import { CashWithdrawResolver } from '../core/resolver/cash-withdraw.resolver';
+import { CashWithdrawComponent } from './cash-withdraw/cash-withdraw.component';
 
 const routes: Routes = [
   {
@@ -85,6 +87,12 @@ const routes: Routes = [
     title: PageTitle.depositAmount,
     component: DepositAmountComponent,
     resolve: { DataResolver: SelfTransferResolver }
+  },
+  {
+    path: AppPaths.cashWithdraw,
+    title: PageTitle.cashWithdraw,
+    component: CashWithdrawComponent,
+    resolve: { DataResolver: CashWithdrawResolver }
   }
 ];
 
@@ -99,7 +107,8 @@ const routes: Routes = [
     CreateAccountComponent,
     TransactionsListComponent,
     TransferAmountComponent,
-    DepositAmountComponent
+    DepositAmountComponent,
+    CashWithdrawComponent
   ],
   imports: [
     RouterModule.forChild(routes),
