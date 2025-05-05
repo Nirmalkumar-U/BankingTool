@@ -13,6 +13,7 @@ USING (VALUES
  ,(9,N'Union Bank of India',N'UBI')
  ,(10,N'IDBI Bank',N'IDBI')
  ,(11,N'Indian Overseas Bank',N'IOB')
+ ,(12,N'South Indian Bank',N'SIB')
 ) AS Source ([BankId],[BankName],[BankAbbrivation])
 ON (Target.[BankId] = Source.[BankId])
 WHEN MATCHED AND (
