@@ -35,6 +35,7 @@ export class DepositAmountComponent {
       this.bankAccountService.depositAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
+          this.messageList.push("Amount deposited successfully.");
         } else {
           if (Array.isArray(response?.errors) && response?.errors)
             this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]

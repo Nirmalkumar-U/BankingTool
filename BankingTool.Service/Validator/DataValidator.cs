@@ -66,7 +66,7 @@ namespace BankingTool.Service.Validator
 
                         if (rule.StringRules.EmailFormat && !new EmailAddressAttribute().IsValid(strVal))
                             results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} must be a valid email address." });
-                        if (rule.StringRules.NotEmpty && strVal == "")
+                        if (rule.StringRules.NotEmpty && strVal?.Trim() == "")
                             results.Add(new ValidationResults { PropertyName = propertyName, PropertyPath = path, ErrorMessage = $"{propertyName} is required." });
 
                     }

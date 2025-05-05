@@ -55,10 +55,11 @@ export class CashWithdrawComponent {
       this.bankAccountService.cashWithdraw(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
+          this.messageList.push("Cash withdraw successfully.");
         } else {
           if (Array.isArray(response?.errors) && response?.errors)
             this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
-          this.messageList.push("Transfer failed");
+          this.messageList.push("Transfer failed.");
         }
       });
     }

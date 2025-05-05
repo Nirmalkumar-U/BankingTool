@@ -224,6 +224,13 @@ namespace BankingTool.Service
                 ValidationErrors = [],
                 Errors = []
             };
+            bool isUserExist = await _userRepository.IsUserExist(user.Request.User.Email);
+            if (isUserExist)
+            {
+                response.Errors.Add(new Errors { PropertyName = "InsertUser", ErrorMessage = $"This User {user.Request.User.Email} is already exist." });
+                response.StatuCode = 400;
+                return response;
+            }
             Users userDetail = new()
             {
                 FirstName = user.Request.User.FirstName,

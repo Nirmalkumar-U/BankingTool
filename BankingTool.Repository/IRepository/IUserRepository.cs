@@ -13,6 +13,7 @@ namespace BankingTool.Repository
         Task<Staff> GetStaffByUserId(int userId);
         Task<List<UserListResponse>> GetUserList();
         int? CreateUser(Users userDetail, UserRole userRole, Staff staff, Customer customer, bool isCustomerNeedToInsert);
+        Task<bool> IsUserExist(string email);
         int InsertUser(Users user);
         bool InsertUserRole(UserRole userRole);
         Task<List<GetActionsByUserIdDto>> GetActionsByUserId(int userId);

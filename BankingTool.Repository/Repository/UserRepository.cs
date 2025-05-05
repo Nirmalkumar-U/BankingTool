@@ -41,6 +41,10 @@ namespace BankingTool.Repository
         {
             return await dataContext.RoleAccess.Where(x => x.RoleId == RoleId).Select(z => z.ActionId).ToListAsync();
         }
+        public async Task<bool> IsUserExist(string email)
+        {
+            return await dataContext.Users.Where(x => x.EmailId.Trim().ToLower() == email.Trim().ToLower()).AnyAsync();
+        }
         public async Task<Customer> GetCustomerByUserId(int userId)
         {
             return await dataContext.Customer.FirstOrDefaultAsync(x => x.UserId == userId);
@@ -79,8 +83,11 @@ namespace BankingTool.Repository
             return await (from u in dataContext.Users.AsNoTracking()
                           join ur in dataContext.UserRole.AsNoTracking() on u.UserId equals ur.UserId
                           join r in dataContext.Role.AsNoTracking() on ur.RoleId equals r.RoleId
-                          join c in dataContext.Customer.AsNoTracking() on u.UserId equals c.UserId
-                          join s in dataContext.State on u.State equals s.StateId
+                          join c in dataContext.Customer.AsNoTracking() on u.UserId equals c.UserId into customerGroup
+                          from c in customerGroup.DefaultIfEmpty() 
+                          join s in dataContext.Staff.AsNoTracking() on u.UserId equals s.UserId into staffGroup
+                          from s in staffGroup.DefaultIfEmpty()
+                          join st in dataContext.State on u.State equals st.StateId
                           join ci in dataContext.City on u.City equals ci.CityId
                           where u.IsDeleted == false
                           select new UserListResponse
@@ -90,9 +97,9 @@ namespace BankingTool.Repository
                               UserMailId = u.EmailId,
                               IsActive = u.IsActive,
                               Password = u.Password,
-                              PrimaryAccountNumber = c.PrimaryAccountNumber,
+                              PrimaryAccountNumber = c.PrimaryAccountNumber ?? null,
                               RoleName = r.RoleName,
-                              State = s.StateName,
+                              State = st.StateName,
                               City = ci.CityName
                           }).ToListAsync();
         }

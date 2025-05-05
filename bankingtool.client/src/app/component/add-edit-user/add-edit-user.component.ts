@@ -103,6 +103,9 @@ export class AddEditUserComponent implements OnInit {
 
         this.userService.saveUser(model).subscribe((response: ResponseDto<number | null>) => {
           this.messageList = [...response.errors.map(error => error.errorMessage), ...response.validationErrors.map(error => error.errorMessage)];
+          if (response.status == true) {
+            this.messageList.push("User created successfully.")
+          }
         });
       }
     }

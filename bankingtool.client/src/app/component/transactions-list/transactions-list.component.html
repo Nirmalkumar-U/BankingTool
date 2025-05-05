@@ -29,15 +29,17 @@
           </div>
         </form>
         <hr *ngIf="cardInfo && cardInfo != null && cardInfo.length != 0" />
-        <div class="p-3">
-          <div class="atm-card" *ngFor="let card of cardInfo">
-            <h5 class="card-title">{{card.bankName}}</h5>
-            <h6 class="card-number">{{card.cardNumber}}</h6>
-            <h6>CVV: {{card.cvv}}</h6>
-            <div style="position: relative;top: 67px;">
-              <h6 class="mt-2" *ngIf="card.balanceLimit != null">{{card.balanceLimit}}</h6>
-              <h6 class="card-holder">{{card.holderName}}</h6>
-              <h6 class="card-type">{{card.cardType}}</h6>
+        <div class="row">
+          <div class="col-md-4 p-3" *ngFor="let card of cardInfo">
+            <div class="atm-card">
+              <h5 class="card-title">{{card.bankName}}</h5>
+              <h6 class="card-number">{{card.cardNumber}}</h6>
+              <h6>CVV: {{card.cvv}}</h6>
+              <div [ngStyle]="{ position: 'relative', top: card.cardType === 'DebitCard' ? '62px' : '43px' }">
+                <h6 class="mt-2" *ngIf="card.balanceLimit != null">{{card.balanceLimit}}</h6>
+                <h6 class="card-holder">{{card.holderName}}</h6>
+                <h6 class="card-type">{{card.cardType}}</h6>
+              </div>
             </div>
           </div>
         </div>
