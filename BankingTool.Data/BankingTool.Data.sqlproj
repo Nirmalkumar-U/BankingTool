@@ -59,6 +59,8 @@
     <Folder Include="Scripts" />
     <Folder Include="Scripts\MergeScripts" />
     <Folder Include="Scripts\Schema" />
+    <Folder Include="PostProductionScripts" />
+    <Folder Include="PostProductionScripts\Sprint1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\MergeScripts\BankTable.sql" />
@@ -70,10 +72,17 @@
     <None Include="Scripts\Schema\StoreProcedure.sql" />
     <None Include="Scripts\ConsolidateScript.sql" />
     <None Include="Scripts\Schema\ScalarFunction.sql" />
+    <None Include="PostProductionScripts\Sprint1\StoreProcedure.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\MergeScripts\ConsolidateMergeScripts.sql" />
     <None Include="Scripts\MergeScripts\UsersTable.sql" />
     <None Include="Scripts\MergeScripts\ActionTable.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostProductionScripts\Sprint1\SchemaUpdates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostProductionScripts\Sprint1\CodeValue.sql" />
   </ItemGroup>
 </Project>

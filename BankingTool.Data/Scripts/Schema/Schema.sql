@@ -276,6 +276,7 @@ CREATE TABLE [Transaction] (
     Amount INT NOT NULL,
     Description VARCHAR(500),
     TransactionTime DATETIME NOT NULL DEFAULT GETDATE(),
+	TransactionTag VARCHAR(50) NULL,
     CreatedBy VARCHAR(30) NOT NULL,
     CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
     ModifiedBy VARCHAR(30) NULL,

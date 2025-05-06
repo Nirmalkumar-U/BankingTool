@@ -8,6 +8,7 @@ import { GetAccountTypeDropDownListRequestObject } from '../../dto/request/bank-
 import { GetBankDetailWithoutCustomerAndAccountTypeRequestObject } from '../../dto/request/bank-account/get-bank-detail-without-customer-and-account-type-request';
 import { GetToAccountListExcludedByAccountIdRequestObject } from '../../dto/request/bank-account/get-to-account-list-excluded-by-account-id-request';
 import { IsCustomerHasCreditCardInThatBankRequestObject } from '../../dto/request/bank-account/is-customer-has-credit-card-in-that-bank-request';
+import { TransactionListRequestObject } from '../../dto/request/bank-account/transaction-list-request';
 import { TransactionsListForCustomerRequestObject } from '../../dto/request/bank-account/transactions-list-for-customer-request';
 import { TransferAmountRequestObject } from '../../dto/request/bank-account/transfer-amount-request';
 import { HttpService } from '../http/http.service';
@@ -59,6 +60,9 @@ export class BankAccountService {
   }
   cashWithdraw(model: CashWithdrawRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/CashWithdraw', model);
+  }
+  transactionList(model: TransactionListRequestObject): Observable<any> {
+    return this.httpService.post('BankAccount/TransactionList', model);
   }
 }
 

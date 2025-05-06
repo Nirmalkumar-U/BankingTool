@@ -156,7 +156,23 @@ namespace BankingTool.Service.Service
                 {
                     AccountInfo = await _bankAccountRepository.GetAccountInfo(accountId, accountType, name, bankName),
                     CardInfo = await _bankAccountRepository.GetCardInfoByAccountId(accountId, name, bankName),
-                    TransactionsList = await _bankAccountRepository.GetTransactionByAccountId(accountId),
+                    TransactionsList = await _bankAccountRepository.GetTransactionByAccountId(accountId, null, null, null, null, null, null),
+                },
+                StatuCode = 200,
+                Status = true,
+                Errors = [],
+                ValidationErrors = []
+            };
+        }
+        public async Task<ResponseDto<GetTransactionsListResponse>> TransactionsList(TransactionListRequest request)
+        {
+            return new ResponseDto<GetTransactionsListResponse>
+            {
+                Response = new GetTransactionsListResponse
+                {
+                    TransactionsList = await _bankAccountRepository.GetTransactionByAccountId(request.Account.Id, request.Transaction.TransactionTag,
+                    request.Transaction.TransactionFromDate, request.Transaction.TransactionToDate, request.Account.SenderAccountId,
+                    request.Account.ReceiverAccountId, request.Transaction.TransactionCategory),
                 },
                 StatuCode = 200,
                 Status = true,

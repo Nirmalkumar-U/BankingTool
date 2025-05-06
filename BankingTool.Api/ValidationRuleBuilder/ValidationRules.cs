@@ -221,6 +221,13 @@ namespace BankingTool.Api.Validators
                     r.MaxLength = 100;
                 }),
         };
+        public static List<ValidationRule> TransactionListRequestObjectRules = new()
+        {
+            RuleBuilder<TransactionListRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<TransactionListRequestObject>.For(x => x.Request.Account).Required(),
+            RuleBuilder<TransactionListRequestObject>.For(x => x.Request.Transaction).Required(),
+            RuleBuilder<TransactionListRequestObject>.For(x => x.Request.Account.Id).Required()
+        };
         #endregion BankAccountController
     }
 }

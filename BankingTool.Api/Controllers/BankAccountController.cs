@@ -74,7 +74,17 @@ namespace BankingTool.Api.Controllers
                 () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id, model.Request.Account.AccountTypeId, model.Request.Customer.Id)
             );
         }
-
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 400)]
+        public Task<IActionResult> TransactionsList(TransactionListRequestObject model)
+        {
+            return HandleRequestAsync<TransactionListRequestObject, GetTransactionsListResponse>(
+                model,
+                ValidationRules.TransactionListRequestObjectRules,
+                () => _bankAccountService.TransactionsList(model.Request)
+            );
+        }
         [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]

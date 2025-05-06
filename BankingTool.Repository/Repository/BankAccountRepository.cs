@@ -75,12 +75,19 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.Customer.FirstOrDefaultAsync(x => x.CustomerId == customerId);
         }
-        public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId)
+        public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, string TransactionTag,
+            DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, string TransactionCategory)
         {
-            var sql = "EXEC GetAccountTransactions @AccountId";
+            var sql = "EXEC GetAccountTransactions @AccountId, @TransactionTag, @TransactionFromDate, @TransactionToDate, @SenderAccountId, @ReceiverAccountId, @TransactionCategory";
             var parameters = new[]
                             {
-                                new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString())
+                                new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString()),
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionTag", TransactionTag ?? ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionFromDate", TransactionFromDate != null ? TransactionFromDate.Value.Date.ToString() : ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionToDate", TransactionToDate != null ? TransactionToDate.Value.Date.ToString() : ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@SenderAccountId", SenderAccountId != null ? SenderAccountId.ToString() : ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@ReceiverAccountId",ReceiverAccountId != null ? ReceiverAccountId.ToString() : ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionCategory",TransactionCategory ?? "")
                             };
 
             var transactions = await dataContext.Set<GetTransactionsListResponseTransactionList>()
@@ -89,7 +96,6 @@ namespace BankingTool.Repository.Repository
 
             return transactions;
         }
-
 
         public async Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName)
         {

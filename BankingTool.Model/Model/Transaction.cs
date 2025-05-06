@@ -7,5 +7,6 @@
         public string Description { get; set; }
         public int Amount { get; set; }
         public DateTime TransactionTime { get; set; }
+        public string TransactionTag { get; set; }
     }
 }

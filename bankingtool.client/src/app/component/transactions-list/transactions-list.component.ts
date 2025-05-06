@@ -59,9 +59,16 @@ export class TransactionsListComponent {
         }
         this.bankAccountService.getAccountTypeDropDownListByCustomerIdAndBankId(model).subscribe((response: ResponseDto<boolean>) => {
           this.accountTypeList = response.dropDownList.find(x => x.name == "AccountType")!.dropDown;
+          if (this.accountTypeList.length == 1) {
+            this.transactionForm.controls["accountTypeId"].setValue(this.accountTypeList[0].key);
+          }
+          else
+            this.transactionForm.controls["accountTypeId"].setValue('');
         });
       }
-      this.transactionForm.controls["accountTypeId"].setValue('');
+      else {
+        this.transactionForm.controls["accountTypeId"].setValue('');
+      }
     });
     this.transactionForm.get('accountTypeId')?.valueChanges.subscribe(accountTypeId => {
       if (!isNullOrEmpty(accountTypeId) && !isNullOrEmpty(this.bankId) && !isNullOrEmpty(this.customerId)) {

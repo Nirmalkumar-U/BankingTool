@@ -15,7 +15,8 @@ namespace BankingTool.Repository.IRepository
         Task<Customer> GetCustomerByCustomerId(int customerId);
         Task<List<DropDownDto>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId);
         Task<bool> IsCustomerHasCreditCardInThatBank(int customerId, int bankId);
-        Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId);
+        Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, string TransactionTag,
+            DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, string TransactionCategory);
         Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName);
         Task<List<GetTransactionsListResponseCardInfo>> GetCardInfoByAccountId(int accountId, string name, string bankName);
         Task<(int, string, string, string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId);

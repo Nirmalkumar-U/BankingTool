@@ -20,5 +20,6 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> GetToAccountListExcludedByAccountId(int accountId);
         Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description);
         Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description);
+        Task<ResponseDto<GetTransactionsListResponse>> TransactionsList(TransactionListRequest request);
     }
 }

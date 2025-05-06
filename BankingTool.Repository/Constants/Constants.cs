@@ -1,4 +1,7 @@
-﻿namespace BankingTool.Repository
+﻿using Azure;
+using System.Diagnostics;
+
+namespace BankingTool.Repository
 {
     public class Constants
     {
@@ -41,6 +44,34 @@
         public const string Cheque = "Cheque";
         public const string Deposit = "Deposit";
         public const string Withdraw = "Withdraw";
+    }
+    public class TransactionTag
+    {
+        public const string Transfer = "Transfer";
+        public const string Cheque = "Cheque";
+        public const string Deposit = "Deposit";
+        public const string Withdraw = "Withdraw";
+        public const string Entertainment = "Entertainment";
+        public const string NoTag = "No Tag";
+        public const string Groceries = "Groceries";
+        public const string Miscellaneous = "Miscellaneous";
+        public const string SelfTransfer = "Self Transfer";
+        public const string Food = "Food";
+        public const string Fuel = "Fuel";
+        public const string BillPayment = "Bill Payment";
+        public const string Shopping = "Shopping";
+        public const string Rent = "Rent";
+        public const string Travel = "Travel";
+        public const string Health = "Health";
+        public const string Insurance = "Insurance";
+        public const string Investment = "Investment";
+        public const string Salary = "Salary";
+        public const string Savings = "Savings";
+    }
+    public class CodeValueTypeCode
+    {
+        public const string AccountType = "100";
+        public const string TransactionTag = "101";
     }
 
     public static class AppClaimTypes
