@@ -2,6 +2,7 @@
 using System.Text.Json;
 using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.SPDto;
 using BankingTool.Model.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,8 @@ namespace BankingTool.Repository
         // SP
         public DbSet<GetActionsByUserIdDto> GetActionsByUserIdDto { get; set; }
         public DbSet<GetTransactionsListResponseTransactionList> GetTransactionsListResponseTransactionList { get; set; }
+        public DbSet<GetSenderAccount> GetSenderAccount { get; set; }
+        public DbSet<GetReceiverAccount> GetReceiverAccount { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Role>(entity =>
@@ -121,6 +124,8 @@ namespace BankingTool.Repository
 
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());
             modelBuilder.Entity<GetTransactionsListResponseTransactionList>(e => e.HasNoKey());
+            modelBuilder.Entity<GetSenderAccount>(e => e.HasNoKey());
+            modelBuilder.Entity<GetReceiverAccount>(e => e.HasNoKey());
             base.OnModelCreating(modelBuilder);
         }
     }

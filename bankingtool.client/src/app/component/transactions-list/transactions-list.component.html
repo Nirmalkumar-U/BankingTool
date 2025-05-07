@@ -67,6 +67,50 @@
           </div>
         </div>
         <hr *ngIf="transactionsList && transactionsList != null && transactionsList.length != 0" />
+        <div *ngIf="transactionsList && transactionsList != null && transactionsList.length != 0">
+          <form class="row g-3" [formGroup]="transactionFilterForm" (ngSubmit)="getTransactionList()">
+            <div class="col-md-6">
+              <label class="form-label">From Date</label>
+              <input type="email" class="form-control" formControlName="fromDate">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">To Date</label>
+              <input type="email" class="form-control" formControlName="toDate">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Category</label>
+              <select class="form-select" formControlName="category">
+                <option value="">Select</option>
+                <option *ngFor="let bank of transactionCategoryList" [ngValue]="bank.key">{{ bank.value }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tag</label>
+              <select class="form-select" formControlName="transactionTag">
+                <option value="">Select</option>
+                <option *ngFor="let bank of transactionTagList" [ngValue]="bank.key">{{ bank.value }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Sender</label>
+              <select class="form-select" formControlName="senderAccountId">
+                <option value="">Select</option>
+                <option *ngFor="let bank of senderAccountList" [ngValue]="bank.key">{{ bank.value }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Receiver</label>
+              <select class="form-select" formControlName="receiverAccountId">
+                <option value="">Select</option>
+                <option *ngFor="let bank of receiverAccoountList" [ngValue]="bank.key">{{ bank.value }}</option>
+              </select>
+            </div>
+            <div class="col-md-3" style="padding-top: 30px;">
+              <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+          </form>
+        </div>
+        <hr *ngIf="transactionsList && transactionsList != null && transactionsList.length != 0" />
         <table *ngIf="transactionsList && transactionsList != null && transactionsList.length != 0" class="table caption-top">
           <thead>
             <tr>

@@ -20,3 +20,23 @@ export interface TransactionListRequestTransaction {
   transactionToDate: Date | null;
   transactionCategory: string | null
 }
+
+export const createTransactionListRequestObject = (accountId: number, receiverAccountId: number | null, senderAccountId: number | null,
+  transactionCategory: string | null, transactionFromDate: Date | null, transactionTag: string | null, transactionToDate: Date | null): TransactionListRequestObject => {
+  let model: TransactionListRequestObject = {
+    request: {
+      account: {
+        id: accountId,
+        receiverAccountId: receiverAccountId,
+        senderAccountId: senderAccountId
+      },
+      transaction: {
+        transactionCategory: transactionCategory,
+        transactionFromDate: transactionFromDate,
+        transactionTag: transactionTag,
+        transactionToDate: transactionToDate
+      }
+    }
+  }
+  return model;
+}

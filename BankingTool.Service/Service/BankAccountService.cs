@@ -150,6 +150,20 @@ namespace BankingTool.Service.Service
         public async Task<ResponseDto<GetTransactionsListResponse>> TransactionsListForCustomer(int bankId, int accountTypeId, int customerId)
         {
             var (accountId, name, bankName, accountType) = await _bankAccountRepository.GetAccountIdByBankIdAndAccountTypeAndCustomerId(bankId, accountTypeId, customerId);
+            var senderAccountList = await _bankAccountRepository.GetSenderAccountDropdown(accountId);
+            var receiverAccountList = await _bankAccountRepository.GetReceiverAccountDropdown(accountId);
+            var senderAccountDropDownList = senderAccountList.Select(x => new DropDownDto
+            {
+                Key = x.AccountId,
+                Value = x.AccountDescription,
+                IsSelected = false
+            }).ToList();
+            var receiverAccountDropDownList = receiverAccountList.Select(x => new DropDownDto
+            {
+                Key = x.AccountId,
+                Value = x.AccountDescription,
+                IsSelected = false
+            }).ToList();
             return new ResponseDto<GetTransactionsListResponse>
             {
                 Response = new GetTransactionsListResponse
@@ -161,7 +175,13 @@ namespace BankingTool.Service.Service
                 StatuCode = 200,
                 Status = true,
                 Errors = [],
-                ValidationErrors = []
+                ValidationErrors = [],
+                DropDownList = [
+                        new DropDownListDto { Name = "SenderAccount", DropDown = senderAccountDropDownList },
+                        new DropDownListDto { Name = "ReceiverAccount", DropDown = receiverAccountDropDownList },
+                        new DropDownListDto { Name = "TransactionCategory", DropDown = await _bankAccountRepository.GetAllTransactionCategory() },
+                        new DropDownListDto { Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() },
+                    ]
             };
         }
         public async Task<ResponseDto<GetTransactionsListResponse>> TransactionsList(TransactionListRequest request)

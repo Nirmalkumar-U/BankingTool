@@ -77,7 +77,7 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 200)]
         [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 400)]
-        public Task<IActionResult> TransactionsList(TransactionListRequestObject model)
+        public Task<IActionResult> TransactionList(TransactionListRequestObject model)
         {
             return HandleRequestAsync<TransactionListRequestObject, GetTransactionsListResponse>(
                 model,

@@ -22,6 +22,7 @@ export interface GetTransactionsListResponseAccountInfo {
   accountHolderName: string;
   balance: number;
   accountType: string;
+  accountId: number;
 }
 
 export interface GetTransactionsListResponseCardInfo {

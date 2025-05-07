@@ -4,4 +4,5 @@ export interface TransactionsListAccountInfoDto {
   accountHolderName: string;
   balance: number;
   accountType: string;
+  accountId: number;
 }

@@ -21,6 +21,7 @@
     }
     public class GetTransactionsListResponseAccountInfo
     {
+        public int AccountId { get; set; }
         public string AccountNumber { get; set; }
         public string BankName { get; set; }
         public string AccountHolderName { get; set; }

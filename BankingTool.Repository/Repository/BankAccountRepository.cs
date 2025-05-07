@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.SPDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -96,11 +97,57 @@ namespace BankingTool.Repository.Repository
 
             return transactions;
         }
+        public async Task<List<GetSenderAccount>> GetSenderAccountDropdown(int accountId)
+        {
+            var sql = "EXEC GetSenderAccount @AccountId";
+            var parameters = new[]
+                            {
+                                new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString())
+                            };
 
+            var transactions = await dataContext.Set<GetSenderAccount>()
+                .FromSqlRaw(sql, parameters)
+                .ToListAsync();
+
+            return transactions;
+        }
+        public async Task<List<GetReceiverAccount>> GetReceiverAccountDropdown(int accountId)
+        {
+            var sql = "EXEC GetReceiverAccount @AccountId";
+            var parameters = new[]
+                            {
+                                new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString())
+                            };
+
+            var transactions = await dataContext.Set<GetReceiverAccount>()
+                .FromSqlRaw(sql, parameters)
+                .ToListAsync();
+
+            return transactions;
+        }
+        public async Task<List<DropDownDto>> GetAllTransactionCategory()
+        {
+            return await dataContext.CodeValue.Where(x => x.InUse == true && x.TypeCode == CodeValueTypeCode.TransactionCategory)
+                .Select(z => new DropDownDto
+                {
+                    Key = z.CodeValueId,
+                    Value = z.CodeValue1
+                }).ToListAsync();
+        }
+        public async Task<List<DropDownDto>> GetAllTransactionTag()
+        {
+            return await dataContext.CodeValue.Where(x => x.InUse == true && x.TypeCode == CodeValueTypeCode.TransactionTag )
+                .Select(z => new DropDownDto
+                {
+                    Key = z.CodeValueId,
+                    Value = z.CodeValue1
+                }).ToListAsync();
+        }
         public async Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName)
         {
             return await dataContext.Account.Where(x => x.AccountId == accountId).Select(z => new GetTransactionsListResponseAccountInfo
             {
+                AccountId = accountId,
                 AccountHolderName = name,
                 AccountNumber = z.AccountNumber,
                 AccountType = accountType,

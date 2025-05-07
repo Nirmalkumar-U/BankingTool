@@ -98,3 +98,51 @@ BEGIN
 END
 GO
 --------------------------------------------------------------------------------------------
+IF OBJECT_ID('GetSenderAccount', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE GetSenderAccount;
+END
+GO
+
+CREATE PROCEDURE GetSenderAccount
+    @AccountId INT
+AS
+BEGIN
+	SELECT DISTINCT
+		sender_acc.AccountId AS AccountId,
+		dbo.GetCombinedInfoByAccountId(sender_acc.AccountId) AS AccountDescription
+    FROM TransactionDetail td
+    JOIN [Transaction] t ON td.TransactionId = t.TransactionId
+    JOIN (SELECT td2.TransactionId, a2.AccountNumber, a2.AccountId
+			FROM TransactionDetail td2
+			JOIN Account a2 ON td2.AccountId = a2.AccountId
+			WHERE td2.TransactionRole = 'Sender') sender_acc ON sender_acc.TransactionId = t.TransactionId
+	WHERE td.AccountId = @AccountId
+END
+GO
+----------------------------------------------------------------------------------------------------------------------
+IF OBJECT_ID('GetReceiverAccount', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE GetReceiverAccount;
+END
+GO
+
+CREATE PROCEDURE GetReceiverAccount
+    @AccountId INT
+AS
+BEGIN
+	SELECT DISTINCT
+		receiver_acc.AccountId AS AccountId, 
+		dbo.GetCombinedInfoByAccountId(receiver_acc.AccountId) AS AccountDescription
+    FROM TransactionDetail td
+    JOIN [Transaction] t ON td.TransactionId = t.TransactionId
+    JOIN (
+        SELECT td3.TransactionId, a3.AccountNumber, a3.AccountId
+        FROM TransactionDetail td3
+        JOIN Account a3 ON td3.AccountId = a3.AccountId
+        WHERE td3.TransactionRole = 'Receiver'
+    ) receiver_acc ON receiver_acc.TransactionId = t.TransactionId
+	WHERE td.AccountId = @AccountId
+END
+GO
+-----------------------------------------------------------------------------------------------------------------------------

@@ -70,8 +70,9 @@ namespace BankingTool.Repository
     }
     public class CodeValueTypeCode
     {
-        public const string AccountType = "100";
-        public const string TransactionTag = "101";
+        public const int AccountType = 100;
+        public const int TransactionTag = 101;
+        public const int TransactionCategory = 102;
     }
 
     public static class AppClaimTypes

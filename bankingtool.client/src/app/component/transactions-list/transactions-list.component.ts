@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ClaimKey } from '../../constant/constant';
-import { isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { isAllEmptyOrNull, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { LocalStorageService } from '../../core/local-storage.service';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { GetAccountTypeDropDownListRequestObject } from '../../dto/request/bank-account/get-account-type-drop-down-list-request';
+import { createTransactionListRequestObject } from '../../dto/request/bank-account/transaction-list-request';
 import { TransactionsListForCustomerRequestObject } from '../../dto/request/bank-account/transactions-list-for-customer-request';
 import { ResponseDto } from '../../dto/response-dto';
 import { GetTransactionsListResponse, GetTransactionsListResponseCardInfo, GetTransactionsListResponseTransactionList } from '../../dto/response/get-transactions-list-response';
@@ -19,8 +20,13 @@ import { TransactionsListAccountInfoDto } from '../../dto/transactions-list-acco
 })
 export class TransactionsListComponent {
   transactionForm: FormGroup;
+  transactionFilterForm: FormGroup;
   bankList: DropDownDto[] = [];
   accountTypeList: DropDownDto[] = [];
+  transactionCategoryList: DropDownDto[] = [];
+  transactionTagList: DropDownDto[] = [];
+  senderAccountList: DropDownDto[] = [];
+  receiverAccoountList: DropDownDto[] = [];
   customerId: number = 0;
   accountInfo: TransactionsListAccountInfoDto | null = null;
   cardInfo: GetTransactionsListResponseCardInfo[] = [];
@@ -37,6 +43,14 @@ export class TransactionsListComponent {
     this.transactionForm = this.fb.group({
       bankId: ['', [Validators.required]],
       accountTypeId: ['', [Validators.required]]
+    });
+    this.transactionFilterForm = this.fb.group({
+      fromDate: [''],
+      toDate: [''],
+      category: [''],
+      transactionTag: [''],
+      senderAccountId: [''],
+      receiverAccountId: [''],
     });
   }
   ngOnInit() {
@@ -89,8 +103,22 @@ export class TransactionsListComponent {
           this.accountInfo = response.response.accountInfo;
           this.cardInfo = response.response.cardInfo;
           this.transactionsList = response.response.transactionsList;
+          this.transactionCategoryList = response.dropDownList.find(x => x.name == "TransactionCategory")!.dropDown;
+          this.transactionTagList = response.dropDownList.find(x => x.name == "TransactionTag")!.dropDown;
+          this.senderAccountList = response.dropDownList.find(x => x.name == "SenderAccount")!.dropDown;
+          this.receiverAccoountList = response.dropDownList.find(x => x.name == "ReceiverAccount")!.dropDown;
         });
       }
     });
+  }
+  getTransactionList() {
+    let values = this.transactionFilterForm.value;
+    let isEmpty = isAllEmptyOrNull(values);
+    if (isEmpty == false) {
+      let model = createTransactionListRequestObject(this.accountInfo!.accountId, null, null, null, null, null, null);
+      this.bankAccountService.transactionList(model).subscribe((response: ResponseDto<GetTransactionsListResponse>) => {
+        this.transactionsList = response.response.transactionsList;
+      });
+    }
   }
 }

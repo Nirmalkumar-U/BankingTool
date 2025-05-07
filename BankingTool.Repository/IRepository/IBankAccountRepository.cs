@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.SPDto;
 using BankingTool.Model.Model;
 
 namespace BankingTool.Repository.IRepository
@@ -29,6 +30,10 @@ namespace BankingTool.Repository.IRepository
         Task<Transaction> GetTransaction(int TransactionId);
         Task<List<DropDownDto>> GetToAccountListExcludedByAccountId(int accountId);
         Task<CreditScore> GetCreditScoreOfCustomer(int customerId);
+        Task<List<DropDownDto>> GetAllTransactionTag();
+        Task<List<DropDownDto>> GetAllTransactionCategory();
+        Task<List<GetReceiverAccount>> GetReceiverAccountDropdown(int accountId);
+        Task<List<GetSenderAccount>> GetSenderAccountDropdown(int accountId);
 
         bool CreateAccount(Account account, Transaction transaction,TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);
