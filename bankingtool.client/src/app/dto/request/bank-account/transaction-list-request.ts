@@ -1,3 +1,4 @@
+import { isNullOrEmpty } from "../../../core/commonFunction/common-function";
 import { RequestId } from "../request-id";
 
 export interface TransactionListRequestObject {
@@ -27,8 +28,8 @@ export const createTransactionListRequestObject = (accountId: number, receiverAc
     request: {
       account: {
         id: accountId,
-        receiverAccountId: receiverAccountId,
-        senderAccountId: senderAccountId
+        receiverAccountId: isNullOrEmpty(receiverAccountId) ? null : receiverAccountId,
+        senderAccountId: isNullOrEmpty(senderAccountId) ? null : senderAccountId
       },
       transaction: {
         transactionCategory: transactionCategory,

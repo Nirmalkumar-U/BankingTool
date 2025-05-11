@@ -109,8 +109,8 @@ BEGIN
 		tl.TransactionTag
 	FROM #TempTransactionList tl
 	WHERE (@TransactionTag IS NULL OR @TransactionTag = tl.TransactionTag)
-	AND ((@TransactionFromDate IS NULL OR @TransactionFromDate >= tl.TransactionDate) 
-	AND (@TransactionToDate IS NULL OR @TransactionToDate <= tl.TransactionDate))
+	AND ((@TransactionFromDate IS NULL OR @TransactionFromDate <= tl.TransactionDate) 
+	AND (@TransactionToDate IS NULL OR @TransactionToDate >= tl.TransactionDate))
 	AND (@SenderAccountId IS NULL OR @SenderAccountId = tl.SenderAccountId)
 	AND (@ReceiverAccountId IS NULL OR @ReceiverAccountId = tl.ReceiverAccountId)
 	AND (@TransactionCategory IS NULL OR @TransactionCategory = tl.TransactionCategory)

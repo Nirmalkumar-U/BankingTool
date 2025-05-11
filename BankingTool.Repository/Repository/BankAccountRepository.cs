@@ -79,21 +79,21 @@ namespace BankingTool.Repository.Repository
         public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, string TransactionTag,
             DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, string TransactionCategory)
         {
-            var sql = "EXEC GetAccountTransactions @AccountId, @TransactionTag, @TransactionFromDate, @TransactionToDate, @SenderAccountId, @ReceiverAccountId, @TransactionCategory";
-            var parameters = new[]
-                            {
+                var sql = "EXEC GetAccountTransactions @AccountId, @TransactionTag, @TransactionFromDate, @TransactionToDate, @SenderAccountId, @ReceiverAccountId, @TransactionCategory";
+                var parameters = new[]
+                                {
                                 new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString()),
                                 new Microsoft.Data.SqlClient.SqlParameter("@TransactionTag", TransactionTag ?? ""),
-                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionFromDate", TransactionFromDate != null ? TransactionFromDate.Value.Date.ToString() : ""),
-                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionToDate", TransactionToDate != null ? TransactionToDate.Value.Date.ToString() : ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionFromDate", TransactionFromDate != null ? TransactionFromDate.Value.Date : ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionToDate", TransactionToDate != null ? TransactionToDate.Value.Date : ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@SenderAccountId", SenderAccountId != null ? SenderAccountId.ToString() : ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@ReceiverAccountId",ReceiverAccountId != null ? ReceiverAccountId.ToString() : ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@TransactionCategory",TransactionCategory ?? "")
                             };
 
             var transactions = await dataContext.Set<GetTransactionsListResponseTransactionList>()
-                .FromSqlRaw(sql, parameters)
-                .ToListAsync();
+                    .FromSqlRaw(sql, parameters)
+                    .ToListAsync();
 
             return transactions;
         }
@@ -136,7 +136,7 @@ namespace BankingTool.Repository.Repository
         }
         public async Task<List<DropDownDto>> GetAllTransactionTag()
         {
-            return await dataContext.CodeValue.Where(x => x.InUse == true && x.TypeCode == CodeValueTypeCode.TransactionTag )
+            return await dataContext.CodeValue.Where(x => x.InUse == true && x.TypeCode == CodeValueTypeCode.TransactionTag)
                 .Select(z => new DropDownDto
                 {
                     Key = z.CodeValueId,

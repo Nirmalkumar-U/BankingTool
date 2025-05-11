@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -31,12 +32,23 @@ export class TransactionsListComponent {
   accountInfo: TransactionsListAccountInfoDto | null = null;
   cardInfo: GetTransactionsListResponseCardInfo[] = [];
   transactionsList: GetTransactionsListResponseTransactionList[] = [];
-
   get accountTypeId(): number {
     return this.transactionForm.controls["accountTypeId"].value;
   }
   get bankId(): number {
     return this.transactionForm.controls["bankId"].value;
+  }
+  get fromDate(): Date {
+    return this.transactionFilterForm.controls["fromDate"].value;
+  }
+  set fromDate(value: any) {
+    this.transactionFilterForm.patchValue({ fromDate: this.formatDateForInput(value) });
+  }
+  get toDate(): Date {
+    return this.transactionFilterForm.controls["toDate"].value;
+  }
+  set toDate(value: any) {
+    this.transactionFilterForm.patchValue({ toDate: this.formatDateForInput(value) });
   }
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService,
     private localStorageService: LocalStorageService) {
@@ -51,6 +63,12 @@ export class TransactionsListComponent {
       transactionTag: [''],
       senderAccountId: [''],
       receiverAccountId: [''],
+    });
+    let yesterday = new Date();
+    yesterday.setDate(new Date().getDate() - 1);
+    this.transactionFilterForm.patchValue({
+      fromDate: this.formatDateForInput(yesterday),
+      toDate: this.formatDateForInput(new Date()),
     });
   }
   ngOnInit() {
@@ -115,10 +133,28 @@ export class TransactionsListComponent {
     let values = this.transactionFilterForm.value;
     let isEmpty = isAllEmptyOrNull(values);
     if (isEmpty == false) {
-      let model = createTransactionListRequestObject(this.accountInfo!.accountId, null, null, null, null, null, null);
+      let model = createTransactionListRequestObject(this.accountInfo!.accountId, values.receiverAccountId, values.senderAccountId, values.category,
+        this.fromDate, values.transactionTag, this.toDate);
       this.bankAccountService.transactionList(model).subscribe((response: ResponseDto<GetTransactionsListResponse>) => {
         this.transactionsList = response.response.transactionsList;
       });
     }
+  }
+  setFromDate($event: any) {
+    $event.preventDefault();
+    if (!isNullOrEmpty($event.target.value))
+      this.fromDate = new Date($event.target.value);
+    else
+      this.fromDate = null;
+  }
+  setToDate($event: any) {
+    $event.preventDefault();
+    if (!isNullOrEmpty($event.target.value))
+      this.toDate = new Date($event.target.value);
+    else
+      this.toDate = null;
+  }
+  formatDateForInput(date: Date): string {
+    return formatDate(date, 'yyyy-MM-dd', 'en');
   }
 }
