@@ -41,14 +41,14 @@ export class TransactionsListComponent {
   get fromDate(): Date {
     return this.transactionFilterForm.controls["fromDate"].value;
   }
-  set fromDate(value: any) {
-    this.transactionFilterForm.patchValue({ fromDate: this.formatDateForInput(value) });
+  set fromDate(value: Date | null) {
+    this.transactionFilterForm.patchValue({ fromDate: value == null ? null : this.formatDateForInput(value) });
   }
   get toDate(): Date {
     return this.transactionFilterForm.controls["toDate"].value;
   }
-  set toDate(value: any) {
-    this.transactionFilterForm.patchValue({ toDate: this.formatDateForInput(value) });
+  set toDate(value: Date | null) {
+    this.transactionFilterForm.patchValue({ toDate: value == null ? null : this.formatDateForInput(value) });
   }
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService,
     private localStorageService: LocalStorageService) {
@@ -131,8 +131,8 @@ export class TransactionsListComponent {
   }
   getTransactionList() {
     let values = this.transactionFilterForm.value;
-    let isEmpty = isAllEmptyOrNull(values);
-    if (isEmpty == false) {
+    //let isEmpty = isAllEmptyOrNull(values);
+    if (!isNullOrEmpty(this.accountInfo!.accountId)) {
       let model = createTransactionListRequestObject(this.accountInfo!.accountId, values.receiverAccountId, values.senderAccountId, values.category,
         this.fromDate, values.transactionTag, this.toDate);
       this.bankAccountService.transactionList(model).subscribe((response: ResponseDto<GetTransactionsListResponse>) => {
