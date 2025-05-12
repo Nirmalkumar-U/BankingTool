@@ -47,7 +47,7 @@ export class BankAccountService {
     return this.httpService.post('BankAccount/GetAccountBalance', model);
   }
   transferAmount(model: TransferAmountRequestObject): Observable<any> {
-    return this.httpService.post('BankAccount/transferAmount', model);
+    return this.httpService.post('BankAccount/TransferAmount', model);
   }
   getSelfTransferInitialLoad(): Observable<any> {
     return this.httpService.get('BankAccount/GetSelfTransferInitialLoad');

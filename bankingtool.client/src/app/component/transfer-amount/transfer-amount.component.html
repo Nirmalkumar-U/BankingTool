@@ -31,10 +31,24 @@
             <h6>{{balance}}</h6>
           </div>
           <div class="col-md-3">
+            <label class="form-label">Transaction Date</label>
+            <input type="date" class="form-control" formControlName="transferDate" (blur)="setTransferDate($event)" />
+          </div>
+          <div class="col-md-3">
             <label for="inputPassword4" class="form-label">Amount</label>
             <input type="text" class="form-control" formControlName="amount" required>
             <div class="invalid-feedback">
               Please Enter amount...
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Transaction Tag</label>
+            <select class="form-select" formControlName="transactionTag" required>
+              <option value="">Select</option>
+              <option *ngFor="let bank of transactionTagList" [ngValue]="bank.value">{{ bank.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select tag...
             </div>
           </div>
           <div class="col-md-3">

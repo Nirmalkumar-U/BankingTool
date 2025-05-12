@@ -344,6 +344,14 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.Account.FirstOrDefaultAsync(x => x.AccountId == AccountId);
         }
+        public async Task<Transaction> GetLastTransaction(int AccountId)
+        {
+            return await (from t in dataContext.Transaction
+                          join td in dataContext.TransactionDetail on t.TransactionId equals td.TransactionId
+                          where td.AccountId == AccountId
+                          orderby t.TransactionTime descending
+                          select t).FirstOrDefaultAsync();
+        }
         public async Task<Transaction> GetTransaction(int TransactionId)
         {
             return await dataContext.Transaction.FirstOrDefaultAsync(x => x.TransactionId == TransactionId);

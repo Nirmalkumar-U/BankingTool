@@ -15,9 +15,11 @@ export interface TransferAmountRequestAccount {
 export interface TransferAmountRequestTransaction {
   amount: number;
   description: string;
+  transactionDate: Date;
+  transactionTag: string;
 }
 
-export const getTransferAmountRequestObject = (fromAccountId: number, toAccountId: number, amount: number, description: string): TransferAmountRequestObject => {
+export const getTransferAmountRequestObject = (fromAccountId: number, toAccountId: number, amount: number, description: string, transactionDate: Date, transactionTag: string): TransferAmountRequestObject => {
   let model: TransferAmountRequestObject = {
     request: {
       account: {
@@ -26,7 +28,9 @@ export const getTransferAmountRequestObject = (fromAccountId: number, toAccountI
       },
       transaction: {
         amount: amount,
-        description: description
+        description: description,
+        transactionDate: transactionDate,
+        transactionTag: transactionTag
       }
     }
   }

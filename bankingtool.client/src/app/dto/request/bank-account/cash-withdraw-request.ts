@@ -16,9 +16,10 @@ export interface CashWithdrawRequestAccount extends RequestId {
 export interface CashWithdrawRequestTransaction {
   amount: number;
   description: string;
+  transactionDate: Date;
 }
 
-export const CreateCashWithdrawRequestObject = (accountId: number, amount: number, description: string): CashWithdrawRequestObject => {
+export const CreateCashWithdrawRequestObject = (accountId: number, amount: number, description: string, transactionDate: Date): CashWithdrawRequestObject => {
   let model: CashWithdrawRequestObject = {
     request: {
       account: {
@@ -26,7 +27,8 @@ export const CreateCashWithdrawRequestObject = (accountId: number, amount: numbe
       },
       transaction: {
         amount: amount,
-        description: description
+        description: description,
+        transactionDate: transactionDate
       }
     }
   }

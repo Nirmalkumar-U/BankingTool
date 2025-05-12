@@ -142,7 +142,7 @@ namespace BankingTool.Api.Controllers
                 model,
                 ValidationRules.TransferAmountRequestRules,
                 () => _bankAccountService.TransferAmount(model.Request.Account.FromAccountId, model.Request.Account.ToAccountId,
-                model.Request.Transaction.Amount, model.Request.Transaction.Description)
+                model.Request.Transaction.Amount, model.Request.Transaction.Description, model.Request.Transaction.TransactionDate, model.Request.Transaction.TransactionTag)
             );
         }
         [HttpGet]
@@ -175,7 +175,8 @@ namespace BankingTool.Api.Controllers
             return HandleRequestAsync<DepositAmountRequestObject, bool>(
                 model,
                 ValidationRules.DepositAmountRequestObjectRules,
-                () => _bankAccountService.DepositAmount(model.Request.Account.Id, model.Request.Transaction.Amount, model.Request.Transaction.Description)
+                () => _bankAccountService.DepositAmount(model.Request.Account.Id, model.Request.Transaction.Amount,
+                model.Request.Transaction.Description, model.Request.Transaction.TransactionDate)
             );
         }
         [HttpPost]
@@ -186,7 +187,8 @@ namespace BankingTool.Api.Controllers
             return HandleRequestAsync<CashWithdrawRequestObject, bool>(
                 model,
                 ValidationRules.DepositAmountRequestObjectRules,
-                () => _bankAccountService.CashWithdraw(model.Request.Account.Id, model.Request.Transaction.Amount, model.Request.Transaction.Description)
+                () => _bankAccountService.CashWithdraw(model.Request.Account.Id, model.Request.Transaction.Amount,
+                model.Request.Transaction.Description, model.Request.Transaction.TransactionDate)
             );
         }
     }

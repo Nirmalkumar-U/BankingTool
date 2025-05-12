@@ -14,6 +14,7 @@ export interface GetTransactionsListResponseTransactionList {
   transactionCategory: string;
   fromAccountId: string;
   toAccountId: string;
+  transactionTag: string;
 }
 
 export interface GetTransactionsListResponseAccountInfo {

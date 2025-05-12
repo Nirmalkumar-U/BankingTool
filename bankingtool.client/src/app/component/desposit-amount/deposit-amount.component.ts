@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { CreateDepositAmountRequestObject } from '../../dto/request/bank-account/deposit-amount-request';
@@ -20,7 +21,11 @@ export class DepositAmountComponent {
     this.depositAmountForm = this.fb.group({
       accountId: ['', [Validators.required]],
       amount: ['', [Validators.required]],
-      description: ['', [Validators.required]]
+      description: ['', [Validators.required]],
+      transferDate: ['', [Validators.required]]
+    });
+    this.depositAmountForm.patchValue({
+      transferDate: formatDateForInput(new Date()),
     });
   }
   ngOnInit() {
@@ -31,7 +36,7 @@ export class DepositAmountComponent {
     this.messageList = [];
     if (!this.depositAmountForm.invalid) {
       let model = CreateDepositAmountRequestObject(this.depositAmountForm.get('accountId')?.value,
-        this.depositAmountForm.get('amount')?.value, this.depositAmountForm.get('description')?.value);
+        this.depositAmountForm.get('amount')?.value, this.depositAmountForm.get('description')?.value, this.depositAmountForm.get('transferDate')?.value);
       this.bankAccountService.depositAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
@@ -43,5 +48,16 @@ export class DepositAmountComponent {
         }
       });
     }
+  }
+  setTransferDate($event: any) {
+    $event.preventDefault();
+    if (!isNullOrEmpty($event.target.value))
+      this.depositAmountForm.patchValue({
+        transferDate: formatDateForInput(new Date($event.target.value)),
+      });
+    else
+      this.depositAmountForm.patchValue({
+        transferDate: null
+      });
   }
 }

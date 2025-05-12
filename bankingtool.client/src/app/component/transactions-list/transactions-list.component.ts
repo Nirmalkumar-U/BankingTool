@@ -65,7 +65,7 @@ export class TransactionsListComponent {
       receiverAccountId: [''],
     });
     let yesterday = new Date();
-    yesterday.setDate(new Date().getDate() - 1);
+    yesterday.setDate(new Date().getDate() - 7);
     this.transactionFilterForm.patchValue({
       fromDate: this.formatDateForInput(yesterday),
       toDate: this.formatDateForInput(new Date()),

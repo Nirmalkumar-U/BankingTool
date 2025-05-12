@@ -16,9 +16,10 @@ export interface DepositAmountRequestAccount extends RequestId {
 export interface DepositAmountRequestTransaction {
   amount: number;
   description: string;
+  transactionDate: Date;
 }
 
-export const CreateDepositAmountRequestObject = (accountId: number, amount: number, description: string): DepositAmountRequestObject => {
+export const CreateDepositAmountRequestObject = (accountId: number, amount: number, description: string, transactionDate: Date): DepositAmountRequestObject => {
   let model: DepositAmountRequestObject = {
     request: {
       account: {
@@ -26,7 +27,8 @@ export const CreateDepositAmountRequestObject = (accountId: number, amount: numb
       },
       transaction: {
         amount: amount,
-        description: description
+        description: description,
+        transactionDate: transactionDate
       }
     }
   }

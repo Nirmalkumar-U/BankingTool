@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PageTitle } from '../../constant/constant';
-import { isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
@@ -19,6 +19,7 @@ export class TransferAmountComponent {
   transferAmountForm: FormGroup;
   toList: DropDownDto[] = [];
   fromList: DropDownDto[] = [];
+  transactionTagList: DropDownDto[] = [];
   balance: number = 0;
   messageList: string[] = [];
   isSubmitted: boolean = false;
@@ -29,8 +30,13 @@ export class TransferAmountComponent {
     this.transferAmountForm = this.fb.group({
       toAccountId: ['', [Validators.required]],
       fromAccountId: ['', [Validators.required]],
+      transferDate: ['', [Validators.required]],
       amount: ['', [Validators.required]],
-      description: ['', [Validators.required]]
+      description: ['', [Validators.required]],
+      transactionTag: ['', [Validators.required]]
+    });
+    this.transferAmountForm.patchValue({
+      transferDate: formatDateForInput(new Date()),
     });
   }
   ngOnInit() {
@@ -43,7 +49,9 @@ export class TransferAmountComponent {
     else if (this.reportName == PageTitle.selfTransfer) {
       this.fromList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
     }
-    
+
+    this.transactionTagList = initialData.dropDownList.find(x => x.name == "TransactionTag")!.dropDown;
+
     this.transferAmountForm.get('fromAccountId')?.valueChanges.subscribe(fromAccountId => {
       if (!isNullOrEmpty(fromAccountId)) {
         let model: GetAccountBalanceRequestObject = {
@@ -71,7 +79,8 @@ export class TransferAmountComponent {
     this.messageList = [];
     if (!this.transferAmountForm.invalid) {
       let model = getTransferAmountRequestObject(this.transferAmountForm.get('fromAccountId')?.value, this.transferAmountForm.get('toAccountId')?.value,
-        this.transferAmountForm.get('amount')?.value, this.transferAmountForm.get('description')?.value);
+        this.transferAmountForm.get('amount')?.value, this.transferAmountForm.get('description')?.value, this.transferAmountForm.get('transferDate')?.value,
+        this.transferAmountForm.get('transactionTag')?.value);
       this.bankAccountService.transferAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
@@ -83,5 +92,16 @@ export class TransferAmountComponent {
         }
       });
     }
+  }
+  setTransferDate($event: any) {
+    $event.preventDefault();
+    if (!isNullOrEmpty($event.target.value))
+      this.transferAmountForm.patchValue({
+        transferDate: formatDateForInput(new Date($event.target.value)),
+      });
+    else
+      this.transferAmountForm.patchValue({
+        transferDate: null
+      });
   }
 }

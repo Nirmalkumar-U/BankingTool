@@ -232,7 +232,8 @@ namespace BankingTool.Service.Service
                 DropDownList = new List<DropDownListDto>
                 {
                     new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() },
-                    new DropDownListDto{ Name = "ToAccount", DropDown = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId() }
+                    new DropDownListDto{ Name = "ToAccount", DropDown = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId() },
+                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() }
                 },
                 StatuCode = 200,
                 Status = true,
@@ -280,18 +281,52 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description)
+        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag)
         {
+            var lastFromAccountTransaction = await _bankAccountRepository.GetLastTransaction(fromAccountId);
+            var lastToAccountTransaction = await _bankAccountRepository.GetLastTransaction(toAccountId);
+            if (lastFromAccountTransaction != null && lastFromAccountTransaction?.TransactionTime.Date > transactionDate.Date)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = [],
+                    Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                };
+            }
+            if (lastToAccountTransaction != null && lastToAccountTransaction?.TransactionTime.Date > transactionDate.Date)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = [],
+                    Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                };
+            }
+            DateTime? latestTransactionDate = new[]
+            {
+                lastFromAccountTransaction?.TransactionTime,
+                lastToAccountTransaction?.TransactionTime
+            }.Max();
+
+            if (latestTransactionDate != null && latestTransactionDate.Value.Date == transactionDate.Date)
+            {
+                transactionDate = latestTransactionDate.Value;
+                transactionDate = transactionDate.AddMinutes(5);
+            }
             Account fromAccount = await _bankAccountRepository.GetAccount(fromAccountId);
             Account toAccount = await _bankAccountRepository.GetAccount(toAccountId);
             fromAccount.Balance = fromAccount.Balance - amount;
             toAccount.Balance = toAccount.Balance + amount;
             Transaction transaction = new Transaction
             {
-                TransactionTime = DateTime.Now,
+                TransactionTime = transactionDate,
                 Amount = amount,
                 Description = description,
-                TransactionCategory = TransactionCatagory.Transfer
+                TransactionCategory = TransactionCatagory.Transfer,
+                TransactionTag = transactionTag
             };
             TransactionDetail fromTransactionDetail = new TransactionDetail
             {
@@ -316,8 +351,24 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description)
+        public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate)
         {
+            var lastTransaction = await _bankAccountRepository.GetLastTransaction(accountId);
+            if (lastTransaction != null && lastTransaction?.TransactionTime.Date > transactionDate.Date)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = [],
+                    Errors = [new Errors { PropertyName = "DepositAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                };
+            }
+            if (lastTransaction != null && lastTransaction.TransactionTime.Date == transactionDate.Date)
+            {
+                transactionDate = lastTransaction.TransactionTime;
+                transactionDate = transactionDate.AddMinutes(5);
+            }
             Account account = await _bankAccountRepository.GetAccount(accountId);
             account.Balance = account.Balance + amount;
 
@@ -326,7 +377,8 @@ namespace BankingTool.Service.Service
                 Amount = amount,
                 Description = description,
                 TransactionTime = DateTime.Now,
-                TransactionCategory = TransactionCatagory.Deposit
+                TransactionCategory = TransactionCatagory.Deposit,
+                TransactionTag = TransactionTag.Deposit
             };
             TransactionDetail transactionDetails = new()
             {
@@ -344,8 +396,24 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description)
+        public async Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate)
         {
+            var lastTransaction = await _bankAccountRepository.GetLastTransaction(accountId);
+            if (lastTransaction != null && lastTransaction?.TransactionTime.Date > transactionDate.Date)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = [],
+                    Errors = [new Errors { PropertyName = "DepositAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                };
+            }
+            if (lastTransaction != null && lastTransaction.TransactionTime.Date == transactionDate.Date)
+            {
+                transactionDate = lastTransaction.TransactionTime;
+                transactionDate = transactionDate.AddMinutes(5);
+            }
             Account account = await _bankAccountRepository.GetAccount(accountId);
             account.Balance = account.Balance - amount;
 
@@ -354,7 +422,8 @@ namespace BankingTool.Service.Service
                 Amount = amount,
                 Description = description,
                 TransactionTime = DateTime.Now,
-                TransactionCategory = TransactionCatagory.Withdraw
+                TransactionCategory = TransactionCatagory.Withdraw,
+                TransactionTag = TransactionTag.Withdraw
             };
             TransactionDetail transactionDetails = new()
             {

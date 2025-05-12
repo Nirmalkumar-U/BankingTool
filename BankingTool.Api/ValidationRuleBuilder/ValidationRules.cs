@@ -182,6 +182,8 @@ namespace BankingTool.Api.Validators
                     r.MinLength = 1;
                     r.MaxLength = 100;
                 }),
+            RuleBuilder<TransferAmountRequestObject>.For(x => x.Request.Transaction.TransactionDate).Required(),
+            RuleBuilder<TransferAmountRequestObject>.For(x => x.Request.Transaction.TransactionTag).Required()
         };
         public static List<ValidationRule> DepositAmountRequestObjectRules = new()
         {
@@ -201,6 +203,7 @@ namespace BankingTool.Api.Validators
                     r.MinLength = 1;
                     r.MaxLength = 100;
                 }),
+            RuleBuilder<DepositAmountRequestObject>.For(x => x.Request.Transaction.TransactionDate).Required()
         };
         public static List<ValidationRule> CashWithdrawRequestObjectRules = new()
         {
@@ -220,6 +223,7 @@ namespace BankingTool.Api.Validators
                     r.MinLength = 1;
                     r.MaxLength = 100;
                 }),
+            RuleBuilder<CashWithdrawRequestObject>.For(x => x.Request.Transaction.TransactionDate).Required()
         };
         public static List<ValidationRule> TransactionListRequestObjectRules = new()
         {
