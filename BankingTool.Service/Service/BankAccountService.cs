@@ -78,7 +78,7 @@ namespace BankingTool.Service.Service
             {
                 Amount = Constants.AccountMininumBalanceForSavingsAccount,
                 Description = "Initial Credit",
-                TransactionTime = DateTime.Now,
+                TransactionTime = new DateTime(2025, 5, 6),
                 TransactionCategory = TransactionCatagory.Deposit
             };
             TransactionDetail transactionDetails = new()
@@ -248,7 +248,8 @@ namespace BankingTool.Service.Service
                 Response = true,
                 DropDownList = new List<DropDownListDto>
                 {
-                    new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() }
+                    new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() },
+                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() }
                 },
                 StatuCode = 200,
                 Status = true,

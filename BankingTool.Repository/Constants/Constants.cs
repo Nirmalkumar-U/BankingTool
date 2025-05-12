@@ -1,13 +1,10 @@
-﻿using Azure;
-using System.Diagnostics;
-
-namespace BankingTool.Repository
+﻿namespace BankingTool.Repository
 {
     public class Constants
     {
         public const int AccountType = 100;
         public const int DefaultDebitCard = 50000;
-        public const int AccountMininumBalanceForSavingsAccount = 500;
+        public const int AccountMininumBalanceForSavingsAccount = 0;
     }
     public class AccountStatus
     {
