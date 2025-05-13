@@ -183,8 +183,8 @@ namespace BankingTool.Service
                     LastName = user.LastName,
                     EmailId = user.EmailId,
                     Password = user.UserId != 0 ? _encriptDecriptService.DecryptData(user.Password) : null,
-                    City = user.City,
-                    State = user.State,
+                    City = user.CityId,
+                    State = user.StateId,
                     RoleId = role.RoleId
                 }
             };
@@ -237,8 +237,8 @@ namespace BankingTool.Service
                 LastName = user.Request.User.LastName,
                 EmailId = user.Request.User.Email,
                 Password = _encriptDecriptService.EncryptData(user.Request.User.Password),
-                State = user.Request.State.Id,
-                City = user.Request.City.Id,
+                StateId = user.Request.State.Id,
+                CityId = user.Request.City.Id,
                 IsActive = true,
                 IsDeleted = false,
                 CreatedBy = "Admin",

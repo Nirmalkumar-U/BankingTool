@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model
+﻿using BankingTool.Model.Model;
+
+namespace BankingTool.Model
 {
     public class Account : BaseSchema
     {
@@ -9,5 +11,11 @@
         public string AccountNumber { get; set; }
         public int AccountTypeId { get; set; }
         public string AccountStatus { get; set; }
+
+
+        // Optional Navigation Properties
+        public virtual Customer Customer { get; set; } 
+        public virtual Bank Bank { get; set; } 
+        public virtual ICollection<Card> Card { get; set; }
     }
 }

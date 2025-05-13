@@ -4,6 +4,7 @@ using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.SPDto;
 using BankingTool.Model.Model;
+using BankingTool.Repository.EntityConfiguration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Action = BankingTool.Model.Action;
@@ -56,76 +57,30 @@ namespace BankingTool.Repository
         public DbSet<GetReceiverAccount> GetReceiverAccount { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Role>(entity =>
-            {
-                entity.HasKey(r => r.RoleId);
-            });
+            //Tables
+            modelBuilder.ApplyConfiguration(new CodeValueConfiguration());
+            modelBuilder.ApplyConfiguration(new StateConfiguration());
+            modelBuilder.ApplyConfiguration(new CityConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfiguration(new ActionConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleAccessConfiguration());
+            modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new StaffConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerConfiguration());
+            modelBuilder.ApplyConfiguration(new CreditScoreConfiguration());
+            modelBuilder.ApplyConfiguration(new BankConfiguration());
+            modelBuilder.ApplyConfiguration(new AccountConfiguration());
+            modelBuilder.ApplyConfiguration(new CardConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionDetailConfiguration());
 
-            modelBuilder.Entity<Users>(entity =>
-            {
-                entity.HasKey(u => u.UserId);
-                entity.Property(e => e.State).HasColumnName("State").HasColumnType("int");
-            });
-
-            modelBuilder.Entity<Action>(entity =>
-            {
-                entity.HasKey(a => a.ActionId);
-            });
-
-            modelBuilder.Entity<UserRole>(entity =>
-            {
-                entity.HasKey(ur => ur.UserId);
-            });
-
-            modelBuilder.Entity<RoleAccess>(entity =>
-            {
-                entity.HasKey(ra => new { ra.RoleId, ra.ActionId });
-            });
-            modelBuilder.Entity<Account>(entity =>
-            {
-                entity.HasKey(ur => ur.AccountId);
-            });
-            modelBuilder.Entity<Card>(entity =>
-            {
-                entity.HasKey(ur => ur.CardId);
-            });
-            modelBuilder.Entity<City>(entity =>
-            {
-                entity.HasKey(ur => ur.CityId);
-            });
-            modelBuilder.Entity<CreditScore>(entity =>
-            {
-                entity.HasKey(ur => ur.CreditScoreId);
-            });
-            modelBuilder.Entity<Customer>(entity =>
-            {
-                entity.HasKey(ur => ur.CustomerId);
-            });
-            modelBuilder.Entity<State>(entity =>
-            {
-                entity.HasKey(ur => ur.StateId);
-            });
-            modelBuilder.Entity<Transaction>(entity =>
-            {
-                entity.HasKey(ur => ur.TransactionId);
-            });
-            modelBuilder.Entity<TransactionDetail>(entity =>
-            {
-                entity.HasKey(ur => ur.TransactionDetailsId);
-            });
-            modelBuilder.Entity<Bank>(entity =>
-            {
-                entity.HasKey(ur => ur.BankId);
-            });
-            modelBuilder.Entity<CodeValue>(entity =>
-            {
-                entity.HasKey(ur => ur.CodeValueId);
-            });
-
+            //SPs
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());
             modelBuilder.Entity<GetTransactionsListResponseTransactionList>(e => e.HasNoKey());
             modelBuilder.Entity<GetSenderAccount>(e => e.HasNoKey());
             modelBuilder.Entity<GetReceiverAccount>(e => e.HasNoKey());
+
             base.OnModelCreating(modelBuilder);
         }
     }

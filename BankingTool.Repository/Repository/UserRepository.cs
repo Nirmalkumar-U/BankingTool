@@ -84,11 +84,11 @@ namespace BankingTool.Repository
                           join ur in dataContext.UserRole.AsNoTracking() on u.UserId equals ur.UserId
                           join r in dataContext.Role.AsNoTracking() on ur.RoleId equals r.RoleId
                           join c in dataContext.Customer.AsNoTracking() on u.UserId equals c.UserId into customerGroup
-                          from c in customerGroup.DefaultIfEmpty() 
+                          from c in customerGroup.DefaultIfEmpty()
                           join s in dataContext.Staff.AsNoTracking() on u.UserId equals s.UserId into staffGroup
                           from s in staffGroup.DefaultIfEmpty()
-                          join st in dataContext.State on u.State equals st.StateId
-                          join ci in dataContext.City on u.City equals ci.CityId
+                          join st in dataContext.State on u.StateId equals st.StateId
+                          join ci in dataContext.City on u.CityId equals ci.CityId
                           where u.IsDeleted == false
                           select new UserListResponse
                           {

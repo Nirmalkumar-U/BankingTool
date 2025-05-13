@@ -12,7 +12,7 @@
         public string CodeValue2Description { get; set; }
         public string CodeValue3Description { get; set; }
         public bool InUse { get; set; }
-        public int Sequence { get; set; }
+        public int? Sequence { get; set; }
     }
 
 }

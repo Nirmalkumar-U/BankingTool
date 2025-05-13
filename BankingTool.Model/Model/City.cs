@@ -6,5 +6,8 @@
         public int StateId { get; set; } 
         public string CityName { get; set; }
         public string PostalCode { get; set; }
+
+        // Optional Navigation Property
+        public virtual State State { get; set; }
     }
 }

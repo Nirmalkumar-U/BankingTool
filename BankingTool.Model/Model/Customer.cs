@@ -6,5 +6,11 @@
         public int UserId { get; set; }
         public int CustomerLevel { get; set; }
         public string PrimaryAccountNumber { get; set; }
+
+
+        // Optional Navigation Property
+        public virtual Users User { get; set; }
+        public virtual ICollection<Account> Account { get; set; }
+        public virtual CreditScore CreditScore { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model
+﻿using BankingTool.Model.Model;
+
+namespace BankingTool.Model
 {
     public class Transaction : BaseSchema
     {
@@ -8,5 +10,9 @@
         public int Amount { get; set; }
         public DateTime TransactionTime { get; set; }
         public string TransactionTag { get; set; }
+
+
+        // Optional Navigation Property
+        public virtual ICollection<TransactionDetail> TransactionDetail { get; set; }
     }
 }

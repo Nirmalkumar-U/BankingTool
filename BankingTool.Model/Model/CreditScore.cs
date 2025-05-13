@@ -7,5 +7,7 @@
         public int? CreditScoreValue { get; set; }
         public string Status { get; set; }
         public string Description { get; set; }
+
+        public virtual Customer Customer { get; set; }
     }
 }
