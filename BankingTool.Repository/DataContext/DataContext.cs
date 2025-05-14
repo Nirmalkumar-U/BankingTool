@@ -49,6 +49,9 @@ namespace BankingTool.Repository
         public DbSet<Staff> Staff { get; set; }
         public DbSet<Bank> Bank { get; set; }
         public DbSet<CodeValue> CodeValue { get; set; }
+        public DbSet<BudgetAccount> BudgetAccount { get; set; }
+        public DbSet<BudgetTransaction> BudgetTransaction { get; set; }
+        public DbSet<BudgetTransactionDetail> BudgetTransactionDetail { get; set; }
 
         // SP
         public DbSet<GetActionsByUserIdDto> GetActionsByUserIdDto { get; set; }
@@ -74,6 +77,9 @@ namespace BankingTool.Repository
             modelBuilder.ApplyConfiguration(new CardConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetAccountConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetTransactionDetailConfiguration());
 
             //SPs
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());

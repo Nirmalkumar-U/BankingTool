@@ -28,6 +28,9 @@ USING (VALUES
  ,(24,N'TransactionCategory',102,N'Cheque',NULL,NULL,N'Transaction happened for Cheque',NULL,NULL,0,3)
  ,(25,N'TransactionCategory',102,N'Deposit',NULL,NULL,N'Transaction happened for Deposit',NULL,NULL,1,4)
  ,(26,N'TransactionCategory',102,N'Withdraw',NULL,NULL,N'Transaction happened for Withdraw',NULL,NULL,1,5)
+ ,(27,N'TransactionTag',101,N'Given Debt',NULL,NULL,N'Transaction Happened for given debt',NULL,NULL,1,18)
+ ,(28,N'TransactionTag',101,N'Withdraw',NULL,NULL,N'Transaction Happened for withdraw',NULL,NULL,1,19)
+ ,(29,N'TransactionTag',101,N'Deposit',NULL,NULL,N'Transaction Happened for deposit',NULL,NULL,1,20)
 ) AS Source ([CodeValueId],[TypeName],[TypeCode],[CodeValue1],[CodeValue2],[CodeValue3],[CodeValue1Description],[CodeValue2Description],[CodeValue3Description],[InUse],[Sequence])
 ON (Target.[CodeValueId] = Source.[CodeValueId])
 WHEN MATCHED AND (

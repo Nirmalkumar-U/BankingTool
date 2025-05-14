@@ -5,3 +5,81 @@ BEGIN
 END
 GO
 --------------------------------------------------------------------------------------------------------------------------------
+If(OBJECT_ID('[FK_BudgetAccount_CustomerId]') Is Not Null)
+BEGIN
+	ALTER TABLE [BudgetAccount] DROP CONSTRAINT [FK_BudgetAccount_CustomerId]
+END
+GO
+
+If(OBJECT_ID('[FK_BudgetTransactionDetail_BudgetTransactionId]') Is Not Null)
+BEGIN
+	ALTER TABLE [BudgetTransactionDetail] DROP CONSTRAINT [FK_BudgetTransactionDetail_BudgetTransactionId]
+END
+GO
+
+If(OBJECT_ID('[FK_BudgetTransactionDetail_AccountId]') Is Not Null)
+BEGIN
+	ALTER TABLE [BudgetTransactionDetail] DROP CONSTRAINT [FK_BudgetTransactionDetail_AccountId]
+END
+GO
+
+If(OBJECT_ID('[FK_BudgetTransactionDetail_BudgetAccountId]') Is Not Null)
+BEGIN
+	ALTER TABLE [BudgetTransactionDetail] DROP CONSTRAINT [FK_BudgetTransactionDetail_BudgetAccountId]
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.tables where name = N'BudgetAccount')
+BEGIN
+	DROP TABLE [BudgetAccount]
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.tables where name = N'BudgetTransaction')
+BEGIN
+	DROP TABLE [BudgetTransaction]
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.tables where name = N'BudgetTransactionDetail')
+BEGIN
+	DROP TABLE [BudgetTransactionDetail]
+END
+GO
+
+CREATE TABLE [BudgetAccount] (
+	BudgetAccountId INT CONSTRAINT [PK_BudgetAccount] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
+	CustomerId INT NOT NULL CONSTRAINT [FK_BudgetAccount_CustomerId] FOREIGN KEY REFERENCES Customer(CustomerId),
+	BudgetName VARCHAR(50) NOT NULL,
+	BudgetNumber VARCHAR(8) NOT NULL,
+	Balance VARCHAR(8) NOT NULL,
+	BudgetStatus VARCHAR(10) NOT NULL,
+	CreatedDate DATETIME NOT NULL,
+	CreatedBy VARCHAR(30) NOT NULL,
+	ModifiedDate DATETIME NULL,
+	ModifiedBy VARCHAR(30) NULL,
+	IsDeleted BIT DEFAULT 0)
+
+CREATE TABLE [BudgetTransaction] (
+    BudgetTransactionId INT CONSTRAINT [PK_BudgetTransaction] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
+    TransactionCategory VARCHAR(20) NOT NULL,
+    Amount INT NOT NULL,
+    Description VARCHAR(500),
+    TransactionTime DATETIME NOT NULL DEFAULT GETDATE(),
+	TransactionTag VARCHAR(50) NULL,
+    CreatedBy VARCHAR(30) NOT NULL,
+    CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
+    ModifiedBy VARCHAR(30) NULL,
+    ModifiedDate DATETIME NULL,
+    IsDeleted BIT DEFAULT 0
+);
+
+CREATE TABLE [BudgetTransactionDetail] (
+    BudgetTransactionDetailId INT CONSTRAINT [PK_BudgetTransactionDetail] PRIMARY KEY IDENTITY(1,1),
+    BudgetTransactionId INT NOT NULL CONSTRAINT [FK_BudgetTransactionDetail_BudgetTransactionId] FOREIGN KEY REFERENCES [BudgetTransaction](BudgetTransactionId),
+    AccountId INT NOT NULL CONSTRAINT [FK_BudgetTransactionDetail_AccountId] FOREIGN KEY REFERENCES Account(AccountId),
+	BudgetAccountId INT NOT NULL CONSTRAINT [FK_BudgetTransactionDetail_BudgetAccountId] FOREIGN KEY REFERENCES BudgetAccount(BudgetAccountId),
+    TransactionRole VARCHAR(10) NOT NULL,
+    TransactionType VARCHAR(10) NOT NULL,
+    StageBalance INT NOT NULL
+);

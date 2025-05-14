@@ -1,10 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppPaths, AppRoute, ClaimKey, Constant } from './constant/constant';
+import { AppPaths, ClaimKey, Constant } from './constant/constant';
 import { EmitterService } from './core/emitter.service';
 import { IndexedDbServiceService } from './core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from './core/local-storage.service';
 import { GetActionsByUserIdDto } from './dto/get-actions-by-user-id-dto';
+import { faBell, faHandshake, faMoneyBill1,faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
+import { faHouse } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +21,11 @@ export class AppComponent implements OnInit {
 
   isMobileNavVisible: boolean = false;
   isCompact: boolean = false;
+  aBell = faBell;
+  aHouse = faHouse;
+  aHandshake = faHandshake;
+  aMoneyBill1 = faMoneyBill1;
+  aArrowAltCircleRight = faArrowAltCircleRight;
   //Menus = [
   //  {
   //    label: 'User',
@@ -49,12 +56,12 @@ export class AppComponent implements OnInit {
       this.indexedDbService.getAllData(Constant.actionTableName).then((data: GetActionsByUserIdDto[]) => {
         console.log(data);
         this.Menus = [];
-        let mainMenu = data.filter(x => x.actionPath == null);
+        let mainMenu = data.filter(x => x.actionPath == null && x.actionType == "Menu");
         let subMenu = data.filter(x => x.actionPath != null);
         mainMenu.forEach((path: GetActionsByUserIdDto) => {
           let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
           this.Menus.push({
-            label: path.actionName, icon: 'fas fa-photo-video', isOpen: false,
+            label: path.actionName, icon: 'aMoneyBill1', isOpen: false,
             items: [...sMenu]
           })
         });
@@ -67,7 +74,7 @@ export class AppComponent implements OnInit {
         this.indexedDbService.getAllData(Constant.actionTableName).then((data: GetActionsByUserIdDto[]) => {
           this.Menus = [];
           console.log(data);
-          let mainMenu = data.filter(x => x.actionPath == null);
+          let mainMenu = data.filter(x => x.actionPath == null && x.actionType == "Menu");
           let subMenu = data.filter(x => x.actionPath != null);
           mainMenu.forEach((path: GetActionsByUserIdDto) => {
             let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));

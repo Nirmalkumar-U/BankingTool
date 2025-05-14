@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model
+﻿using BankingTool.Model.Model;
+
+namespace BankingTool.Model
 {
     public class Customer : BaseSchema
     {
@@ -11,6 +13,7 @@
         // Optional Navigation Property
         public virtual Users User { get; set; }
         public virtual ICollection<Account> Account { get; set; }
+        public virtual ICollection<BudgetAccount> BudgetAccount { get; set; }
         public virtual CreditScore CreditScore { get; set; }
     }
 }

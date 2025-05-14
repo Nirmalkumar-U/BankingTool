@@ -20,6 +20,21 @@ USING (VALUES
  ,(16,N'Deposit Amount',N'/depositAmount',N'Menu',N'RW',2,6,5,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(17,N'Cash Withdraw',N'/cashWithdraw',N'Menu',N'R',2,6,6,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(18,N'Cash Withdraw',N'/cashWithdraw',N'Menu',N'RW',2,6,6,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(19,N'Budget',NULL,N'Menu',NULL,1,NULL,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(20,N'Create Budget Account',N'/createBudgetAccount',N'Menu',N'R',2,19,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(21,N'Create Budget Account',N'/createBudgetAccount',N'Menu',N'RW',2,19,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(22,N'Budget Transaction List',N'/budgetTransactionList',N'Menu',N'R',2,19,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(23,N'Budget Transaction List',N'/budgetTransactionList',N'Menu',N'RW',2,19,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(24,N'Notification',NULL,N'ActionMenu',NULL,1,NULL,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(25,N'Budget Notification',N'/budgetNotification',N'Action',N'R',2,24,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(26,N'Budget Notification',N'/budgetNotification',N'Action',N'RW',2,24,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(27,N'Account Notification',N'/accountNotification',N'Action',N'R',2,24,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(28,N'Account Notification',N'/accountNotification',N'Action',N'RW',2,24,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(29,N'Report',NULL,N'Menu',NULL,1,NULL,4,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(30,N'Account Statement Report',N'/accountStatementReport',N'Menu',N'R',2,29,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(31,N'Account Statement Report',N'/accountStatementReport',N'Menu',N'RW',2,29,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(32,N'Budget Statement Report',N'/budgetStatementReport',N'Menu',N'R',2,29,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(33,N'Budget Statement Report',N'/budgetStatementReport',N'Menu',N'RW',2,29,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
 ) AS Source ([ActionId],[ActionName],[ActionPath],[ActionType],[Access],[MenuLevel],[ParrentMenuId],[Sequence],[CreatedDate],[CreatedBy],[ModifiedDate],[ModifiedBy],[IsDeleted])
 ON (Target.[ActionId] = Source.[ActionId])
 WHEN MATCHED AND (
@@ -82,4 +97,16 @@ Values (1,1),
 (2,12),
 (2,14),
 (2,16),
-(2,18)
+(2,18),
+(2,19),
+(2,21),
+(2,23),
+(2,24),
+(2,26),
+(2,28),
+(1,24),
+(1,26),
+(1,28),
+(2,29),
+(2,31),
+(2,33)

@@ -85,4 +85,7 @@
   <ItemGroup>
     <None Include="PostProductionScripts\Sprint1\CodeValue.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostProductionScripts\Sprint1\ActionTable.sql" />
+  </ItemGroup>
 </Project>

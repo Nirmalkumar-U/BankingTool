@@ -3,19 +3,20 @@
     <div class="dashboard-nav" [class.mobile-show]="isMobileNavVisible">
       <header>
         <a href="#" class="brand-logo">
-          <i class="fas fa-anchor"></i> <span>Banking Tool</span>
+          <fa-icon [icon]="aHandshake"></fa-icon>
+          <span class="p-1">Banking Tool</span>
         </a>
       </header>
       <nav class="dashboard-nav-list">
         <a [routerLink]="[appPaths.home]" class="dashboard-nav-item">
-          <i class="fas fa-home"></i> Home
+          <fa-icon [icon]="aHouse"></fa-icon> <span class="p-1">Home</span>
         </a>
         <div class="dashboard-nav-dropdown"
              *ngFor="let dropdown of Menus"
              [class.show]="dropdown.isOpen">
           <a class="dashboard-nav-item dashboard-nav-dropdown-toggle"
              (click)="toggleDropdown(dropdown)">
-            <i [class]="dropdown.icon"></i> {{ dropdown.label }}
+            <fa-icon [icon]="aMoneyBill1" size="lg"></fa-icon> <span class="p-1">{{ dropdown.label }}</span>
           </a>
           <div class="dashboard-nav-dropdown-menu">
             <a *ngFor="let item of dropdown.items"
@@ -27,7 +28,7 @@
         </div>
         <div class="nav-item-divider"></div>
         <a href="#" class="dashboard-nav-item" (click)="logout()">
-          <i class="fas fa-sign-out-alt"></i> Logout
+          <fa-icon [icon]="aArrowAltCircleRight" size="lg"></fa-icon> <span class="p-1">Logout</span> 
         </a>
       </nav>
     </div>
@@ -35,6 +36,9 @@
       <header class="dashboard-toolbar">
         <div class="container">
           <div class="row justify-content-end">
+            <div class="col-1 text-end">
+              <fa-icon [icon]="aBell" size="lg"></fa-icon>
+            </div>
             <div class="col-2">
               {{logggedInUserName}}
             </div>
