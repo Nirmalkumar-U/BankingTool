@@ -37,7 +37,34 @@
         <div class="container">
           <div class="row justify-content-end">
             <div class="col-1 text-end">
-              <fa-icon [icon]="aBell" size="lg"></fa-icon>
+
+
+
+
+              
+
+              <div class="dropdown">
+                <span class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <fa-icon [icon]="aBell"></fa-icon>
+                </span>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <ng-container *ngFor="let menu of notificationMenus">
+                    <li *ngFor="let item of menu.items">
+                      <a class="dropdown-item" [routerLink]="[item.path]">{{ item.menu }}</a>
+                    </li>
+                  </ng-container>
+                </ul>
+              </div>
+
+
+
+
+
+
+
+
+
+
             </div>
             <div class="col-2">
               {{logggedInUserName}}

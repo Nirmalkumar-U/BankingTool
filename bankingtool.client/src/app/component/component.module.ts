@@ -22,6 +22,18 @@ import { SelfTransferResolver } from '../core/resolver/self-transfer.resolver';
 import { DepositAmountComponent } from './desposit-amount/deposit-amount.component';
 import { CashWithdrawResolver } from '../core/resolver/cash-withdraw.resolver';
 import { CashWithdrawComponent } from './cash-withdraw/cash-withdraw.component';
+import { CreateBudgetAccountComponent } from './create-budget-account/create-budget-account.component';
+import { CreateBudgetAccountResolver } from '../core/resolver/create-budget-account.resolver';
+import { BudgetTransactionListComponent } from './budget-transaction-list/budget-transaction-list.component';
+import { BudgetNotificationComponent } from './budget-notification/budget-notification.component';
+import { AccountNotificationComponent } from './account-notification/account-notification.component';
+import { AccountStatementReportComponent } from './account-statement-report/account-statement-report.component';
+import { BudgetStatementReportComponent } from './budget-statement-report/budget-statement-report.component';
+import { BudgetTransactionListResolver } from '../core/resolver/budget-transaction-list.resolver';
+import { BudgetNotificationResolver } from '../core/resolver/budget-notification.resolver';
+import { AccountNotificationResolver } from '../core/resolver/account-notification.resolver';
+import { AccountStatementReportResolver } from '../core/resolver/account-statement-report.resolver';
+import { BudgetStatementReportResolver } from '../core/resolver/budget-statement-report.resolver';
 
 const routes: Routes = [
   {
@@ -93,6 +105,42 @@ const routes: Routes = [
     title: PageTitle.cashWithdraw,
     component: CashWithdrawComponent,
     resolve: { DataResolver: CashWithdrawResolver }
+  },
+  {
+    path: AppPaths.createBudgetAccount,
+    title: PageTitle.createBudgetAccount,
+    component: CreateBudgetAccountComponent,
+    resolve: { DataResolver: CreateBudgetAccountResolver }
+  },
+  {
+    path: AppPaths.budgetTransactionList,
+    title: PageTitle.budgetTransactionList,
+    component: BudgetTransactionListComponent,
+    resolve: { DataResolver: BudgetTransactionListResolver }
+  },
+  {
+    path: AppPaths.budgetNotification,
+    title: PageTitle.budgetNotification,
+    component: BudgetNotificationComponent,
+    resolve: { DataResolver: BudgetNotificationResolver }
+  },
+  {
+    path: AppPaths.accountNotification,
+    title: PageTitle.accountNotification,
+    component: AccountNotificationComponent,
+    resolve: { DataResolver: AccountNotificationResolver }
+  },
+  {
+    path: AppPaths.budgetStatementReport,
+    title: PageTitle.budgetStatementReport,
+    component: BudgetStatementReportComponent,
+    resolve: { DataResolver: BudgetStatementReportResolver }
+  },
+  {
+    path: AppPaths.accountStatementReport,
+    title: PageTitle.accountStatementReport,
+    component: AccountStatementReportComponent,
+    resolve: { DataResolver: AccountStatementReportResolver }
   }
 ];
 
@@ -108,7 +156,13 @@ const routes: Routes = [
     TransactionsListComponent,
     TransferAmountComponent,
     DepositAmountComponent,
-    CashWithdrawComponent
+    CashWithdrawComponent,
+    CreateBudgetAccountComponent,
+    BudgetTransactionListComponent,
+    BudgetNotificationComponent,
+    AccountNotificationComponent,
+    AccountStatementReportComponent,
+    BudgetStatementReportComponent
   ],
   imports: [
     RouterModule.forChild(routes),

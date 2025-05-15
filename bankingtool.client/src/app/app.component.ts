@@ -42,6 +42,7 @@ export class AppComponent implements OnInit {
   //];
 
   Menus: Menu[] = []
+  notificationMenus: Menu[] = []
 
   constructor(private emitService: EmitterService, private cdr: ChangeDetectorRef, private router: Router,
     private localStorageService: LocalStorageService, private indexedDbService: IndexedDbServiceService) {
@@ -54,13 +55,23 @@ export class AppComponent implements OnInit {
       this.logggedInUserName = this.localStorageService.getItem(ClaimKey.userName)!;
       this.cdr.detectChanges();
       this.indexedDbService.getAllData(Constant.actionTableName).then((data: GetActionsByUserIdDto[]) => {
-        console.log(data);
         this.Menus = [];
+        this.notificationMenus = [];
         let mainMenu = data.filter(x => x.actionPath == null && x.actionType == "Menu");
         let subMenu = data.filter(x => x.actionPath != null);
         mainMenu.forEach((path: GetActionsByUserIdDto) => {
           let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
           this.Menus.push({
+            label: path.actionName, icon: 'aMoneyBill1', isOpen: false,
+            items: [...sMenu]
+          })
+        });
+
+        let notificationMainMenu = data.filter(x => x.actionPath == null && x.actionType == "ActionMenu");
+        let notificationSubMenu = data.filter(x => x.actionPath != null);
+        notificationMainMenu.forEach((path: GetActionsByUserIdDto) => {
+          let sMenu: MenuItem[] = notificationSubMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
+          this.notificationMenus.push({
             label: path.actionName, icon: 'aMoneyBill1', isOpen: false,
             items: [...sMenu]
           })
@@ -73,13 +84,23 @@ export class AppComponent implements OnInit {
       Constant.actionTablePrimaryKey, Constant.actionTableName, Constant.actionCoumns).then(() => {
         this.indexedDbService.getAllData(Constant.actionTableName).then((data: GetActionsByUserIdDto[]) => {
           this.Menus = [];
-          console.log(data);
+          this.notificationMenus = [];
           let mainMenu = data.filter(x => x.actionPath == null && x.actionType == "Menu");
           let subMenu = data.filter(x => x.actionPath != null);
           mainMenu.forEach((path: GetActionsByUserIdDto) => {
             let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
             this.Menus.push({
               label: path.actionName, icon: 'fas fa-photo-video', isOpen: false,
+              items: [...sMenu]
+            })
+          });
+
+          let notificationMainMenu = data.filter(x => x.actionPath == null && x.actionType == "ActionMenu");
+          let notificationSubMenu = data.filter(x => x.actionPath != null);
+          notificationMainMenu.forEach((path: GetActionsByUserIdDto) => {
+            let sMenu: MenuItem[] = notificationSubMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
+            this.notificationMenus.push({
+              label: path.actionName, icon: 'aMoneyBill1', isOpen: false,
               items: [...sMenu]
             })
           });

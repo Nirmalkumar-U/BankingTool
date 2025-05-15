@@ -31,6 +31,18 @@ export class AppPaths {
   public static selfTransfer: string = 'selfTransfer';
   public static depositAmount: string = 'depositAmount';
   public static cashWithdraw: string = 'cashWithdraw';
+
+  //Budget
+  public static createBudgetAccount: string = 'createBudgetAccount';
+  public static budgetTransactionList: string = 'budgetTransactionList';
+
+  //Notification
+  public static budgetNotification: string = 'budgetNotification';
+  public static accountNotification: string = 'accountNotification';
+
+  //Report
+  public static accountStatementReport: string = 'accountStatementReport';
+  public static budgetStatementReport: string = 'budgetStatementReport';
 }
 
 export class AppRoute {
@@ -52,6 +64,18 @@ export class AppRoute {
   public static selfTransfer: string = '/selfTransfer';
   public static depositAmount: string = '/depositAmount';
   public static cashWithdraw: string = '/cashWithdraw';
+
+  // Budget
+  public static createBudgetAccount: string = '/createBudgetAccount';
+  public static budgetTransactionList: string = '/budgetTransactionList';
+
+  //Notification
+  public static budgetNotification: string = '/budgetNotification';
+  public static accountNotification: string = '/accountNotification';
+
+  //Report
+  public static accountStatementReport: string = '/accountStatementReport';
+  public static budgetStatementReport: string = '/budgetStatementReport';
 }
 export class PageTitle {
   public static home: string = 'Home';
@@ -72,6 +96,18 @@ export class PageTitle {
   public static selfTransfer: string = 'Self Transfer';
   public static depositAmount: string = 'Deposit Amount';
   public static cashWithdraw: string = 'Cash Withdraw';
+
+  //Budget
+  public static createBudgetAccount: string = 'Create Budget Account';
+  public static budgetTransactionList: string = 'Budget Transaction List';
+
+  // Notification
+  public static budgetNotification: string = 'Budget Notification';
+  public static accountNotification: string = 'Account Notification';
+
+  //Report
+  public static accountStatementReport: string = 'Account Statement Report';
+  public static budgetStatementReport: string = 'Budget Statement Report';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';
