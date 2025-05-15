@@ -39,8 +39,7 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // Balance
             builder.Property(b => b.Balance)
-                   .IsRequired()
-                   .HasMaxLength(8);
+                   .IsRequired();
 
             // BudgetStatus
             builder.Property(b => b.BudgetStatus)

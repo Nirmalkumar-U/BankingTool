@@ -52,7 +52,7 @@ CREATE TABLE [BudgetAccount] (
 	CustomerId INT NOT NULL CONSTRAINT [FK_BudgetAccount_CustomerId] FOREIGN KEY REFERENCES Customer(CustomerId),
 	BudgetName VARCHAR(50) NOT NULL,
 	BudgetNumber VARCHAR(8) NOT NULL,
-	Balance VARCHAR(8) NOT NULL,
+	Balance INT NOT NULL,
 	BudgetStatus VARCHAR(10) NOT NULL,
 	CreatedDate DATETIME NOT NULL,
 	CreatedBy VARCHAR(30) NOT NULL,

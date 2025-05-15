@@ -6,7 +6,7 @@
         public int CustomerId { get; set; }
         public string BudgetName { get; set; }
         public string BudgetNumber { get; set; }
-        public string Balance { get; set; }
+        public int Balance { get; set; }
         public string BudgetStatus { get; set; }
 
         // Optional navigation property

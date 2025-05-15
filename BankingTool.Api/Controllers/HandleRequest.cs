@@ -49,7 +49,6 @@ namespace BankingTool.Api.Controllers
                 });
             }
 
-
             if (result.Errors.Count > 0)
             {
                 result.Errors = [.. (errors ?? []), .. (result.Errors ?? [])];
@@ -61,22 +60,22 @@ namespace BankingTool.Api.Controllers
 
             if (result.StatuCode == 500 || errors.Any())
             {
-                result.Message = ErrorMessage.InternalServerError;
+                result.Message = result.Message ?? ErrorMessage.InternalServerError;
                 return StatusCode(500, result);
             }
             else if (result.StatuCode == 404)
             {
-                result.Message = ErrorMessage.NotFound;
+                result.Message = result.Message ?? ErrorMessage.NotFound;
                 return NotFound(result);
             }
             else if (result.StatuCode == 200)
             {
-                result.Message = ErrorMessage.Sucess;
+                result.Message = result.Message ?? ErrorMessage.Success;
                 return Ok(result);
             }
             else if (result.StatuCode == 201)
             {
-                result.Message = ErrorMessage.Created;
+                result.Message = result.Message ?? ErrorMessage.Created;
                 return CreatedAtAction(serviceMethod.Method.Name, result);
             }
             else if (result.StatuCode == 204)
@@ -85,12 +84,12 @@ namespace BankingTool.Api.Controllers
             }
             else if (result.StatuCode == 207)
             {
-                result.Message = ErrorMessage.MultiStatus;
+                result.Message = result.Message ?? ErrorMessage.MultiStatus;
                 return StatusCode(207, result); ;
             }
             else
             {
-                result.Message = ErrorMessage.Sucess;
+                result.Message = result.Message ?? ErrorMessage.Success;
                 return Ok(result);
             }
         }

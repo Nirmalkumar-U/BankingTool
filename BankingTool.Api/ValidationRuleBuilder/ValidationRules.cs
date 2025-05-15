@@ -156,7 +156,7 @@ namespace BankingTool.Api.Validators
             RuleBuilder<GetAccountBalanceRequestObject>.For(x => x.Request).Required(),
             RuleBuilder<GetAccountBalanceRequestObject>.For(x => x.Request.Account).Required(),
             RuleBuilder<GetAccountBalanceRequestObject>.For(x => x.Request.Account.Id).Required()
-        }; 
+        };
         public static List<ValidationRule> GetToAccountListExcludedByAccountIdRequestRules = new()
         {
             RuleBuilder<GetToAccountListExcludedByAccountIdRequestObject>.For(x => x.Request).Required(),
@@ -231,6 +231,23 @@ namespace BankingTool.Api.Validators
             RuleBuilder<TransactionListRequestObject>.For(x => x.Request.Account).Required(),
             RuleBuilder<TransactionListRequestObject>.For(x => x.Request.Transaction).Required(),
             RuleBuilder<TransactionListRequestObject>.For(x => x.Request.Account.Id).Required()
+        };
+        public static List<ValidationRule> CreateBudgetAccountRequestObjectRules = new()
+        {
+            RuleBuilder<CreateBudgetAccountRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<CreateBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount).Required(),
+            RuleBuilder<CreateBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount.BudgetName)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<CreateBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
         };
         #endregion BankAccountController
     }
