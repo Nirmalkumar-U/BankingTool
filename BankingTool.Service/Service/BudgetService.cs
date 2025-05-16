@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
@@ -52,6 +53,20 @@ namespace BankingTool.Service.Service
             return response;
         }
 
+        public async Task<ResponseDto<GetBudgetListResponse>> GetBudgetList()
+        {
+            return new ResponseDto<GetBudgetListResponse>()
+            {
+                Errors = [],
+                ValidationErrors = [],
+                Response = new GetBudgetListResponse
+                {
+                    budgetList = await _budgetRepository.GetBudgetList()
+                },
+                Status = true,
+                StatuCode = 200
+            };
+        }
 
         private async Task<string> GetNewBudgetNumber()
         {

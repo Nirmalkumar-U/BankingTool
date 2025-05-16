@@ -1,0 +1,37 @@
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Budget List</h1>
+      </div>
+      <div class='card-body'>
+        <table class="table caption-top">
+          <thead>
+            <tr>
+              <th scope="col">Budget Name</th>
+              <th scope="col">Budget Number</th>
+              <th scope="col">Balance</th>
+              <th scope="col">Budget Status</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="budgetList && budgetList != null && budgetList.length != 0; else noRecords">
+            <tr *ngFor="let trans of budgetList">
+              <td>{{ trans.budgetName }}</td>
+              <td>{{ trans.budgetNumber }}</td>
+              <td>{{ trans.balance }}</td>
+              <td>{{ trans.budgetStatus }}</td>
+            </tr>
+          </tbody>
+          <ng-template #noRecords>
+            <tbody>
+              <tr>
+                <td colspan="9" class="text-center">No records found</td>
+              </tr>
+            </tbody>
+          </ng-template>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+

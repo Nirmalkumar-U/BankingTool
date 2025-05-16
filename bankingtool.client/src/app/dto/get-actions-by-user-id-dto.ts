@@ -3,7 +3,7 @@ export interface GetActionsByUserIdDto {
   actionName: string;
   actionPath: string | null;
   actionType: string;
-  menuLevel: number;
+  menuLevel: number | null;
   parrentMenuId: number | null;
   sequence: number | null;
 }

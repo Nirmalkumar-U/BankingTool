@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 
 namespace BankingTool.Repository.IRepository
@@ -10,5 +11,6 @@ namespace BankingTool.Repository.IRepository
         Task<int> GetPrimaryAccountIdOfCustomer();
         Task<BudgetAccount> GetBudgetAccountById(int budgetAccountId);
         Task<List<DropDownDto>> GetBudgetAccountDropdown();
+        Task<List<GetBudgetList>> GetBudgetList();
     }
 }

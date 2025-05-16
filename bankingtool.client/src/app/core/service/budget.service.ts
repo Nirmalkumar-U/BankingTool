@@ -12,4 +12,7 @@ export class BudgetService {
   getCreateAccountInitialLoad(model: CreateBudgetAccountRequestObject): Observable<any> {
     return this.httpService.post('Budget/CreateBudgetAccount', model);
   }
+  getBudgetList(): Observable<any> {
+    return this.httpService.get('Budget/GetBudgetList');
+  }
 }

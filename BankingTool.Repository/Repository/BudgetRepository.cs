@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +35,6 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
-
         public async Task<int> GetPrimaryAccountIdOfCustomer()
         {
             var primaryAccount = await dataContext.Customer.Include(x => x.Account)
@@ -45,14 +45,12 @@ namespace BankingTool.Repository.Repository
 
             return primaryAccount?.AccountId ?? 0;
         }
-
         public async Task<BudgetAccount> GetBudgetAccountById(int budgetAccountId)
         {
             var budgetAccount = await dataContext.BudgetAccount
                 .FirstOrDefaultAsync(x => x.BudgetAccountId == budgetAccountId);
             return budgetAccount;
         }
-
         public async Task<List<DropDownDto>> GetBudgetAccountDropdown()
         {
             var budgetAccount = await dataContext.BudgetAccount
@@ -65,6 +63,21 @@ namespace BankingTool.Repository.Repository
                 }).ToListAsync();
             return budgetAccount;
         }
+        public async Task<List<GetBudgetList>> GetBudgetList()
+        {
+            var budgetAccountList = await dataContext.BudgetAccount
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.IsDeleted == false)
+                .Select(x => new GetBudgetList
+                {
+                    BudgetAccountId = x.BudgetAccountId,
+                    BudgetName = x.BudgetName,
+                    BudgetNumber = x.BudgetNumber,
+                    Balance = x.Balance,
+                    BudgetStatus = x.BudgetStatus
+                }).ToListAsync();
+            return budgetAccountList;
+        }
+
         public int? InsertBudgetAccount(BudgetAccount BudgetAccount)
         {
             BudgetAccount.CreatedBy = dataContext.UserEmail;

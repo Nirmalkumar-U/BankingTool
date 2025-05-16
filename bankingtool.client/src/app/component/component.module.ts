@@ -4,36 +4,37 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { AppPaths, PageTitle } from '../constant/constant';
-import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './login/login.component';
-import { AddEditRoleComponent } from './add-edit-role/add-edit-role.component';
-import { RoleListComponent } from './role-list/role-list.component';
-import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
-import { UserListComponent } from './user-list/user-list.component';
-import { AddEditUserResolver } from '../core/resolver/add-edit-user.resolver';
-import { CreateAccountComponent } from './create-account/create-account.component';
-import { CreateAccountResolver } from '../core/resolver/create-account.resolver';
-import { TransactionsListComponent } from './transactions-list/transactions-list.component';
-import { TransactionListResolver } from '../core/resolver/transaction-list.resolver';
-import { UserListResolver } from '../core/resolver/user-list.resolver';
-import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
-import { TransferAmountResolver } from '../core/resolver/transfer-amount.resolver';
-import { SelfTransferResolver } from '../core/resolver/self-transfer.resolver';
-import { DepositAmountComponent } from './desposit-amount/deposit-amount.component';
-import { CashWithdrawResolver } from '../core/resolver/cash-withdraw.resolver';
-import { CashWithdrawComponent } from './cash-withdraw/cash-withdraw.component';
-import { CreateBudgetAccountComponent } from './create-budget-account/create-budget-account.component';
-import { CreateBudgetAccountResolver } from '../core/resolver/create-budget-account.resolver';
-import { BudgetTransactionListComponent } from './budget-transaction-list/budget-transaction-list.component';
-import { BudgetNotificationComponent } from './budget-notification/budget-notification.component';
-import { AccountNotificationComponent } from './account-notification/account-notification.component';
-import { AccountStatementReportComponent } from './account-statement-report/account-statement-report.component';
-import { BudgetStatementReportComponent } from './budget-statement-report/budget-statement-report.component';
-import { BudgetTransactionListResolver } from '../core/resolver/budget-transaction-list.resolver';
-import { BudgetNotificationResolver } from '../core/resolver/budget-notification.resolver';
 import { AccountNotificationResolver } from '../core/resolver/account-notification.resolver';
 import { AccountStatementReportResolver } from '../core/resolver/account-statement-report.resolver';
+import { AddEditUserResolver } from '../core/resolver/add-edit-user.resolver';
+import { BudgetListResolver } from '../core/resolver/budget-list.resolver';
+import { BudgetNotificationResolver } from '../core/resolver/budget-notification.resolver';
 import { BudgetStatementReportResolver } from '../core/resolver/budget-statement-report.resolver';
+import { BudgetTransactionListResolver } from '../core/resolver/budget-transaction-list.resolver';
+import { CashWithdrawResolver } from '../core/resolver/cash-withdraw.resolver';
+import { CreateAccountResolver } from '../core/resolver/create-account.resolver';
+import { SelfTransferResolver } from '../core/resolver/self-transfer.resolver';
+import { TransactionListResolver } from '../core/resolver/transaction-list.resolver';
+import { TransferAmountResolver } from '../core/resolver/transfer-amount.resolver';
+import { UserListResolver } from '../core/resolver/user-list.resolver';
+import { AccountNotificationComponent } from './account-notification/account-notification.component';
+import { AccountStatementReportComponent } from './account-statement-report/account-statement-report.component';
+import { AddEditRoleComponent } from './add-edit-role/add-edit-role.component';
+import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
+import { BudgetListComponent } from './budget-list/budget-list.component';
+import { BudgetNotificationComponent } from './budget-notification/budget-notification.component';
+import { BudgetStatementReportComponent } from './budget-statement-report/budget-statement-report.component';
+import { BudgetTransactionListComponent } from './budget-transaction-list/budget-transaction-list.component';
+import { CashWithdrawComponent } from './cash-withdraw/cash-withdraw.component';
+import { CreateAccountComponent } from './create-account/create-account.component';
+import { CreateBudgetAccountComponent } from './create-budget-account/create-budget-account.component';
+import { DepositAmountComponent } from './desposit-amount/deposit-amount.component';
+import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
+import { RoleListComponent } from './role-list/role-list.component';
+import { TransactionsListComponent } from './transactions-list/transactions-list.component';
+import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
+import { UserListComponent } from './user-list/user-list.component';
 
 const routes: Routes = [
   {
@@ -110,7 +111,6 @@ const routes: Routes = [
     path: AppPaths.createBudgetAccount,
     title: PageTitle.createBudgetAccount,
     component: CreateBudgetAccountComponent,
-    resolve: { DataResolver: CreateBudgetAccountResolver }
   },
   {
     path: AppPaths.budgetTransactionList,
@@ -141,6 +141,12 @@ const routes: Routes = [
     title: PageTitle.accountStatementReport,
     component: AccountStatementReportComponent,
     resolve: { DataResolver: AccountStatementReportResolver }
+  },
+  {
+    path: AppPaths.budgetList,
+    title: PageTitle.budgetList,
+    component: BudgetListComponent,
+    resolve: { DataResolver: BudgetListResolver }
   }
 ];
 
@@ -162,7 +168,8 @@ const routes: Routes = [
     BudgetNotificationComponent,
     AccountNotificationComponent,
     AccountStatementReportComponent,
-    BudgetStatementReportComponent
+    BudgetStatementReportComponent,
+    BudgetListComponent
   ],
   imports: [
     RouterModule.forChild(routes),

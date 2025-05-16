@@ -5,7 +5,7 @@ import { EmitterService } from './core/emitter.service';
 import { IndexedDbServiceService } from './core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from './core/local-storage.service';
 import { GetActionsByUserIdDto } from './dto/get-actions-by-user-id-dto';
-import { faBell, faHandshake, faMoneyBill1,faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
+import { faBell, faHandshake, faMoneyBill1, faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -70,7 +70,7 @@ export class AppComponent implements OnInit {
         let notificationMainMenu = data.filter(x => x.actionPath == null && x.actionType == "ActionMenu");
         let notificationSubMenu = data.filter(x => x.actionPath != null);
         notificationMainMenu.forEach((path: GetActionsByUserIdDto) => {
-          let sMenu: MenuItem[] = notificationSubMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
+          let sMenu: MenuItem[] = notificationSubMenu.filter(x => x.parrentMenuId == path.actionId && x.actionType == "Menu").map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
           this.notificationMenus.push({
             label: path.actionName, icon: 'aMoneyBill1', isOpen: false,
             items: [...sMenu]
@@ -88,7 +88,7 @@ export class AppComponent implements OnInit {
           let mainMenu = data.filter(x => x.actionPath == null && x.actionType == "Menu");
           let subMenu = data.filter(x => x.actionPath != null);
           mainMenu.forEach((path: GetActionsByUserIdDto) => {
-            let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
+            let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId && x.actionType == "Menu").map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
             this.Menus.push({
               label: path.actionName, icon: 'fas fa-photo-video', isOpen: false,
               items: [...sMenu]
