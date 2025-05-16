@@ -1,3 +1,6 @@
+import { isNullOrEmpty } from "../../../core/commonFunction/common-function";
+import { RequestNullableId } from "../request-id";
+
 export interface TransferAmountRequestObject {
   request: TransferAmountRequest;
 }
@@ -5,6 +8,7 @@ export interface TransferAmountRequestObject {
 export interface TransferAmountRequest {
   account: TransferAmountRequestAccount;
   transaction: TransferAmountRequestTransaction;
+  budgetAccount: TransferAmountRequestBudgetAccount;
 }
 
 export interface TransferAmountRequestAccount {
@@ -19,7 +23,12 @@ export interface TransferAmountRequestTransaction {
   transactionTag: string;
 }
 
-export const getTransferAmountRequestObject = (fromAccountId: number, toAccountId: number, amount: number, description: string, transactionDate: Date, transactionTag: string): TransferAmountRequestObject => {
+export interface TransferAmountRequestBudgetAccount extends RequestNullableId {
+
+}
+
+export const getTransferAmountRequestObject = (fromAccountId: number, toAccountId: number, amount: number, description: string,
+  transactionDate: Date, transactionTag: string, budgetAccountId: number | null): TransferAmountRequestObject => {
   let model: TransferAmountRequestObject = {
     request: {
       account: {
@@ -31,6 +40,9 @@ export const getTransferAmountRequestObject = (fromAccountId: number, toAccountI
         description: description,
         transactionDate: transactionDate,
         transactionTag: transactionTag
+      },
+      budgetAccount: {
+        id: isNullOrEmpty(budgetAccountId) ? null : budgetAccountId
       }
     }
   }

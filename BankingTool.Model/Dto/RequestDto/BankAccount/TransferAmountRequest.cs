@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model.Dto.RequestDto.BankAccount
+﻿using BankingTool.Model.Dto.RequestDtos;
+
+namespace BankingTool.Model.Dto.RequestDto.BankAccount
 {
     public class TransferAmountRequestObject
     {
@@ -8,6 +10,7 @@
     {
         public TransferAmountRequestAccount Account { get; set; }
         public TransferAmountRequestTransaction Transaction { get; set; }
+        public TransferAmountRequestBudgetAccount BudgetAccount { get; set; }
     }
     public class TransferAmountRequestAccount
     {
@@ -21,4 +24,6 @@
         public DateTime TransactionDate { get; set; }
         public string TransactionTag { get; set; }
     }
+    public class TransferAmountRequestBudgetAccount : RequestNullableId
+    { }
 }

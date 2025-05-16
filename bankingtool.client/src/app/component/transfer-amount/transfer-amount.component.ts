@@ -19,6 +19,7 @@ export class TransferAmountComponent {
   transferAmountForm: FormGroup;
   toList: DropDownDto[] = [];
   fromList: DropDownDto[] = [];
+  budgetAccountList: DropDownDto[] = [];
   transactionTagList: DropDownDto[] = [];
   balance: number = 0;
   messageList: string[] = [];
@@ -33,7 +34,8 @@ export class TransferAmountComponent {
       transferDate: ['', [Validators.required]],
       amount: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      transactionTag: ['', [Validators.required]]
+      transactionTag: ['', [Validators.required]],
+      budgetAccountId: ['']
     });
     this.transferAmountForm.patchValue({
       transferDate: formatDateForInput(new Date()),
@@ -45,6 +47,7 @@ export class TransferAmountComponent {
     if (this.reportName == PageTitle.transfer) {
       this.toList = initialData.dropDownList.find(x => x.name == "ToAccount")!.dropDown;
       this.fromList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
+      this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown;
     }
     else if (this.reportName == PageTitle.selfTransfer) {
       this.fromList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
@@ -80,7 +83,7 @@ export class TransferAmountComponent {
     if (!this.transferAmountForm.invalid) {
       let model = getTransferAmountRequestObject(this.transferAmountForm.get('fromAccountId')?.value, this.transferAmountForm.get('toAccountId')?.value,
         this.transferAmountForm.get('amount')?.value, this.transferAmountForm.get('description')?.value, this.transferAmountForm.get('transferDate')?.value,
-        this.transferAmountForm.get('transactionTag')?.value);
+        this.transferAmountForm.get('transactionTag')?.value, this.transferAmountForm.get('budgetAccountId')?.value);
       this.bankAccountService.transferAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;

@@ -34,6 +34,16 @@
               Please Enter Description...
             </div>
           </div>
+          <div class="col-md-3" *ngIf="budgetAccountList && budgetAccountList.length != 0">
+            <label class="form-label">Budget Account</label>
+            <select class="form-select" formControlName="budgetAccountId">
+              <option value="">Select</option>
+              <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Budget Account...
+            </div>
+          </div>
           <div class="col-12">
             <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Deposit Amount</button>
           </div>

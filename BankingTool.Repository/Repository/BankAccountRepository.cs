@@ -79,9 +79,9 @@ namespace BankingTool.Repository.Repository
         public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, string TransactionTag,
             DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, string TransactionCategory)
         {
-                var sql = "EXEC GetAccountTransactions @AccountId, @TransactionTag, @TransactionFromDate, @TransactionToDate, @SenderAccountId, @ReceiverAccountId, @TransactionCategory";
-                var parameters = new[]
-                                {
+            var sql = "EXEC GetAccountTransactions @AccountId, @TransactionTag, @TransactionFromDate, @TransactionToDate, @SenderAccountId, @ReceiverAccountId, @TransactionCategory";
+            var parameters = new[]
+                            {
                                 new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString()),
                                 new Microsoft.Data.SqlClient.SqlParameter("@TransactionTag", TransactionTag ?? ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@TransactionFromDate", TransactionFromDate != null ? TransactionFromDate.Value.Date : ""),
@@ -299,7 +299,8 @@ namespace BankingTool.Repository.Repository
         }
 
         public bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
-            TransactionDetail toTransactionDetail)
+            TransactionDetail toTransactionDetail, bool isBudgetAccountAttached, BudgetAccount budgetAccount, BudgetTransaction budgetTransaction,
+            BudgetTransactionDetail budgetTransactionDetail)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
@@ -311,6 +312,15 @@ namespace BankingTool.Repository.Repository
                 fromTransactionDetail.TransactionId = transactionId.Value;
                 InsertTransactionDetail(toTransactionDetail);
                 InsertTransactionDetail(fromTransactionDetail);
+
+                if (isBudgetAccountAttached)
+                {
+                    UpdateBudgetAccount(budgetAccount);
+                    var budgetTransactionId = InsertBudgetTransaction(budgetTransaction);
+                    budgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                    var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
+                }
+
                 sqlTransaction.Commit();
                 return true;
             }
@@ -321,7 +331,9 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
-        public bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail)
+        public bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail,
+            bool isBudgetAccountAttached, BudgetAccount budgetAccount, BudgetTransaction budgetTransaction,
+            BudgetTransactionDetail budgetTransactionDetail)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
@@ -330,6 +342,13 @@ namespace BankingTool.Repository.Repository
                 var transactionId = InsertTransaction(transaction);
                 transactionDetail.TransactionId = transactionId.Value;
                 InsertTransactionDetail(transactionDetail);
+                if (isBudgetAccountAttached)
+                {
+                    UpdateBudgetAccount(budgetAccount);
+                    var budgetTransactionId = InsertBudgetTransaction(budgetTransaction);
+                    budgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                    var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
+                }
                 sqlTransaction.Commit();
                 return true;
             }
@@ -418,6 +437,27 @@ namespace BankingTool.Repository.Repository
             customer.ModifiedBy = dataContext.UserEmail;
             customer.ModifiedDate = DateTime.Now;
             Update(customer);
+        }
+        public void UpdateBudgetAccount(BudgetAccount model)
+        {
+            model.ModifiedBy = dataContext.UserEmail;
+            model.ModifiedDate = DateTime.Now;
+            Update(model);
+        }
+        public int? InsertBudgetTransaction(BudgetTransaction model)
+        {
+            model.CreatedBy = dataContext.UserEmail;
+            model.CreatedDate = DateTime.Now;
+            model.ModifiedBy = null;
+            model.ModifiedDate = null;
+            model.IsDeleted = false;
+            var isInserted = Insert(model);
+            return isInserted ? model.BudgetTransactionId : null;
+        }
+        public int? InsertBudgetTransactionDetail(BudgetTransactionDetail model)
+        {
+            var isInserted = Insert(model);
+            return isInserted ? model.BudgetTransactionDetailId : null;
         }
     }
 }

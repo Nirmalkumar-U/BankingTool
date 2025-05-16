@@ -16,6 +16,7 @@ import { ResponseDto } from '../../dto/response-dto';
 export class CashWithdrawComponent {
   cashWithdrawForm: FormGroup;
   accountList: DropDownDto[] = [];
+  budgetAccountList: DropDownDto[] = [];
   messageList: string[] = [];
   isSubmitted: boolean = false;
   balance: number = 0;
@@ -24,7 +25,8 @@ export class CashWithdrawComponent {
       accountId: ['', [Validators.required]],
       amount: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      transferDate: ['', [Validators.required]]
+      transferDate: ['', [Validators.required]],
+      budgetAccountId: ['']
     });
     this.cashWithdrawForm.patchValue({
       transferDate: formatDateForInput(new Date()),
@@ -33,6 +35,7 @@ export class CashWithdrawComponent {
   ngOnInit() {
     const initialData: ResponseDto<boolean> = this.activatedRoute.snapshot.data['DataResolver'];
     this.accountList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
+    this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown;
 
     this.cashWithdrawForm.get('accountId')?.valueChanges.subscribe(accountId => {
       if (!isNullOrEmpty(accountId)) {
@@ -55,7 +58,8 @@ export class CashWithdrawComponent {
     this.messageList = [];
     if (!this.cashWithdrawForm.invalid) {
       let model = CreateCashWithdrawRequestObject(this.cashWithdrawForm.get('accountId')?.value,
-        this.cashWithdrawForm.get('amount')?.value, this.cashWithdrawForm.get('description')?.value, this.cashWithdrawForm.get('transferDate')?.value);
+        this.cashWithdrawForm.get('amount')?.value, this.cashWithdrawForm.get('description')?.value
+        , this.cashWithdrawForm.get('transferDate')?.value, this.cashWithdrawForm.get('budgetAccountId')?.value);
       this.bankAccountService.cashWithdraw(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;

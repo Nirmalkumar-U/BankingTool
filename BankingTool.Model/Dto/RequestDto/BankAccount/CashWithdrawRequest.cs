@@ -10,8 +10,12 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
     {
         public CashWithdrawRequestAccount Account { get; set; }
         public CashWithdrawRequestTransaction Transaction { get; set; }
+        public CashWithdrawRequestBudgetAccount BudgetAccount { get; set; }
     }
     public class CashWithdrawRequestAccount : RequestId
+    {
+    }
+    public class CashWithdrawRequestBudgetAccount : RequestNullableId
     {
     }
     public class CashWithdrawRequestTransaction

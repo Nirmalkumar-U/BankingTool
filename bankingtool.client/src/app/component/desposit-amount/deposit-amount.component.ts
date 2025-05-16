@@ -15,6 +15,7 @@ import { ResponseDto } from '../../dto/response-dto';
 export class DepositAmountComponent {
   depositAmountForm: FormGroup;
   accountList: DropDownDto[] = [];
+  budgetAccountList: DropDownDto[] = [];
   messageList: string[] = [];
   isSubmitted: boolean = false;
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService) {
@@ -22,7 +23,8 @@ export class DepositAmountComponent {
       accountId: ['', [Validators.required]],
       amount: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      transferDate: ['', [Validators.required]]
+      transferDate: ['', [Validators.required]],
+      budgetAccountId: ['']
     });
     this.depositAmountForm.patchValue({
       transferDate: formatDateForInput(new Date()),
@@ -31,12 +33,14 @@ export class DepositAmountComponent {
   ngOnInit() {
     const initialData: ResponseDto<boolean> = this.activatedRoute.snapshot.data['DataResolver'];
     this.accountList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
+    this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown;
   }
   depositAmount() {
     this.messageList = [];
     if (!this.depositAmountForm.invalid) {
       let model = CreateDepositAmountRequestObject(this.depositAmountForm.get('accountId')?.value,
-        this.depositAmountForm.get('amount')?.value, this.depositAmountForm.get('description')?.value, this.depositAmountForm.get('transferDate')?.value);
+        this.depositAmountForm.get('amount')?.value, this.depositAmountForm.get('description')?.value,
+        this.depositAmountForm.get('transferDate')?.value, this.depositAmountForm.get('budgetAccountId')?.value);
       this.bankAccountService.depositAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;

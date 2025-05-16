@@ -10,6 +10,7 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
     {
         public DepositAmountRequestAccount Account { get; set; }
         public DepositAmountRequestTransaction Transaction { get; set; }
+        public DepositAmountRequestBudgetAccount BudgetAccount { get; set; }
     }
     public class DepositAmountRequestAccount : RequestId
     {
@@ -19,5 +20,8 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
         public int Amount { get; set; }
         public string Description { get; set; }
         public DateTime TransactionDate { get; set; }
+    }
+    public class DepositAmountRequestBudgetAccount : RequestNullableId
+    {
     }
 }

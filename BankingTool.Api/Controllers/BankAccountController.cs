@@ -142,7 +142,8 @@ namespace BankingTool.Api.Controllers
                 model,
                 ValidationRules.TransferAmountRequestRules,
                 () => _bankAccountService.TransferAmount(model.Request.Account.FromAccountId, model.Request.Account.ToAccountId,
-                model.Request.Transaction.Amount, model.Request.Transaction.Description, model.Request.Transaction.TransactionDate, model.Request.Transaction.TransactionTag)
+                model.Request.Transaction.Amount, model.Request.Transaction.Description, model.Request.Transaction.TransactionDate,
+                model.Request.Transaction.TransactionTag, model.Request.BudgetAccount.Id)
             );
         }
         [HttpGet]
@@ -176,7 +177,7 @@ namespace BankingTool.Api.Controllers
                 model,
                 ValidationRules.DepositAmountRequestObjectRules,
                 () => _bankAccountService.DepositAmount(model.Request.Account.Id, model.Request.Transaction.Amount,
-                model.Request.Transaction.Description, model.Request.Transaction.TransactionDate)
+                model.Request.Transaction.Description, model.Request.Transaction.TransactionDate, model.Request.BudgetAccount.Id)
             );
         }
         [HttpPost]
@@ -188,7 +189,7 @@ namespace BankingTool.Api.Controllers
                 model,
                 ValidationRules.DepositAmountRequestObjectRules,
                 () => _bankAccountService.CashWithdraw(model.Request.Account.Id, model.Request.Transaction.Amount,
-                model.Request.Transaction.Description, model.Request.Transaction.TransactionDate)
+                model.Request.Transaction.Description, model.Request.Transaction.TransactionDate, model.Request.BudgetAccount.Id)
             );
         }
     }

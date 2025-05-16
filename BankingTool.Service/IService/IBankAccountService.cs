@@ -15,11 +15,11 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId);
         Task<ResponseDto<bool>> GetTransferAmountInitialLoad();
         Task<ResponseDto<int>> GetAccountBalance(int accountId);
-        Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag);
+        Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag, int? budgetAccountId);
         Task<ResponseDto<bool>> GetSelfTransferInitialLoad();
         Task<ResponseDto<bool>> GetToAccountListExcludedByAccountId(int accountId);
-        Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate);
-        Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate);
+        Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId);
+        Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId);
         Task<ResponseDto<GetTransactionsListResponse>> TransactionsList(TransactionListRequest request);
     }
 }

@@ -1,11 +1,14 @@
-﻿using BankingTool.Model.Model;
+﻿using BankingTool.Model;
+using BankingTool.Model.Model;
 
 namespace BankingTool.Repository.IRepository
 {
     public interface IBudgetRepository
     {
-        public Task<BudgetAccount> GetLastBudgetAccount();
-        public Task<bool> CreateBudgetAccount(BudgetAccount budgetAccount, BudgetTransaction budgetTransaction, BudgetTransactionDetail budgetTransactionDetails);
-        public Task<int> GetPrimaryAccountIdOfCustomer();
+        Task<BudgetAccount> GetLastBudgetAccount();
+        Task<bool> CreateBudgetAccount(BudgetAccount budgetAccount, BudgetTransaction budgetTransaction, BudgetTransactionDetail budgetTransactionDetails);
+        Task<int> GetPrimaryAccountIdOfCustomer();
+        Task<BudgetAccount> GetBudgetAccountById(int budgetAccountId);
+        Task<List<DropDownDto>> GetBudgetAccountDropdown();
     }
 }

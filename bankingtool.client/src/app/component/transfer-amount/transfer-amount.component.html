@@ -26,7 +26,7 @@
               Please Select Account...
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-1">
             <label class="form-label">Balance</label>
             <h6>{{balance}}</h6>
           </div>
@@ -56,6 +56,16 @@
             <input type="text" class="form-control" formControlName="description" required>
             <div class="invalid-feedback">
               Please Enter Description...
+            </div>
+          </div>
+          <div class="col-md-3" *ngIf="budgetAccountList && budgetAccountList.length != 0">
+            <label class="form-label">Budget Account</label>
+            <select class="form-select" formControlName="budgetAccountId">
+              <option value="">Select</option>
+              <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Budget Account...
             </div>
           </div>
           <div class="col-12">

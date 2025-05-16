@@ -1,4 +1,5 @@
-﻿using BankingTool.Model.Model;
+﻿using BankingTool.Model;
+using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,6 +46,25 @@ namespace BankingTool.Repository.Repository
             return primaryAccount?.AccountId ?? 0;
         }
 
+        public async Task<BudgetAccount> GetBudgetAccountById(int budgetAccountId)
+        {
+            var budgetAccount = await dataContext.BudgetAccount
+                .FirstOrDefaultAsync(x => x.BudgetAccountId == budgetAccountId);
+            return budgetAccount;
+        }
+
+        public async Task<List<DropDownDto>> GetBudgetAccountDropdown()
+        {
+            var budgetAccount = await dataContext.BudgetAccount
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetStatus == "Active" && x.IsDeleted == false)
+                .Select(x => new DropDownDto
+                {
+                    Key = x.BudgetAccountId,
+                    Value = x.BudgetName,
+                    IsSelected = false
+                }).ToListAsync();
+            return budgetAccount;
+        }
         public int? InsertBudgetAccount(BudgetAccount BudgetAccount)
         {
             BudgetAccount.CreatedBy = dataContext.UserEmail;

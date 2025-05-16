@@ -8,9 +8,10 @@ using BankingTool.Service.IService;
 
 namespace BankingTool.Service.Service
 {
-    public class BankAccountService(IBankAccountRepository bankAccountRepository) : IBankAccountService
+    public class BankAccountService(IBankAccountRepository bankAccountRepository, IBudgetRepository budgetRepository) : IBankAccountService
     {
         private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
+        private readonly IBudgetRepository _budgetRepository = budgetRepository;
 
         public async Task<ResponseDto<bool>> GetCreateAccountInitialLoad()
         {
@@ -233,7 +234,8 @@ namespace BankingTool.Service.Service
                 {
                     new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() },
                     new DropDownListDto{ Name = "ToAccount", DropDown = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId() },
-                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() }
+                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() },
+                    new DropDownListDto{ Name = "BudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() }
                 },
                 StatuCode = 200,
                 Status = true,
@@ -249,7 +251,8 @@ namespace BankingTool.Service.Service
                 DropDownList = new List<DropDownListDto>
                 {
                     new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() },
-                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() }
+                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() },
+                    new DropDownListDto{ Name = "BudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() }
                 },
                 StatuCode = 200,
                 Status = true,
@@ -282,7 +285,7 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag)
+        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag, int? budgetAccountId)
         {
             var lastFromAccountTransaction = await _bankAccountRepository.GetLastTransaction(fromAccountId);
             var lastToAccountTransaction = await _bankAccountRepository.GetLastTransaction(toAccountId);
@@ -343,7 +346,36 @@ namespace BankingTool.Service.Service
                 TransactionType = TransactionType.Credit,
                 TransactionRole = TransactionRole.Receiver
             };
-            _bankAccountRepository.TransferAmount(fromAccount, toAccount, transaction, fromTransactionDetail, toTransactionDetail);
+
+            BudgetAccount budgetAccount = null;
+            BudgetTransaction budgetTransaction = null;
+            BudgetTransactionDetail budgetTransactionDetails = null;
+            if (budgetAccountId.HasValue)
+            {
+                budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId.Value);
+                budgetAccount.Balance = budgetAccount.Balance - amount;
+                budgetTransaction = new()
+                {
+                    Amount = amount,
+                    Description = description,
+                    TransactionTime = transactionDate,
+                    TransactionCategory = TransactionCatagory.Transfer,
+                    TransactionTag = transactionTag
+                };
+                budgetTransactionDetails = new()
+                {
+                    TransactionType = TransactionType.Debit,
+                    StageBalance = budgetAccount.Balance,
+                    TransactionRole = TransactionRole.Sender,
+                    AccountId = fromAccountId,
+                    BudgetAccountId = budgetAccount.BudgetAccountId
+                };
+            }
+
+            //TODO: Sent notification
+
+            _bankAccountRepository.TransferAmount(fromAccount, toAccount, transaction, fromTransactionDetail, toTransactionDetail,
+                budgetAccountId.HasValue, budgetAccount, budgetTransaction, budgetTransactionDetails);
             return new ResponseDto<bool>
             {
                 Response = true,
@@ -352,7 +384,7 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate)
+        public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId)
         {
             var lastTransaction = await _bankAccountRepository.GetLastTransaction(accountId);
             if (lastTransaction != null && lastTransaction?.TransactionTime.Date > transactionDate.Date)
@@ -388,7 +420,33 @@ namespace BankingTool.Service.Service
                 StageBalance = account.Balance,
                 TransactionRole = TransactionRole.Receiver,
             };
-            _bankAccountRepository.CashTransfer(account, transaction, transactionDetails);
+
+            BudgetAccount budgetAccount = null;
+            BudgetTransaction budgetTransaction = null;
+            BudgetTransactionDetail budgetTransactionDetails = null;
+            if (budgetAccountId.HasValue)
+            {
+                budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId.Value);
+                budgetAccount.Balance = budgetAccount.Balance + amount;
+                budgetTransaction = new()
+                {
+                    Amount = amount,
+                    Description = description,
+                    TransactionTime = transactionDate,
+                    TransactionCategory = TransactionCatagory.Deposit,
+                    TransactionTag = TransactionTag.Deposit
+                };
+                budgetTransactionDetails = new()
+                {
+                    TransactionType = TransactionType.Credit,
+                    StageBalance = budgetAccount.Balance,
+                    TransactionRole = TransactionRole.Receiver,
+                    AccountId = account.AccountId,
+                    BudgetAccountId = budgetAccount.BudgetAccountId
+                };
+            }
+
+            _bankAccountRepository.CashTransfer(account, transaction, transactionDetails, budgetAccountId.HasValue, budgetAccount, budgetTransaction, budgetTransactionDetails);
             return new ResponseDto<bool>
             {
                 Response = true,
@@ -397,7 +455,7 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate)
+        public async Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId)
         {
             var lastTransaction = await _bankAccountRepository.GetLastTransaction(accountId);
             if (lastTransaction != null && lastTransaction?.TransactionTime.Date > transactionDate.Date)
@@ -422,7 +480,7 @@ namespace BankingTool.Service.Service
             {
                 Amount = amount,
                 Description = description,
-                TransactionTime = DateTime.Now,
+                TransactionTime = transactionDate,
                 TransactionCategory = TransactionCatagory.Withdraw,
                 TransactionTag = TransactionTag.Withdraw
             };
@@ -433,7 +491,33 @@ namespace BankingTool.Service.Service
                 StageBalance = account.Balance,
                 TransactionRole = TransactionRole.Sender,
             };
-            _bankAccountRepository.CashTransfer(account, transaction, transactionDetails);
+
+            BudgetAccount budgetAccount = null;
+            BudgetTransaction budgetTransaction = null;
+            BudgetTransactionDetail budgetTransactionDetails = null;
+            if (budgetAccountId.HasValue)
+            {
+                budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId.Value);
+                budgetAccount.Balance = budgetAccount.Balance - amount;
+                budgetTransaction = new()
+                {
+                    Amount = amount,
+                    Description = description,
+                    TransactionTime = transactionDate,
+                    TransactionCategory = TransactionCatagory.Withdraw,
+                    TransactionTag = TransactionTag.Withdraw
+                };
+                budgetTransactionDetails = new()
+                {
+                    TransactionType = TransactionType.Debit,
+                    StageBalance = budgetAccount.Balance,
+                    TransactionRole = TransactionRole.Sender,
+                    AccountId = account.AccountId,
+                    BudgetAccountId = budgetAccount.BudgetAccountId
+                };
+            }
+
+            _bankAccountRepository.CashTransfer(account, transaction, transactionDetails, budgetAccountId.HasValue, budgetAccount, budgetTransaction, budgetTransactionDetails);
             return new ResponseDto<bool>
             {
                 Response = true,
