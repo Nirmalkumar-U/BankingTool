@@ -2,6 +2,7 @@
 using System.Text.Json;
 using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Dto.SPDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository.EntityConfiguration;
@@ -58,6 +59,7 @@ namespace BankingTool.Repository
         public DbSet<GetTransactionsListResponseTransactionList> GetTransactionsListResponseTransactionList { get; set; }
         public DbSet<GetSenderAccount> GetSenderAccount { get; set; }
         public DbSet<GetReceiverAccount> GetReceiverAccount { get; set; }
+        public DbSet<GetBudgetTransactionList> GetBudgetTransactionList { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Tables
@@ -84,6 +86,7 @@ namespace BankingTool.Repository
             //SPs
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());
             modelBuilder.Entity<GetTransactionsListResponseTransactionList>(e => e.HasNoKey());
+            modelBuilder.Entity<GetBudgetTransactionList>(e => e.HasNoKey());
             modelBuilder.Entity<GetSenderAccount>(e => e.HasNoKey());
             modelBuilder.Entity<GetReceiverAccount>(e => e.HasNoKey());
 

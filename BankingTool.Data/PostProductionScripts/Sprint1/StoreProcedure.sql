@@ -146,3 +146,32 @@ BEGIN
 END
 GO
 -----------------------------------------------------------------------------------------------------------------------------
+IF OBJECT_ID('GetBudgetAccountTransactions', 'P') IS NOT NULL
+BEGIN
+    DROP PROCEDURE GetBudgetAccountTransactions;
+END
+GO
+
+CREATE PROCEDURE GetBudgetAccountTransactions
+    @BudgetAccountId INT
+AS
+BEGIN
+
+SELECT
+	[dbo].[GetCombinedInfoByAccountId](a.AccountId) AS AccountName,
+	bt.TransactionTag AS TransactionTag,
+	bt.TransactionTime AS TransactionDate,
+	bt.Description AS Description,
+	CASE WHEN btd.TransactionRole = 'Receiver' THEN bt.Amount ELSE NULL END AS ReceiverAmount,
+	CASE WHEN btd.TransactionRole = 'Sender' THEN bt.Amount ELSE NULL END AS SenderAmount,
+	btd.StageBalance AS StageBalance
+FROM BudgetTransaction bt
+JOIN BudgetTransactionDetail btd on bt.BudgetTransactionId = btd.BudgetTransactionId
+JOIN Account a on btd.AccountId = a.AccountId
+JOIN BudgetAccount ba on btd.BudgetAccountId = ba.BudgetAccountId
+WHERE ba.BudgetAccountId = @BudgetAccountId
+ORDER BY bt.TransactionTime DESC
+
+END
+GO
+--------------------------------------------------------------------------------------------------------------------------------

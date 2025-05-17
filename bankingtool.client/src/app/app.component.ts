@@ -70,7 +70,7 @@ export class AppComponent implements OnInit {
         let notificationMainMenu = data.filter(x => x.actionPath == null && x.actionType == "ActionMenu");
         let notificationSubMenu = data.filter(x => x.actionPath != null);
         notificationMainMenu.forEach((path: GetActionsByUserIdDto) => {
-          let sMenu: MenuItem[] = notificationSubMenu.filter(x => x.parrentMenuId == path.actionId && x.actionType == "Menu").map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
+          let sMenu: MenuItem[] = notificationSubMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
           this.notificationMenus.push({
             label: path.actionName, icon: 'aMoneyBill1', isOpen: false,
             items: [...sMenu]

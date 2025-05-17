@@ -34,7 +34,7 @@ export class AppPaths {
 
   //Budget
   public static createBudgetAccount: string = 'createBudgetAccount';
-  public static budgetTransactionList: string = 'budgetTransactionList';
+  public static budgetTransactionList: string = 'budgetTransactionList/:id';
   public static budgetList: string = 'budgetList';
 
   //Notification
@@ -68,8 +68,8 @@ export class AppRoute {
 
   // Budget
   public static createBudgetAccount: string = '/createBudgetAccount';
-  public static budgetTransactionList: string = '/budgetTransactionList';
   public static budgetList: string = '/budgetList';
+  public static budgetTransactionList = (id: number): string => { return `/budgetTransactionList/${id}`; }
 
   //Notification
   public static budgetNotification: string = '/budgetNotification';

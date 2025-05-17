@@ -16,7 +16,7 @@
           </thead>
           <tbody *ngIf="budgetList && budgetList != null && budgetList.length != 0; else noRecords">
             <tr *ngFor="let trans of budgetList">
-              <td>{{ trans.budgetName }}</td>
+              <td> <a style="cursor: pointer;" class="text-secondary" (click)="getBudgetTransactionList(trans.budgetAccountId)">{{ trans.budgetName }}</a></td>
               <td>{{ trans.budgetNumber }}</td>
               <td>{{ trans.balance }}</td>
               <td>{{ trans.budgetStatus }}</td>

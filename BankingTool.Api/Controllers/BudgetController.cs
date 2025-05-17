@@ -2,6 +2,7 @@
 using BankingTool.Api.Validators;
 using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
+using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Service.IService;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,17 @@ namespace BankingTool.Api.Controllers
                 null,
                 null,
                 () => _budgetService.GetBudgetList()
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<GetBudgetTransactionListResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetBudgetTransactionListResponse>), 400)]
+        public Task<IActionResult> GetBudgetTransactionList(GetBudgetTransactionListRequestObject model)
+        {
+            return HandleRequestAsync<GetBudgetTransactionListRequestObject, GetBudgetTransactionListResponse>(
+                model,
+                ValidationRules.CreateGetBudgetTransactionListRequestObjectRules,
+                () => _budgetService.GetBudgetTransactionList(model.Request.BudgetAccount.Id)
             );
         }
     }

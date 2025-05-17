@@ -7,5 +7,6 @@ namespace BankingTool.Service.IService
     {
         Task<ResponseDto<bool>> CreateBudgetAccount(string budgetName, int amount);
         Task<ResponseDto<GetBudgetListResponse>> GetBudgetList();
+        Task<ResponseDto<GetBudgetTransactionListResponse>> GetBudgetTransactionList(int budgetAccountId);
     }
 }

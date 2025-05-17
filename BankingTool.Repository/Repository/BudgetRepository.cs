@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
@@ -76,6 +77,28 @@ namespace BankingTool.Repository.Repository
                     BudgetStatus = x.BudgetStatus
                 }).ToListAsync();
             return budgetAccountList;
+        }
+        public async Task<List<GetBudgetTransactionList>> GetBudgetTransactionList(int budgetAccountId)
+        {
+            var sql = "EXEC GetBudgetAccountTransactions @BudgetAccountId";
+            var parameters = new[]
+                            {
+                                new Microsoft.Data.SqlClient.SqlParameter("@BudgetAccountId", budgetAccountId.ToString())
+                            };
+
+            var transactions = await dataContext.Set<GetBudgetTransactionList>()
+                    .FromSqlRaw(sql, parameters)
+                    .ToListAsync();
+
+            return transactions;
+        }
+        public async Task<BudgetTransaction> GetLastBudgetTransaction(int BudgetAccountId)
+        {
+            return await (from t in dataContext.BudgetTransaction
+                          join td in dataContext.BudgetTransactionDetail on t.BudgetTransactionId equals td.BudgetTransactionId
+                          where td.BudgetAccountId == BudgetAccountId
+                          orderby t.TransactionTime descending
+                          select t).FirstOrDefaultAsync();
         }
 
         public int? InsertBudgetAccount(BudgetAccount BudgetAccount)

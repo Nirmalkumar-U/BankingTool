@@ -352,13 +352,30 @@ namespace BankingTool.Service.Service
             BudgetTransactionDetail budgetTransactionDetails = null;
             if (budgetAccountId.HasValue)
             {
+                var lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(budgetAccountId.Value);
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionDate.Date)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = [],
+                        Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                    };
+                }
+                var budgetTransactionDate = transactionDate;
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
+                {
+                    budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
+                    budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
+                }
                 budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId.Value);
                 budgetAccount.Balance = budgetAccount.Balance - amount;
                 budgetTransaction = new()
                 {
                     Amount = amount,
                     Description = description,
-                    TransactionTime = transactionDate,
+                    TransactionTime = budgetTransactionDate,
                     TransactionCategory = TransactionCatagory.Transfer,
                     TransactionTag = transactionTag
                 };
@@ -426,13 +443,30 @@ namespace BankingTool.Service.Service
             BudgetTransactionDetail budgetTransactionDetails = null;
             if (budgetAccountId.HasValue)
             {
+                var lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(budgetAccountId.Value);
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionDate.Date)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = [],
+                        Errors = [new Errors { PropertyName = "DepositAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                    };
+                }
+                var budgetTransactionDate = transactionDate;
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
+                {
+                    budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
+                    budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
+                }
                 budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId.Value);
                 budgetAccount.Balance = budgetAccount.Balance + amount;
                 budgetTransaction = new()
                 {
                     Amount = amount,
                     Description = description,
-                    TransactionTime = transactionDate,
+                    TransactionTime = budgetTransactionDate,
                     TransactionCategory = TransactionCatagory.Deposit,
                     TransactionTag = TransactionTag.Deposit
                 };
@@ -465,7 +499,7 @@ namespace BankingTool.Service.Service
                     Response = false,
                     Status = false,
                     ValidationErrors = [],
-                    Errors = [new Errors { PropertyName = "DepositAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                    Errors = [new Errors { PropertyName = "CashWithdraw", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
                 };
             }
             if (lastTransaction != null && lastTransaction.TransactionTime.Date == transactionDate.Date)
@@ -497,13 +531,30 @@ namespace BankingTool.Service.Service
             BudgetTransactionDetail budgetTransactionDetails = null;
             if (budgetAccountId.HasValue)
             {
+                var lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(budgetAccountId.Value);
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionDate.Date)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = [],
+                        Errors = [new Errors { PropertyName = "CashWithdraw", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                    };
+                }
+                var budgetTransactionDate = transactionDate;
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
+                {
+                    budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
+                    budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
+                }
                 budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId.Value);
                 budgetAccount.Balance = budgetAccount.Balance - amount;
                 budgetTransaction = new()
                 {
                     Amount = amount,
                     Description = description,
-                    TransactionTime = transactionDate,
+                    TransactionTime = budgetTransactionDate,
                     TransactionCategory = TransactionCatagory.Withdraw,
                     TransactionTag = TransactionTag.Withdraw
                 };

@@ -12,5 +12,7 @@ namespace BankingTool.Repository.IRepository
         Task<BudgetAccount> GetBudgetAccountById(int budgetAccountId);
         Task<List<DropDownDto>> GetBudgetAccountDropdown();
         Task<List<GetBudgetList>> GetBudgetList();
+        Task<List<GetBudgetTransactionList>> GetBudgetTransactionList(int budgetAccountId);
+        Task<BudgetTransaction> GetLastBudgetTransaction(int BudgetAccountId);
     }
 }

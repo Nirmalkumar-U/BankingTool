@@ -68,6 +68,26 @@ namespace BankingTool.Service.Service
             };
         }
 
+        public async Task<ResponseDto<GetBudgetTransactionListResponse>> GetBudgetTransactionList(int budgetAccountId)
+        {
+            var budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId);
+            return new ResponseDto<GetBudgetTransactionListResponse>()
+            {
+                Errors = [],
+                ValidationErrors = [],
+                Response = new GetBudgetTransactionListResponse
+                {
+                    BudgetName = budgetAccount.BudgetName,
+                    BudgetNumber = budgetAccount.BudgetNumber,
+                    BudgetStatus = budgetAccount.BudgetStatus,
+                    Balance = budgetAccount.Balance,
+                    BudgetTransactionList = await _budgetRepository.GetBudgetTransactionList(budgetAccountId)
+                },
+                Status = true,
+                StatuCode = 200
+            };
+        }
+
         private async Task<string> GetNewBudgetNumber()
         {
             var lastBudgetAccount = await _budgetRepository.GetLastBudgetAccount();

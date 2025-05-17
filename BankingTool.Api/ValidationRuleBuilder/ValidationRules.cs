@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
+using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.RequestDto.User;
 
 namespace BankingTool.Api.Validators
@@ -248,6 +249,12 @@ namespace BankingTool.Api.Validators
                 .WithNumericRules(r => {
                     r.GreaterThan = 0;
                 }),
+        };
+        public static List<ValidationRule> CreateGetBudgetTransactionListRequestObjectRules = new()
+        {
+            RuleBuilder<GetBudgetTransactionListRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<GetBudgetTransactionListRequestObject>.For(x => x.Request.BudgetAccount).Required(),
+            RuleBuilder<GetBudgetTransactionListRequestObject>.For(x => x.Request.BudgetAccount.Id).Required(),
         };
         #endregion BankAccountController
     }
