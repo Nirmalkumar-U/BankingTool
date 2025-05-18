@@ -100,6 +100,98 @@ namespace BankingTool.Repository.Repository
                           orderby t.TransactionTime descending
                           select t).FirstOrDefaultAsync();
         }
+        public async Task AcceptBudgetTransaction(int BudgetAccountId, int BudgetNotificationId)
+        {
+            DateTime transferedTime = DateTime.Now;
+            string transactionCatagory = TransactionCatagory.Transfer;
+            int amount = 100;
+            string description = "Transfer";
+            string transactionTag = TransactionTag.Transfer;
+            string transactionType = TransactionType.Credit;
+            string transactionRole = TransactionRole.Receiver;
+            int accountId = 1;
+
+            var budgetTransactionAboveTransferedTime = await dataContext.BudgetTransaction
+                .Include(x => x.BudgetTransactionDetail)
+                .Where(x => x.TransactionTime > transferedTime)
+                .OrderBy(x => x.TransactionTime)
+                .ToListAsync();
+            if (budgetTransactionAboveTransferedTime == null || budgetTransactionAboveTransferedTime.Count == 0)
+            {
+                var lastBudgetAccountTransaction = await GetLastBudgetTransaction(BudgetAccountId);
+                var budgetTransactionDate = transferedTime;
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
+                {
+                    budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
+                    budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
+                }
+                var budgetAccount = await GetBudgetAccountById(BudgetAccountId);
+                budgetAccount.Balance = transactionRole == TransactionRole.Receiver ? budgetAccount.Balance + amount : budgetAccount.Balance - amount;
+                var budgetTransaction = new BudgetTransaction()
+                {
+                    Amount = amount,
+                    Description = description,
+                    TransactionTime = budgetTransactionDate,
+                    TransactionCategory = transactionCatagory,
+                    TransactionTag = transactionTag
+                };
+                var budgetTransactionDetails = new BudgetTransactionDetail()
+                {
+                    TransactionType = transactionType,
+                    StageBalance = budgetAccount.Balance,
+                    TransactionRole = transactionRole,
+                    AccountId = accountId,
+                    BudgetAccountId = budgetAccount.BudgetAccountId
+                };
+                UpdateBudgetAccount(budgetAccount);
+                var budgetTransactionId = InsertBudgetTransaction(budgetTransaction);
+                budgetTransactionDetails.BudgetTransactionId = budgetTransactionId.Value;
+                var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetails);
+            }
+            else
+            {
+                var previousTransaction = dataContext.BudgetTransaction
+                    .Include(x => x.BudgetTransactionDetail)
+                    .Where(t => t.TransactionTime < transferedTime)
+                    .OrderByDescending(t => t.TransactionTime)
+                    .FirstOrDefault();
+
+                var lastTransactionAmount = previousTransaction.Amount;
+                var lastTransactionStageBalance = previousTransaction.BudgetTransactionDetail.FirstOrDefault().StageBalance;
+
+                BudgetTransaction budgetTransaction = new BudgetTransaction
+                {
+                    TransactionCategory = transactionCatagory,
+                    Amount = amount,
+                    Description = description,
+                    TransactionTime = transferedTime,
+                    TransactionTag = transactionTag
+                };
+                var budgetTransactionId = InsertBudgetTransaction(budgetTransaction);
+                BudgetTransactionDetail budgetTransactionDetail = new BudgetTransactionDetail
+                {
+                    TransactionType = transactionType,
+                    StageBalance = transactionRole == TransactionRole.Receiver ? lastTransactionStageBalance + amount : lastTransactionStageBalance - amount,
+                    TransactionRole = transactionRole,
+                    AccountId = accountId,
+                    BudgetTransactionId = budgetTransactionId.Value,
+                };
+                var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
+                int currentStageBalance = budgetTransactionDetail.StageBalance;
+
+                foreach (var budget in budgetTransactionAboveTransferedTime)
+                {
+                    var updateBudgetTransactionDetail = budget.BudgetTransactionDetail.FirstOrDefault();
+                    updateBudgetTransactionDetail.StageBalance = updateBudgetTransactionDetail.TransactionRole == TransactionRole.Receiver ?
+                        currentStageBalance + budget.Amount : currentStageBalance - budget.Amount;
+                    Update(updateBudgetTransactionDetail);
+                    currentStageBalance = updateBudgetTransactionDetail.StageBalance;
+                }
+                var budgetAccount = await GetBudgetAccountById(BudgetAccountId);
+                budgetAccount.Balance = currentStageBalance;
+                UpdateBudgetAccount(budgetAccount);
+            }
+        }
 
         public int? InsertBudgetAccount(BudgetAccount BudgetAccount)
         {
@@ -131,6 +223,10 @@ namespace BankingTool.Repository.Repository
         {
             var isInserted = Insert(BudgetTransactionDetail);
             return isInserted ? BudgetTransactionDetail.BudgetTransactionDetailId : null;
+        }
+        public void UpdateBudgetTransactionDetail(BudgetTransactionDetail model)
+        {
+            Update(model);
         }
     }
 }
