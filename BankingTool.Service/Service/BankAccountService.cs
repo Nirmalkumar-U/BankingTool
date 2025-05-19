@@ -389,10 +389,27 @@ namespace BankingTool.Service.Service
                 };
             }
 
-            //TODO: Sent notification
+            var isCustomerAsBudgetAccount = await _budgetRepository.IsCustomerAsBudgetAccount(toAccount.CustomerId);
+            BudgetNotification budgetNotification = null;
+            if (isCustomerAsBudgetAccount)
+            {
+                budgetNotification = new BudgetNotification()
+                {
+                    AccountId = toAccountId,
+                    Amount = amount,
+                    Description = description,
+                    TransactionDate = transactionDate,
+                    TransactionCatagory = TransactionCatagory.Transfer,
+                    TransactionTag = transactionTag,
+                    TransactionRole = TransactionRole.Receiver,
+                    TransactionType = TransactionType.Credit,
+                    CustomerId = toAccount.CustomerId,
+                    NotificationStatus = NotificationStatus.Pending
+                };
+            }
 
             _bankAccountRepository.TransferAmount(fromAccount, toAccount, transaction, fromTransactionDetail, toTransactionDetail,
-                budgetAccountId.HasValue, budgetAccount, budgetTransaction, budgetTransactionDetails);
+                budgetAccountId.HasValue, budgetAccount, budgetTransaction, budgetTransactionDetails, budgetNotification, isCustomerAsBudgetAccount);
             return new ResponseDto<bool>
             {
                 Response = true,

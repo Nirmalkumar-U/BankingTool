@@ -47,6 +47,12 @@ BEGIN
 END
 GO
 
+IF EXISTS (SELECT * FROM sys.tables where name = N'BudgetNotification')
+BEGIN
+	DROP TABLE [BudgetNotification]
+END
+GO
+
 CREATE TABLE [BudgetAccount] (
 	BudgetAccountId INT CONSTRAINT [PK_BudgetAccount] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	CustomerId INT NOT NULL CONSTRAINT [FK_BudgetAccount_CustomerId] FOREIGN KEY REFERENCES Customer(CustomerId),
@@ -83,3 +89,20 @@ CREATE TABLE [BudgetTransactionDetail] (
     TransactionType VARCHAR(10) NOT NULL,
     StageBalance INT NOT NULL
 );
+
+CREATE TABLE [BudgetNotification] (
+	BudgetNotificationId INT CONSTRAINT [PK_BudgetNotification] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
+	CustomerId INT NOT NULL,
+	AccountId INT NOT NULL,
+	TransactionRole VARCHAR(20) NOT NULL,
+	TransactionType VARCHAR(20) NOT NULL,
+	TransactionTag VARCHAR(20) NOT NULL,
+	TransactionCatagory VARCHAR(20) NOT NULL,
+	Description VARCHAR(20) NOT NULL,
+	Amount INT NOT NULL,
+	TransactionDate DATETIME NOT NULL,
+	CreatedDate DATETIME NOT NULL,
+	CreatedBy VARCHAR(30) NOT NULL,
+	ModifiedDate DATETIME NULL,
+	ModifiedBy VARCHAR(30) NULL,
+	IsDeleted BIT DEFAULT 0)

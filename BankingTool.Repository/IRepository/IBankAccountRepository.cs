@@ -40,7 +40,7 @@ namespace BankingTool.Repository.IRepository
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);
         bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
             TransactionDetail toTransactionDetail, bool isBudgetAccountAttached, BudgetAccount budgetAccount, BudgetTransaction budgetTransaction,
-            BudgetTransactionDetail budgetTransactionDetail);
+            BudgetTransactionDetail budgetTransactionDetail, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount);
         bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail, bool isBudgetAccountAttached, BudgetAccount budgetAccount,
             BudgetTransaction budgetTransaction, BudgetTransactionDetail budgetTransactionDetail);
 

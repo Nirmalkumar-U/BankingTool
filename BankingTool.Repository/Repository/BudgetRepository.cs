@@ -192,6 +192,10 @@ namespace BankingTool.Repository.Repository
                 UpdateBudgetAccount(budgetAccount);
             }
         }
+        public async Task<bool> IsCustomerAsBudgetAccount(int customerId)
+        {
+            return await dataContext.BudgetAccount.Where(x => x.CustomerId == customerId).AnyAsync();
+        }
 
         public int? InsertBudgetAccount(BudgetAccount BudgetAccount)
         {

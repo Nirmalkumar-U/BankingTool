@@ -300,7 +300,7 @@ namespace BankingTool.Repository.Repository
 
         public bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
             TransactionDetail toTransactionDetail, bool isBudgetAccountAttached, BudgetAccount budgetAccount, BudgetTransaction budgetTransaction,
-            BudgetTransactionDetail budgetTransactionDetail)
+            BudgetTransactionDetail budgetTransactionDetail, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
@@ -320,7 +320,10 @@ namespace BankingTool.Repository.Repository
                     budgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
                     var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
                 }
-
+                if(fromAccount.CustomerId != toAccount.CustomerId && isCustomerAsBudgetAccount)
+                {
+                    var budgetNotificationId = InsertBudgetNotification(budgetNotification);
+                }
                 sqlTransaction.Commit();
                 return true;
             }
@@ -458,6 +461,16 @@ namespace BankingTool.Repository.Repository
         {
             var isInserted = Insert(model);
             return isInserted ? model.BudgetTransactionDetailId : null;
+        }
+        public int? InsertBudgetNotification(BudgetNotification model)
+        {
+            model.CreatedBy = dataContext.UserEmail;
+            model.CreatedDate = DateTime.Now;
+            model.ModifiedBy = null;
+            model.ModifiedDate = null;
+            model.IsDeleted = false;
+            var isInserted = Insert(model);
+            return isInserted ? model.BudgetNotificationId : null;
         }
     }
 }

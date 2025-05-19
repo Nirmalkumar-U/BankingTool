@@ -29,6 +29,12 @@
         public const string Debit = "Debit";
         public const string Credit = "Credit";
     }
+    public class NotificationStatus
+    {
+        public const string Pending = "Pending";
+        public const string Accepted = "Accepted";
+        public const string Rejected = "Rejected";
+    }
     public class TransactionRole
     {
         public const string Sender = "Sender";
