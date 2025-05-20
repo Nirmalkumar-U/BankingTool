@@ -19,4 +19,7 @@ export class BudgetService {
   getBudgetTransactionList(model: GetBudgetTransactionListRequestObject): Observable<any> {
     return this.httpService.post('Budget/GetBudgetTransactionList', model);
   }
+  getBudgetNotificationList(): Observable<any> {
+    return this.httpService.get('Budget/GetBudgetNotificationList');
+  }
 }

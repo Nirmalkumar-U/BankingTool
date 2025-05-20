@@ -10,7 +10,6 @@ namespace BankingTool.Service.Service
     public class BudgetService(IBudgetRepository budgetRepository) : IBudgetService
     {
         private readonly IBudgetRepository _budgetRepository = budgetRepository;
-
         public async Task<ResponseDto<bool>> CreateBudgetAccount(string budgetName, int amount)
         {
             ResponseDto<bool> response = new()
@@ -52,7 +51,6 @@ namespace BankingTool.Service.Service
             response.Message = createdBudgerAccount ? "Budget Account Created Successfully" : "Failed to create budget account";
             return response;
         }
-
         public async Task<ResponseDto<GetBudgetListResponse>> GetBudgetList()
         {
             return new ResponseDto<GetBudgetListResponse>()
@@ -67,7 +65,6 @@ namespace BankingTool.Service.Service
                 StatuCode = 200
             };
         }
-
         public async Task<ResponseDto<GetBudgetTransactionListResponse>> GetBudgetTransactionList(int budgetAccountId)
         {
             var budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId);
@@ -87,7 +84,20 @@ namespace BankingTool.Service.Service
                 StatuCode = 200
             };
         }
-
+        public async Task<ResponseDto<GetBudgetNotificationListResponse>> GetBudgetNotificationList()
+        {
+            return new ResponseDto<GetBudgetNotificationListResponse>
+            {
+                DropDownList = [],
+                Errors = [],
+                StatuCode = 200,
+                ValidationErrors = [],
+                Response = new GetBudgetNotificationListResponse
+                {
+                    budgetNotificationList = await _budgetRepository.GetBudgetNotificationList()
+                }
+            };
+        }
         private async Task<string> GetNewBudgetNumber()
         {
             var lastBudgetAccount = await _budgetRepository.GetLastBudgetAccount();

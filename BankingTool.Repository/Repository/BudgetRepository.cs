@@ -197,6 +197,22 @@ namespace BankingTool.Repository.Repository
             return await dataContext.BudgetAccount.Where(x => x.CustomerId == customerId).AnyAsync();
         }
 
+        public async Task<List<GetBudgetNotificationList>> GetBudgetNotificationList()
+        {
+            return await dataContext.BudgetNotification
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.NotificationStatus == NotificationStatus.Pending)
+                .Select(z => new GetBudgetNotificationList
+                {
+                    BudgetNotificationId = z.BudgetNotificationId,
+                    TransactionType = z.TransactionType,
+                    TransactionCatagory = z.TransactionCatagory,
+                    Description = z.Description,
+                    Amount = z.Amount,
+                    TransactionDate = z.TransactionDate,
+                    NotificationStatus = z.NotificationStatus
+                }).ToListAsync();
+        }
+
         public int? InsertBudgetAccount(BudgetAccount BudgetAccount)
         {
             BudgetAccount.CreatedBy = dataContext.UserEmail;

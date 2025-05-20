@@ -1,1 +1,41 @@
-<p>budget-notification works!</p>
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Budget Notifications</h1>
+      </div>
+      <div class='card-body'>
+        <table class="table caption-top">
+          <thead>
+            <tr>
+              <th scope="col">Transaction Catagory</th>
+              <th scope="col">Transaction Type</th>
+              <th scope="col">Date</th>
+              <th scope="col">Description</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="accountInfo && accountInfo.budgetNotificationList && accountInfo.budgetNotificationList != null && accountInfo.budgetNotificationList.length != 0; else noRecords">
+            <tr *ngFor="let trans of accountInfo.budgetNotificationList">
+              <td>{{ trans.transactionCatagory }}</td>
+              <td>{{ trans.transactionType }}</td>
+              <td>{{ trans.transactionDate | date:'dd-MM-yyyy' }}</td>
+              <td>{{ trans.description }}</td>
+              <td>{{ trans.amount }}</td>
+              <td>{{ trans.notificationStatus }}</td>
+            </tr>
+          </tbody>
+          <ng-template #noRecords>
+            <tbody>
+              <tr>
+                <td colspan="6" class="text-center">No records found</td>
+              </tr>
+            </tbody>
+          </ng-template>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+

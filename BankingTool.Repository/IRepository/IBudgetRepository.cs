@@ -15,5 +15,6 @@ namespace BankingTool.Repository.IRepository
         Task<List<GetBudgetTransactionList>> GetBudgetTransactionList(int budgetAccountId);
         Task<BudgetTransaction> GetLastBudgetTransaction(int BudgetAccountId);
         Task<bool> IsCustomerAsBudgetAccount(int customerId);
+        Task<List<GetBudgetNotificationList>> GetBudgetNotificationList();
     }
 }

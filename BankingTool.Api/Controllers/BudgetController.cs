@@ -50,5 +50,16 @@ namespace BankingTool.Api.Controllers
                 () => _budgetService.GetBudgetTransactionList(model.Request.BudgetAccount.Id)
             );
         }
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<GetBudgetNotificationListResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetBudgetNotificationListResponse>), 400)]
+        public Task<IActionResult> GetBudgetNotificationList()
+        {
+            return HandleRequestAsync<bool?, GetBudgetNotificationListResponse>(
+                null,
+                null,
+                () => _budgetService.GetBudgetNotificationList()
+            );
+        }
     }
 }
