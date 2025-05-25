@@ -65,6 +65,20 @@ namespace BankingTool.Service.Service
                 ValidationErrors = []
             };
         }
+        public async Task<ResponseDto<bool>> RejectBudgetTransaction(int BudgetNotificationId)
+        {
+            var isRejected = await _budgetRepository.RejectBudgetTransaction(BudgetNotificationId);
+            return new ResponseDto<bool>
+            {
+                DropDownList = [],
+                Errors = isRejected ? [] : [new Errors { PropertyName = "Reject Budget Transaction", ErrorMessage = "Failed to RejectBudgetTransaction." }],
+                Message = isRejected ? "Rejected successfully." : "Failed to Reject.",
+                Response = isRejected,
+                StatuCode = isRejected ? 200 : 400,
+                Status = isRejected,
+                ValidationErrors = []
+            };
+        }
         public async Task<ResponseDto<GetBudgetListResponse>> GetBudgetList()
         {
             return new ResponseDto<GetBudgetListResponse>()

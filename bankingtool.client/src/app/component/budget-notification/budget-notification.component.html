@@ -37,7 +37,7 @@
               <td>
                 <div>
                   <button class="btn btn-primary" (click)="transferBudgetAmount(trans.budgetNotificationId)">Save</button>
-                  <button class="m-1 btn btn-danger">Reject</button>
+                  <button class="m-1 btn btn-danger" (click)="rejectBudgetAmount(trans.budgetNotificationId)">Reject</button>
                 </div>
               </td>
             </tr>
@@ -45,7 +45,7 @@
           <ng-template #noRecords>
             <tbody>
               <tr>
-                <td colspan="6" class="text-center">No records found</td>
+                <td colspan="8" class="text-center">No records found</td>
               </tr>
             </tbody>
           </ng-template>

@@ -201,6 +201,13 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
+        public async Task<bool> RejectBudgetTransaction(int BudgetNotificationId)
+        {
+            var budgetNotification = await dataContext.BudgetNotification.FirstOrDefaultAsync(x => x.BudgetNotificationId == BudgetNotificationId);
+            budgetNotification.NotificationStatus = NotificationStatus.Rejected;
+            UpdateBudgetNotification(budgetNotification);
+            return true;
+        }
         public async Task<bool> IsCustomerAsBudgetAccount(int customerId)
         {
             return await dataContext.BudgetAccount.Where(x => x.CustomerId == customerId).AnyAsync();

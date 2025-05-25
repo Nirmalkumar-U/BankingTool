@@ -443,7 +443,7 @@ namespace BankingTool.Service.Service
             {
                 Amount = amount,
                 Description = description,
-                TransactionTime = DateTime.Now,
+                TransactionTime = transactionDate,
                 TransactionCategory = TransactionCatagory.Deposit,
                 TransactionTag = TransactionTag.Deposit
             };

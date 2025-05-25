@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { AcceptBudgetTransactionRequestObject } from '../../dto/request/budget/accept-budget-transaction-request';
 import { CreateBudgetAccountRequestObject } from '../../dto/request/budget/create-budget-account-request';
 import { GetBudgetTransactionListRequestObject } from '../../dto/request/budget/get-budget-transaction-list-request';
+import { RejectBudgetTransactionRequestObject } from '../../dto/request/budget/reject-budget-transaction-request';
 import { HttpService } from '../http/http.service';
 
 @Injectable({
@@ -25,5 +26,8 @@ export class BudgetService {
   }
   acceptBudgetTransaction(model: AcceptBudgetTransactionRequestObject): Observable<any> {
     return this.httpService.post('Budget/AcceptBudgetTransaction', model);
+  }
+  rejectBudgetTransaction(model: RejectBudgetTransactionRequestObject): Observable<any> {
+    return this.httpService.post('Budget/RejectBudgetTransaction', model);
   }
 }

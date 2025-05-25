@@ -73,5 +73,16 @@ namespace BankingTool.Api.Controllers
                 () => _budgetService.AcceptBudgetTransaction(model.Request.BudgetAccount.Id, model.Request.BudgetNotification.Id)
             );
         }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> RejectBudgetTransaction(RejectBudgetTransactionRequestObject model)
+        {
+            return HandleRequestAsync<RejectBudgetTransactionRequestObject, bool>(
+                model,
+                ValidationRules.CreateRejectBudgetTransactionRequestRules,
+                () => _budgetService.RejectBudgetTransaction(model.Request.BudgetNotification.Id)
+            );
+        }
     }
 }
