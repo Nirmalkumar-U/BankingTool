@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { AcceptBudgetTransactionRequestObject } from '../../dto/request/budget/accept-budget-transaction-request';
 import { CreateBudgetAccountRequestObject } from '../../dto/request/budget/create-budget-account-request';
 import { GetBudgetTransactionListRequestObject } from '../../dto/request/budget/get-budget-transaction-list-request';
 import { HttpService } from '../http/http.service';
@@ -21,5 +22,8 @@ export class BudgetService {
   }
   getBudgetNotificationList(): Observable<any> {
     return this.httpService.get('Budget/GetBudgetNotificationList');
+  }
+  acceptBudgetTransaction(model: AcceptBudgetTransactionRequestObject): Observable<any> {
+    return this.httpService.post('Budget/AcceptBudgetTransaction', model);
   }
 }

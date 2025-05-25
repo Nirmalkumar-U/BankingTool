@@ -14,6 +14,8 @@
               <th scope="col">Description</th>
               <th scope="col">Amount</th>
               <th scope="col">Status</th>
+              <th scope="col">Select</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody *ngIf="accountInfo && accountInfo.budgetNotificationList && accountInfo.budgetNotificationList != null && accountInfo.budgetNotificationList.length != 0; else noRecords">
@@ -24,6 +26,20 @@
               <td>{{ trans.description }}</td>
               <td>{{ trans.amount }}</td>
               <td>{{ trans.notificationStatus }}</td>
+              <td>
+                <div>
+                  <select id="inputState" class="form-select" (change)="selectedBudgetAccount($event,trans.budgetNotificationId)" >
+                    <option value="" selected>Select</option>
+                    <option *ngFor="let state of budgetAccountList" value="{{state.key}}">{{ state.value }}</option>
+                  </select>
+                </div>
+              </td>
+              <td>
+                <div>
+                  <button class="btn btn-primary" (click)="transferBudgetAmount(trans.budgetNotificationId)">Save</button>
+                  <button class="m-1 btn btn-danger">Reject</button>
+                </div>
+              </td>
             </tr>
           </tbody>
           <ng-template #noRecords>

@@ -378,7 +378,6 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.Transaction.FirstOrDefaultAsync(x => x.TransactionId == TransactionId);
         }
-
         public int? InsertAccount(Account account)
         {
             account.CreatedBy = dataContext.UserEmail;

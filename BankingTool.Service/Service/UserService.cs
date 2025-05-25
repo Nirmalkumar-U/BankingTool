@@ -162,7 +162,6 @@ namespace BankingTool.Service
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
         public async Task<ResponseDto<UserInitialLoadResponse>> GetUserInitialLoad(int? userId)
         {
             var response = new ResponseDto<UserInitialLoadResponse>

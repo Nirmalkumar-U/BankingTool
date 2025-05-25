@@ -51,6 +51,20 @@ namespace BankingTool.Service.Service
             response.Message = createdBudgerAccount ? "Budget Account Created Successfully" : "Failed to create budget account";
             return response;
         }
+        public async Task<ResponseDto<bool>> AcceptBudgetTransaction(int BudgetAccountId, int BudgetNotificationId)
+        {
+            var isAccepted = await _budgetRepository.AcceptBudgetTransaction(BudgetAccountId, BudgetNotificationId);
+            return new ResponseDto<bool>
+            {
+                DropDownList = [],
+                Errors = isAccepted ? [] : [new Errors { PropertyName = "Accept Budget Transaction", ErrorMessage = "Failed to AcceptBudgetTransaction." }],
+                Message = isAccepted ? "Accepted successfully." : "Failed to accept.",
+                Response = isAccepted,
+                StatuCode = isAccepted ? 200 : 400,
+                Status = isAccepted,
+                ValidationErrors = []
+            };
+        }
         public async Task<ResponseDto<GetBudgetListResponse>> GetBudgetList()
         {
             return new ResponseDto<GetBudgetListResponse>()
@@ -86,9 +100,16 @@ namespace BankingTool.Service.Service
         }
         public async Task<ResponseDto<GetBudgetNotificationListResponse>> GetBudgetNotificationList()
         {
+            var budgetList = await _budgetRepository.GetBudgetList();
+            var budgetDropdownList = budgetList.Select(x => new DropDownDto
+            {
+                Key = x.BudgetAccountId,
+                Value = x.BudgetName,
+                IsSelected = false
+            }).ToList();
             return new ResponseDto<GetBudgetNotificationListResponse>
             {
-                DropDownList = [],
+                DropDownList = [new DropDownListDto { Name = "BudgetAccount", DropDown = budgetDropdownList }],
                 Errors = [],
                 StatuCode = 200,
                 ValidationErrors = [],

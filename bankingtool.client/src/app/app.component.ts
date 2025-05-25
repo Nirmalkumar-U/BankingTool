@@ -60,7 +60,7 @@ export class AppComponent implements OnInit {
         let mainMenu = data.filter(x => x.actionPath == null && x.actionType == "Menu");
         let subMenu = data.filter(x => x.actionPath != null);
         mainMenu.forEach((path: GetActionsByUserIdDto) => {
-          let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId).map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
+          let sMenu: MenuItem[] = subMenu.filter(x => x.parrentMenuId == path.actionId && x.actionType == "Menu").map(z => ({ menu: z.actionName, path: z.actionPath ?? '' }));
           this.Menus.push({
             label: path.actionName, icon: 'aMoneyBill1', isOpen: false,
             items: [...sMenu]
