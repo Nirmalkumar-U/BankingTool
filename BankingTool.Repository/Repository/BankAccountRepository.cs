@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Dto.SPDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
@@ -320,7 +321,7 @@ namespace BankingTool.Repository.Repository
                     budgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
                     var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
                 }
-                if(fromAccount.CustomerId != toAccount.CustomerId && isCustomerAsBudgetAccount)
+                if (fromAccount.CustomerId != toAccount.CustomerId && isCustomerAsBudgetAccount)
                 {
                     var budgetNotificationId = InsertBudgetNotification(budgetNotification);
                 }
@@ -378,6 +379,32 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.Transaction.FirstOrDefaultAsync(x => x.TransactionId == TransactionId);
         }
+        public async Task<List<DashBoardAccountList>> GetDashBoardInitialLoad()
+        {
+            var accountDetailList = await dataContext.Account
+                .Include(c => c.Bank)
+                .Where(z => z.CustomerId == dataContext.CustomerId)
+                .Select(x => new DashBoardAccountList
+                {
+                    BankName = x.Bank.BankAbbrivation,
+                    AccountNumber = x.AccountNumber,
+                    AccountType = dataContext.CodeValue.Where(v => v.CodeValueId == x.AccountTypeId).FirstOrDefault().CodeValue1,
+                    Balance = x.Balance,
+                    AccountId = x.AccountId
+                }).ToListAsync();
+            var budgetAccountList = await dataContext.BudgetAccount
+                .Where(z => z.CustomerId == dataContext.CustomerId && z.BudgetStatus == "Active")
+                .Select(x => new DashBoardAccountList
+                {
+                    BankName = x.BudgetName,
+                    AccountNumber = x.BudgetNumber,
+                    AccountType = "Budget Account",
+                    Balance = x.Balance,
+                    AccountId = x.BudgetAccountId
+                }).ToListAsync();
+            return [.. accountDetailList, .. budgetAccountList];
+        }
+        #region Private
         public int? InsertAccount(Account account)
         {
             account.CreatedBy = dataContext.UserEmail;
@@ -471,5 +498,6 @@ namespace BankingTool.Repository.Repository
             var isInserted = Insert(model);
             return isInserted ? model.BudgetNotificationId : null;
         }
+        #endregion Private
     }
 }

@@ -22,6 +22,9 @@ export class BankAccountService {
   getCreateAccountInitialLoad(): Observable<any> {
     return this.httpService.get('BankAccount/GetCreateAccountInitialLoad');
   }
+  getDashBoardInitialLoad(): Observable<any> {
+    return this.httpService.get('BankAccount/GetDashBoardInitialLoad');
+  }
   createAccount(model: CreateAccountRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/CreateAccount', model);
   }

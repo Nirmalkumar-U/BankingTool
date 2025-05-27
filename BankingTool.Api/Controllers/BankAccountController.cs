@@ -3,6 +3,7 @@ using BankingTool.Api.Validators;
 using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -190,6 +191,17 @@ namespace BankingTool.Api.Controllers
                 ValidationRules.DepositAmountRequestObjectRules,
                 () => _bankAccountService.CashWithdraw(model.Request.Account.Id, model.Request.Transaction.Amount,
                 model.Request.Transaction.Description, model.Request.Transaction.TransactionDate, model.Request.BudgetAccount.Id)
+            );
+        }
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<GetDashBoardInitialLoadResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetDashBoardInitialLoadResponse>), 400)]
+        public Task<IActionResult> GetDashBoardInitialLoad()
+        {
+            return HandleRequestAsync<int?, GetDashBoardInitialLoadResponse>(
+                null,
+                null,
+                _bankAccountService.GetDashBoardInitialLoad
             );
         }
     }

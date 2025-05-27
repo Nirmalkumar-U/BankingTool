@@ -13,6 +13,7 @@ import { BudgetStatementReportResolver } from '../core/resolver/budget-statement
 import { BudgetTransactionListResolver } from '../core/resolver/budget-transaction-list.resolver';
 import { CashWithdrawResolver } from '../core/resolver/cash-withdraw.resolver';
 import { CreateAccountResolver } from '../core/resolver/create-account.resolver';
+import { HomeResolver } from '../core/resolver/home.resolver';
 import { SelfTransferResolver } from '../core/resolver/self-transfer.resolver';
 import { TransactionListResolver } from '../core/resolver/transaction-list.resolver';
 import { TransferAmountResolver } from '../core/resolver/transfer-amount.resolver';
@@ -40,7 +41,8 @@ const routes: Routes = [
   {
     path: AppPaths.home,
     title: PageTitle.home,
-    component: HomeComponent
+    component: HomeComponent,
+    resolve: { DataResolver: HomeResolver }
   },
   {
     path: AppPaths.login,

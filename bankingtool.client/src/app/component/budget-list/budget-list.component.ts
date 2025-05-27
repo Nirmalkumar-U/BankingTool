@@ -20,8 +20,6 @@ export class BudgetListComponent {
     this.budgetList = initialData.response.budgetList;
   }
   getBudgetTransactionList(budgetAccountId: number) {
-    console.log(budgetAccountId);
-
     this.router.navigate([AppRoute.budgetTransactionList(budgetAccountId)]);
   }
 }

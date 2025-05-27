@@ -1,5 +1,6 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Dto.SPDto;
 using BankingTool.Model.Model;
 
@@ -43,6 +44,7 @@ namespace BankingTool.Repository.IRepository
             BudgetTransactionDetail budgetTransactionDetail, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount);
         bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail, bool isBudgetAccountAttached, BudgetAccount budgetAccount,
             BudgetTransaction budgetTransaction, BudgetTransactionDetail budgetTransactionDetail);
+        Task<List<DashBoardAccountList>> GetDashBoardInitialLoad();
 
         void UpdateCustomer(Customer customer);
         int? InsertTransaction(Transaction transaction);

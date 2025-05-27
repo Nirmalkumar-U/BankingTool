@@ -1,0 +1,21 @@
+.account-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+  .account-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0, 128, 0, 0.15);
+  }
+
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}

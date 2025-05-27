@@ -1,6 +1,7 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.ResponseDto;
 
 namespace BankingTool.Service.IService
 {
@@ -21,5 +22,6 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId);
         Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId);
         Task<ResponseDto<GetTransactionsListResponse>> TransactionsList(TransactionListRequest request);
+        Task<ResponseDto<GetDashBoardInitialLoadResponse>> GetDashBoardInitialLoad();
     }
 }

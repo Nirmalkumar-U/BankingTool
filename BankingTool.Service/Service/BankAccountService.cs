@@ -1,6 +1,7 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
@@ -12,6 +13,21 @@ namespace BankingTool.Service.Service
     {
         private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
         private readonly IBudgetRepository _budgetRepository = budgetRepository;
+
+        public async Task<ResponseDto<GetDashBoardInitialLoadResponse>> GetDashBoardInitialLoad()
+        {
+            var accountList = await _bankAccountRepository.GetDashBoardInitialLoad();
+            var totalBalance = accountList.Where(z => z.AccountType == "Saving Account").Sum(x => x.Balance);
+            return new ResponseDto<GetDashBoardInitialLoadResponse>
+            {
+                DropDownList = [],
+                Errors = [],
+                Response = new GetDashBoardInitialLoadResponse { TotalBalance = totalBalance, DashBoardAccountList = accountList },
+                StatuCode = 200,
+                ValidationErrors = [],
+                Status = true
+            };
+        }
 
         public async Task<ResponseDto<bool>> GetCreateAccountInitialLoad()
         {
