@@ -5,6 +5,7 @@ using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Service.IService;
+using LazyCache;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
@@ -13,28 +14,29 @@ namespace BankingTool.Api.Controllers
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
     public class BankAccountController(IBankAccountService bankAccountService,
-        IValidatorService validatorService) : HandleRequest(validatorService)
+        IValidatorService validatorService, ICacheProvider cacheProvider) : HandleRequest(validatorService, cacheProvider)
     {
         private readonly IBankAccountService _bankAccountService = bankAccountService;
 
         [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> GetCreateAccountInitialLoad()
+        public async Task<IActionResult> GetCreateAccountInitialLoad()
         {
-            return HandleRequestAsync<int?, bool>(
-                null,
-                null,
-                _bankAccountService.GetCreateAccountInitialLoad
-            );
+            return await HandleRequestAsync<int?, bool>(
+               null,
+               null,
+               _bankAccountService.GetCreateAccountInitialLoad,
+               true
+           );
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> CreateAccount(CreateAccountRequestObject model)
+        public async Task<IActionResult> CreateAccount(CreateAccountRequestObject model)
         {
-            return HandleRequestAsync<CreateAccountRequestObject, bool>(
+            return await HandleRequestAsync<CreateAccountRequestObject, bool>(
                 model,
                 ValidationRules.CreateAccountRequestRules,
                 () => _bankAccountService.CreateAccount(model.Request)
@@ -43,9 +45,9 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> GetBankDetailsWithoutCustomerAndAccountType(GetBankDetailWithoutCustomerAndAccountTypeRequestObject model)
+        public async Task<IActionResult> GetBankDetailsWithoutCustomerAndAccountType(GetBankDetailWithoutCustomerAndAccountTypeRequestObject model)
         {
-            return HandleRequestAsync<GetBankDetailWithoutCustomerAndAccountTypeRequestObject, bool>(
+            return await HandleRequestAsync<GetBankDetailWithoutCustomerAndAccountTypeRequestObject, bool>(
                 model,
                 ValidationRules.GetBankDetailWithoutCustomerAndAccountTypeRequestRules,
                 () => _bankAccountService.GetBankDetailsDropDownWithoutCustomerAndAccountType(model.Request.Customer.Id,
@@ -55,9 +57,9 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> IsCustomerHasCreditCardInThatBank(IsCustomerHasCreditCardInThatBankRequestObject model)
+        public async Task<IActionResult> IsCustomerHasCreditCardInThatBank(IsCustomerHasCreditCardInThatBankRequestObject model)
         {
-            return HandleRequestAsync<IsCustomerHasCreditCardInThatBankRequestObject, bool>(
+            return await HandleRequestAsync<IsCustomerHasCreditCardInThatBankRequestObject, bool>(
                 model,
                 ValidationRules.IsCustomerHasCreditCardInThatBankRequestRules,
                 () => _bankAccountService.IsCustomerHasCreditCardInThatBank(model.Request.Customer.Id, model.Request.Bank.Id)
@@ -67,9 +69,9 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 200)]
         [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 400)]
-        public Task<IActionResult> TransactionsListForCustomer(TransactionsListForCustomerRequestObject model)
+        public async Task<IActionResult> TransactionsListForCustomer(TransactionsListForCustomerRequestObject model)
         {
-            return HandleRequestAsync<TransactionsListForCustomerRequestObject, GetTransactionsListResponse>(
+            return await HandleRequestAsync<TransactionsListForCustomerRequestObject, GetTransactionsListResponse>(
                 model,
                 ValidationRules.TransactionsListForCustomerRequestRules,
                 () => _bankAccountService.TransactionsListForCustomer(model.Request.Bank.Id, model.Request.Account.AccountTypeId, model.Request.Customer.Id)
@@ -78,9 +80,9 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 200)]
         [ProducesResponseType(typeof(ResponseDto<GetTransactionsListResponse>), 400)]
-        public Task<IActionResult> TransactionList(TransactionListRequestObject model)
+        public async Task<IActionResult> TransactionList(TransactionListRequestObject model)
         {
-            return HandleRequestAsync<TransactionListRequestObject, GetTransactionsListResponse>(
+            return await HandleRequestAsync<TransactionListRequestObject, GetTransactionsListResponse>(
                 model,
                 ValidationRules.TransactionListRequestObjectRules,
                 () => _bankAccountService.TransactionsList(model.Request)
@@ -89,45 +91,48 @@ namespace BankingTool.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> BankDropDownList()
+        public async Task<IActionResult> BankDropDownList()
         {
-            return HandleRequestAsync<int?, bool>(
+            return await HandleRequestAsync<int?, bool>(
                 null,
                 null,
-                _bankAccountService.BankDropDownList
+                _bankAccountService.BankDropDownList,
+                true
             );
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> GetAccountTypeDropDownListByCustomerIdAndBankId(GetAccountTypeDropDownListRequestObject model)
+        public async Task<IActionResult> GetAccountTypeDropDownListByCustomerIdAndBankId(GetAccountTypeDropDownListRequestObject model)
         {
-            return HandleRequestAsync<GetAccountTypeDropDownListRequestObject, bool>(
+            return await HandleRequestAsync<GetAccountTypeDropDownListRequestObject, bool>(
                 model,
                 ValidationRules.GetAccountTypeDropDownListRequestRules,
-                () => _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(model.Request.Customer.Id, model.Request.Bank.Id)
+                () => _bankAccountService.GetAccountTypeDropDownListByCustomerIdAndBankId(model.Request.Customer.Id, model.Request.Bank.Id),
+                true
             );
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> GetTransferAmountInitialLoad()
+        public async Task<IActionResult> GetTransferAmountInitialLoad()
         {
-            return HandleRequestAsync<int?, bool>(
+            return await HandleRequestAsync<int?, bool>(
                 null,
                 null,
-                () => _bankAccountService.GetTransferAmountInitialLoad()
+                () => _bankAccountService.GetTransferAmountInitialLoad(),
+                true
             );
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<int>), 200)]
         [ProducesResponseType(typeof(ResponseDto<int>), 400)]
-        public Task<IActionResult> GetAccountBalance(GetAccountBalanceRequestObject model)
+        public async Task<IActionResult> GetAccountBalance(GetAccountBalanceRequestObject model)
         {
-            return HandleRequestAsync<GetAccountBalanceRequestObject, int>(
+            return await HandleRequestAsync<GetAccountBalanceRequestObject, int>(
                 model,
                 ValidationRules.GetAccountBalanceRequestRules,
                 () => _bankAccountService.GetAccountBalance(model.Request.Account.Id)
@@ -137,9 +142,9 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> TransferAmount(TransferAmountRequestObject model)
+        public async Task<IActionResult> TransferAmount(TransferAmountRequestObject model)
         {
-            return HandleRequestAsync<TransferAmountRequestObject, bool>(
+            return await HandleRequestAsync<TransferAmountRequestObject, bool>(
                 model,
                 ValidationRules.TransferAmountRequestRules,
                 () => _bankAccountService.TransferAmount(model.Request.Account.FromAccountId, model.Request.Account.ToAccountId,
@@ -150,20 +155,21 @@ namespace BankingTool.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> GetSelfTransferInitialLoad()
+        public async Task<IActionResult> GetSelfTransferInitialLoad()
         {
-            return HandleRequestAsync<int?, bool>(
+            return await HandleRequestAsync<int?, bool>(
                 null,
                 null,
-                _bankAccountService.GetSelfTransferInitialLoad
+                _bankAccountService.GetSelfTransferInitialLoad,
+                true
             );
         }
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> GetToAccountListExcludedByAccountId(GetToAccountListExcludedByAccountIdRequestObject model)
+        public async Task<IActionResult> GetToAccountListExcludedByAccountId(GetToAccountListExcludedByAccountIdRequestObject model)
         {
-            return HandleRequestAsync<GetToAccountListExcludedByAccountIdRequestObject, bool>(
+            return await HandleRequestAsync<GetToAccountListExcludedByAccountIdRequestObject, bool>(
                 model,
                 ValidationRules.GetToAccountListExcludedByAccountIdRequestRules,
                 () => _bankAccountService.GetToAccountListExcludedByAccountId(model.Request.Account.Id)
@@ -172,9 +178,9 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> DepositAmount(DepositAmountRequestObject model)
+        public async Task<IActionResult> DepositAmount(DepositAmountRequestObject model)
         {
-            return HandleRequestAsync<DepositAmountRequestObject, bool>(
+            return await HandleRequestAsync<DepositAmountRequestObject, bool>(
                 model,
                 ValidationRules.DepositAmountRequestObjectRules,
                 () => _bankAccountService.DepositAmount(model.Request.Account.Id, model.Request.Transaction.Amount,
@@ -184,9 +190,9 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public Task<IActionResult> CashWithdraw(CashWithdrawRequestObject model)
+        public async Task<IActionResult> CashWithdraw(CashWithdrawRequestObject model)
         {
-            return HandleRequestAsync<CashWithdrawRequestObject, bool>(
+            return await HandleRequestAsync<CashWithdrawRequestObject, bool>(
                 model,
                 ValidationRules.DepositAmountRequestObjectRules,
                 () => _bankAccountService.CashWithdraw(model.Request.Account.Id, model.Request.Transaction.Amount,
@@ -196,9 +202,9 @@ namespace BankingTool.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<GetDashBoardInitialLoadResponse>), 200)]
         [ProducesResponseType(typeof(ResponseDto<GetDashBoardInitialLoadResponse>), 400)]
-        public Task<IActionResult> GetDashBoardInitialLoad()
+        public async Task<IActionResult> GetDashBoardInitialLoad()
         {
-            return HandleRequestAsync<int?, GetDashBoardInitialLoadResponse>(
+            return await HandleRequestAsync<int?, GetDashBoardInitialLoadResponse>(
                 null,
                 null,
                 _bankAccountService.GetDashBoardInitialLoad

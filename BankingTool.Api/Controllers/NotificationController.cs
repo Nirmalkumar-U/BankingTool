@@ -1,5 +1,6 @@
 ﻿using BankingTool.Api.Filter;
 using BankingTool.Service.IService;
+using LazyCache;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
@@ -8,7 +9,7 @@ namespace BankingTool.Api.Controllers
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
     public class NotificationController(INotificationService notificationService,
-        IValidatorService validatorService) : HandleRequest(validatorService)
+        IValidatorService validatorService, ICacheProvider cacheProvider) : HandleRequest(validatorService, cacheProvider)
     {
         private readonly INotificationService _notificationService = notificationService;
 

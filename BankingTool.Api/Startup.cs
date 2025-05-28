@@ -47,6 +47,9 @@ namespace BankingTool.Api
                 });
             });
 
+            services.AddMemoryCache();
+            services.AddLazyCache();
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpContextAccessor();
 

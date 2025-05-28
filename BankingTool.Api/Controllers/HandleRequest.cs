@@ -2,18 +2,22 @@
 using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Repository;
 using BankingTool.Service.IService;
+using LazyCache;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BankingTool.Api.Controllers
 {
-    public class HandleRequest(IValidatorService validatorService) : ControllerBase
+    public class HandleRequest(IValidatorService validatorService, ICacheProvider cacheProvider) : ControllerBase
     {
-
         private readonly IValidatorService _validatorService = validatorService;
+        private readonly ICacheProvider _cacheProvider = cacheProvider;
+
         public async Task<IActionResult> HandleRequestAsync<TRequest, TResponse>(
                 TRequest model,
                 List<ValidationRule> ruleSet,
-                Func<Task<ResponseDto<TResponse>>> serviceMethod)
+                Func<Task<ResponseDto<TResponse>>> serviceMethod,
+                bool addCache = false)
         {
             var errors = new List<Errors>();
             ResponseDto<TResponse> result = new()
@@ -23,6 +27,7 @@ namespace BankingTool.Api.Controllers
                 ValidationErrors = [],
                 DropDownList = []
             };
+
             if (model is not null && ruleSet?.Any() == true)
             {
                 var (isValid, validationResult) = _validatorService.Validate(model, ruleSet);
@@ -38,7 +43,30 @@ namespace BankingTool.Api.Controllers
 
             try
             {
-                result = await serviceMethod();
+                string cacheKey = $"{serviceMethod.Method.Name}:{System.Text.Json.JsonSerializer.Serialize(model)}";
+                if (addCache)
+                {
+                    if (_cacheProvider.TryGetValue(cacheKey, out ResponseDto<TResponse> cached) && cached is not null)
+                    {
+                        return Ok(cached);
+                    }
+
+                    result = await serviceMethod();
+                    if (result.Status && result.Response is not null)
+                    {
+                        var cacheOption = new MemoryCacheEntryOptions
+                        {
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
+                            SlidingExpiration = TimeSpan.FromMinutes(5),
+                            Size = 5096
+                        };
+                        _cacheProvider.Set(cacheKey, result, cacheOption);
+                    }
+                }
+                else
+                {
+                    result = await serviceMethod();
+                }
             }
             catch (Exception ex)
             {
