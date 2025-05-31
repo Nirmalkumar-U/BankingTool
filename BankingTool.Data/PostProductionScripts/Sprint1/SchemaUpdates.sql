@@ -101,6 +101,7 @@ CREATE TABLE [BudgetNotification] (
 	Description VARCHAR(20) NOT NULL,
 	Amount INT NOT NULL,
 	TransactionDate DATETIME NOT NULL,
+	NotificationStatus VARCHAR(30) NOT NULL,
 	CreatedDate DATETIME NOT NULL,
 	CreatedBy VARCHAR(30) NOT NULL,
 	ModifiedDate DATETIME NULL,

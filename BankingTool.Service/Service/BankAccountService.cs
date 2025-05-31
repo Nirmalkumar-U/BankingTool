@@ -28,7 +28,6 @@ namespace BankingTool.Service.Service
                 Status = true
             };
         }
-
         public async Task<ResponseDto<bool>> GetCreateAccountInitialLoad()
         {
             return new ResponseDto<bool>
@@ -424,14 +423,15 @@ namespace BankingTool.Service.Service
                 };
             }
 
-            _bankAccountRepository.TransferAmount(fromAccount, toAccount, transaction, fromTransactionDetail, toTransactionDetail,
+            var isSaved = _bankAccountRepository.TransferAmount(fromAccount, toAccount, transaction, fromTransactionDetail, toTransactionDetail,
                 budgetAccountId.HasValue, budgetAccount, budgetTransaction, budgetTransactionDetails, budgetNotification, isCustomerAsBudgetAccount);
             return new ResponseDto<bool>
             {
-                Response = true,
-                Status = true,
+                Response = isSaved,
+                Status = isSaved,
+                Message = isSaved ? "Transfered Successfully.": "Transfer Failed.",
                 ValidationErrors = [],
-                Errors = []
+                Errors = isSaved ? [] : [new Errors { PropertyName = "TransferAmount",ErrorMessage = "Transfer Failed" }]
             };
         }
         public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId)
