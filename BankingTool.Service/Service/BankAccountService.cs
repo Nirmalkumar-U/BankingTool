@@ -1,4 +1,6 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.BaseDto;
+using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
@@ -300,8 +302,48 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag, int? budgetAccountId)
+        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate,
+            string transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccounts)
         {
+            if (budgetAccounts != null && budgetAccounts.Count > 0)
+            {
+                bool isInValid = budgetAccounts.Any(x => x.Id == null);
+                bool isAmountInValid = budgetAccounts.Any(x => x?.Amount == null || x.Amount == 0);
+                int sumOfBudgetAccountAmount = budgetAccounts.Sum(x => x.Amount);
+                if (sumOfBudgetAccountAmount > amount)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = [new ValidationResults { PropertyPath = "Request.BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Sum of Budget Account Amount should be lesser equal to Transfer Amount." }],
+                        Errors = [],
+                        StatuCode = 400
+                    };
+                }
+                if (isInValid)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = [new ValidationResults { PropertyPath = "Request.BudgetAccount.Id", PropertyName = "BudgetAccountId", ErrorMessage = "BudgetAccountId is required." }],
+                        Errors = [],
+                        StatuCode = 400
+                    };
+                }
+                if (isAmountInValid)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = [new ValidationResults { PropertyPath = "Request.BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Amount is required." }],
+                        Errors = [],
+                        StatuCode = 400
+                    };
+                }
+            }
             var lastFromAccountTransaction = await _bankAccountRepository.GetLastTransaction(fromAccountId);
             var lastToAccountTransaction = await _bankAccountRepository.GetLastTransaction(toAccountId);
             if (lastFromAccountTransaction != null && lastFromAccountTransaction?.TransactionTime.Date > transactionDate.Date)
@@ -311,7 +353,8 @@ namespace BankingTool.Service.Service
                     Response = false,
                     Status = false,
                     ValidationErrors = [],
-                    Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                    Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }],
+                    StatuCode = 400
                 };
             }
             if (lastToAccountTransaction != null && lastToAccountTransaction?.TransactionTime.Date > transactionDate.Date)
@@ -321,7 +364,8 @@ namespace BankingTool.Service.Service
                     Response = false,
                     Status = false,
                     ValidationErrors = [],
-                    Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                    Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }],
+                    StatuCode = 400
                 };
             }
             DateTime? latestTransactionDate = new[]
@@ -362,46 +406,54 @@ namespace BankingTool.Service.Service
                 TransactionRole = TransactionRole.Receiver
             };
 
-            BudgetAccount budgetAccount = null;
-            BudgetTransaction budgetTransaction = null;
-            BudgetTransactionDetail budgetTransactionDetails = null;
-            if (budgetAccountId.HasValue)
+            List<BudgetTransactionDto> budgetAccountList = [];
+            if (budgetAccounts != null && budgetAccounts.Count > 0)
             {
-                var lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(budgetAccountId.Value);
-                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionDate.Date)
+                foreach (var bAccount in budgetAccounts)
                 {
-                    return new ResponseDto<bool>
+                    var lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(bAccount.Id.Value);
+                    if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionDate.Date)
                     {
-                        Response = false,
-                        Status = false,
-                        ValidationErrors = [],
-                        Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                        return new ResponseDto<bool>
+                        {
+                            Response = false,
+                            Status = false,
+                            ValidationErrors = [],
+                            Errors = [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                        };
+                    }
+                    var budgetTransactionDate = transactionDate;
+                    if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
+                    {
+                        budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
+                        budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
+                    }
+                    var budgetAccount = await _budgetRepository.GetBudgetAccountById(bAccount.Id.Value);
+                    budgetAccount.Balance = budgetAccount.Balance - bAccount.Amount;
+                    var budgetTransaction = new BudgetTransaction()
+                    {
+                        Amount = bAccount.Amount,
+                        Description = description,
+                        TransactionTime = budgetTransactionDate,
+                        TransactionCategory = TransactionCatagory.Transfer,
+                        TransactionTag = transactionTag
                     };
+                    var budgetTransactionDetails = new BudgetTransactionDetail()
+                    {
+                        TransactionType = TransactionType.Debit,
+                        StageBalance = budgetAccount.Balance,
+                        TransactionRole = TransactionRole.Sender,
+                        AccountId = fromAccountId,
+                        BudgetAccountId = budgetAccount.BudgetAccountId
+                    };
+                    BudgetTransactionDto budgetTransactions = new BudgetTransactionDto()
+                    {
+                        BudgetAccount = budgetAccount,
+                        BudgetTransaction = budgetTransaction,
+                        BudgetTransactionDetail = budgetTransactionDetails
+                    };
+                    budgetAccountList.Add(budgetTransactions);
                 }
-                var budgetTransactionDate = transactionDate;
-                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
-                {
-                    budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
-                    budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
-                }
-                budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId.Value);
-                budgetAccount.Balance = budgetAccount.Balance - amount;
-                budgetTransaction = new()
-                {
-                    Amount = amount,
-                    Description = description,
-                    TransactionTime = budgetTransactionDate,
-                    TransactionCategory = TransactionCatagory.Transfer,
-                    TransactionTag = transactionTag
-                };
-                budgetTransactionDetails = new()
-                {
-                    TransactionType = TransactionType.Debit,
-                    StageBalance = budgetAccount.Balance,
-                    TransactionRole = TransactionRole.Sender,
-                    AccountId = fromAccountId,
-                    BudgetAccountId = budgetAccount.BudgetAccountId
-                };
             }
 
             var isCustomerAsBudgetAccount = await _budgetRepository.IsCustomerAsBudgetAccount(toAccount.CustomerId);
@@ -424,14 +476,14 @@ namespace BankingTool.Service.Service
             }
 
             var isSaved = _bankAccountRepository.TransferAmount(fromAccount, toAccount, transaction, fromTransactionDetail, toTransactionDetail,
-                budgetAccountId.HasValue, budgetAccount, budgetTransaction, budgetTransactionDetails, budgetNotification, isCustomerAsBudgetAccount);
+                budgetAccountList, budgetNotification, isCustomerAsBudgetAccount);
             return new ResponseDto<bool>
             {
                 Response = isSaved,
                 Status = isSaved,
-                Message = isSaved ? "Transfered Successfully.": "Transfer Failed.",
+                Message = isSaved ? "Transfered Successfully." : "Transfer Failed.",
                 ValidationErrors = [],
-                Errors = isSaved ? [] : [new Errors { PropertyName = "TransferAmount",ErrorMessage = "Transfer Failed" }]
+                Errors = isSaved ? [] : [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transfer Failed" }]
             };
         }
         public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId)

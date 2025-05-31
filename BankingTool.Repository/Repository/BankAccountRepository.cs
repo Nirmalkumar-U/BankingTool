@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Dto.SPDto;
@@ -300,8 +301,7 @@ namespace BankingTool.Repository.Repository
         }
 
         public bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
-            TransactionDetail toTransactionDetail, bool isBudgetAccountAttached, BudgetAccount budgetAccount, BudgetTransaction budgetTransaction,
-            BudgetTransactionDetail budgetTransactionDetail, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount)
+            TransactionDetail toTransactionDetail, List<BudgetTransactionDto> budgetTransactions, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
@@ -314,12 +314,12 @@ namespace BankingTool.Repository.Repository
                 InsertTransactionDetail(toTransactionDetail);
                 InsertTransactionDetail(fromTransactionDetail);
 
-                if (isBudgetAccountAttached)
+                foreach (BudgetTransactionDto budget in budgetTransactions)
                 {
-                    UpdateBudgetAccount(budgetAccount);
-                    var budgetTransactionId = InsertBudgetTransaction(budgetTransaction);
-                    budgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
-                    var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
+                    UpdateBudgetAccount(budget.BudgetAccount);
+                    var budgetTransactionId = InsertBudgetTransaction(budget.BudgetTransaction);
+                    budget.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                    var budgetTransactionDetailId = InsertBudgetTransactionDetail(budget.BudgetTransactionDetail);
                 }
                 if (fromAccount.CustomerId != toAccount.CustomerId && isCustomerAsBudgetAccount)
                 {

@@ -10,7 +10,7 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
     {
         public TransferAmountRequestAccount Account { get; set; }
         public TransferAmountRequestTransaction Transaction { get; set; }
-        public TransferAmountRequestBudgetAccount BudgetAccount { get; set; }
+        public List<TransferAmountRequestBudgetAccount> BudgetAccount { get; set; }
     }
     public class TransferAmountRequestAccount
     {
@@ -25,5 +25,7 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
         public string TransactionTag { get; set; }
     }
     public class TransferAmountRequestBudgetAccount : RequestNullableId
-    { }
+    {
+        public int Amount { get; set; }
+    }
 }

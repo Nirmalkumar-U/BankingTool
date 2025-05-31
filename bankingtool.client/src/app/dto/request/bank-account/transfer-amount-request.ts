@@ -8,7 +8,7 @@ export interface TransferAmountRequestObject {
 export interface TransferAmountRequest {
   account: TransferAmountRequestAccount;
   transaction: TransferAmountRequestTransaction;
-  budgetAccount: TransferAmountRequestBudgetAccount;
+  budgetAccount: TransferAmountRequestBudgetAccount[];
 }
 
 export interface TransferAmountRequestAccount {
@@ -24,11 +24,11 @@ export interface TransferAmountRequestTransaction {
 }
 
 export interface TransferAmountRequestBudgetAccount extends RequestNullableId {
-
+  amount: number;
 }
 
 export const getTransferAmountRequestObject = (fromAccountId: number, toAccountId: number, amount: number, description: string,
-  transactionDate: Date, transactionTag: string, budgetAccountId: number | null): TransferAmountRequestObject => {
+  transactionDate: Date, transactionTag: string, budgetAccount: TransferAmountRequestBudgetAccount[]): TransferAmountRequestObject => {
   let model: TransferAmountRequestObject = {
     request: {
       account: {
@@ -41,9 +41,7 @@ export const getTransferAmountRequestObject = (fromAccountId: number, toAccountI
         transactionDate: transactionDate,
         transactionTag: transactionTag
       },
-      budgetAccount: {
-        id: isNullOrEmpty(budgetAccountId) ? null : budgetAccountId
-      }
+      budgetAccount: budgetAccount
     }
   }
   return model;

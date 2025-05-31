@@ -149,7 +149,7 @@ namespace BankingTool.Api.Controllers
                 ValidationRules.TransferAmountRequestRules,
                 () => _bankAccountService.TransferAmount(model.Request.Account.FromAccountId, model.Request.Account.ToAccountId,
                 model.Request.Transaction.Amount, model.Request.Transaction.Description, model.Request.Transaction.TransactionDate,
-                model.Request.Transaction.TransactionTag, model.Request.BudgetAccount.Id)
+                model.Request.Transaction.TransactionTag, model.Request.BudgetAccount)
             );
         }
         [HttpGet]

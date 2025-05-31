@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PageTitle } from '../../constant/constant';
 import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
@@ -7,7 +7,7 @@ import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
 import { CreateGetToAccountListExcludedByAccountIdRequestObject, GetToAccountListExcludedByAccountIdRequestObject } from '../../dto/request/bank-account/get-to-account-list-excluded-by-account-id-request';
-import { getTransferAmountRequestObject } from '../../dto/request/bank-account/transfer-amount-request';
+import { getTransferAmountRequestObject, TransferAmountRequestBudgetAccount } from '../../dto/request/bank-account/transfer-amount-request';
 import { ResponseDto } from '../../dto/response-dto';
 
 @Component({
@@ -35,7 +35,7 @@ export class TransferAmountComponent {
       amount: ['', [Validators.required]],
       description: ['', [Validators.required]],
       transactionTag: ['', [Validators.required]],
-      budgetAccountId: ['']
+      budgetAccount: this.fb.array([])
     });
     this.transferAmountForm.patchValue({
       transferDate: formatDateForInput(new Date()),
@@ -81,9 +81,13 @@ export class TransferAmountComponent {
   transferAmount() {
     this.messageList = [];
     if (!this.transferAmountForm.invalid) {
+      let budgetAccounts: any[] = this.transferAmountForm.get('budgetAccount')?.value;
+      let validBudgetAccounts = budgetAccounts
+        .filter(x => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount))
+        .map((z: any) => ({ id: z.budgetAccountId, amount: z.budgetAmount }));
       let model = getTransferAmountRequestObject(this.transferAmountForm.get('fromAccountId')?.value, this.transferAmountForm.get('toAccountId')?.value,
         this.transferAmountForm.get('amount')?.value, this.transferAmountForm.get('description')?.value, this.transferAmountForm.get('transferDate')?.value,
-        this.transferAmountForm.get('transactionTag')?.value, this.transferAmountForm.get('budgetAccountId')?.value);
+        this.transferAmountForm.get('transactionTag')?.value, validBudgetAccounts);
       this.bankAccountService.transferAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
@@ -106,5 +110,21 @@ export class TransferAmountComponent {
       this.transferAmountForm.patchValue({
         transferDate: null
       });
+  }
+  get budgetAccount(): FormArray {
+    return this.transferAmountForm.get('budgetAccount') as FormArray;
+  }
+
+  addBudgetAccount(): void {
+    this.budgetAccount.push(
+      this.fb.group({
+        budgetAccountId: ['', Validators.required],
+        budgetAmount: ['', Validators.required]
+      })
+    );
+  }
+
+  removeBudgetAccount(index: number): void {
+    this.budgetAccount.removeAt(index);
   }
 }
