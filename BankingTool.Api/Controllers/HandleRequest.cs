@@ -44,7 +44,7 @@ namespace BankingTool.Api.Controllers
             try
             {
                 string cacheKey = $"{serviceMethod.Method.Name}:{System.Text.Json.JsonSerializer.Serialize(model)}";
-                if (addCache)
+                if (false)
                 {
                     if (_cacheProvider.TryGetValue(cacheKey, out ResponseDto<TResponse> cached) && cached is not null)
                     {
