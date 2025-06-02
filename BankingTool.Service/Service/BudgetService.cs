@@ -93,6 +93,17 @@ namespace BankingTool.Service.Service
                 StatuCode = 200
             };
         }
+        public async Task<ResponseDto<bool>> ChangeBudgetAccountStatus(int budgetAccountId)
+        {
+            return new ResponseDto<bool>()
+            {
+                Errors = [],
+                ValidationErrors = [],
+                Response = await _budgetRepository.ChangeBudgetAccountStatus(budgetAccountId),
+                Status = true,
+                StatuCode = 200
+            };
+        }
         public async Task<ResponseDto<GetBudgetTransactionListResponse>> GetBudgetTransactionList(int budgetAccountId)
         {
             var budgetAccount = await _budgetRepository.GetBudgetAccountById(budgetAccountId);

@@ -27,13 +27,13 @@ namespace BankingTool.Repository.Repository
                 budgetTransactionDetails.BudgetAccountId = budgetAccountId.Value;
                 var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetails);
                 sqlTransaction.Commit();
-                return true;
+                return await Task.FromResult(true);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 sqlTransaction.Rollback();
-                return false;
+                return await Task.FromResult(false);
             }
         }
         public async Task<int> GetPrimaryAccountIdOfCustomer()
@@ -67,7 +67,7 @@ namespace BankingTool.Repository.Repository
         public async Task<List<GetBudgetList>> GetBudgetList()
         {
             var budgetAccountList = await dataContext.BudgetAccount
-                .Where(x => x.CustomerId == dataContext.CustomerId && x.IsDeleted == false)
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetStatus == BudgetAccountStatus.Active && x.IsDeleted == false)
                 .Select(x => new GetBudgetList
                 {
                     BudgetAccountId = x.BudgetAccountId,
@@ -212,7 +212,6 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.BudgetAccount.Where(x => x.CustomerId == customerId).AnyAsync();
         }
-
         public async Task<List<GetBudgetNotificationList>> GetBudgetNotificationList()
         {
             return await dataContext.BudgetNotification
@@ -227,6 +226,20 @@ namespace BankingTool.Repository.Repository
                     TransactionDate = z.TransactionDate,
                     NotificationStatus = z.NotificationStatus
                 }).ToListAsync();
+        }
+        public async Task<bool> ChangeBudgetAccountStatus(int budgetAccountId)
+        {
+            var budgetAccount = await dataContext.BudgetAccount.Where(x => x.BudgetAccountId == budgetAccountId).FirstOrDefaultAsync();
+            if (budgetAccount != null)
+            {
+                budgetAccount.BudgetStatus = budgetAccount.BudgetStatus == BudgetAccountStatus.Active ? BudgetAccountStatus.InActive : BudgetAccountStatus.Active;
+                UpdateBudgetAccount(budgetAccount);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public int? InsertBudgetAccount(BudgetAccount BudgetAccount)

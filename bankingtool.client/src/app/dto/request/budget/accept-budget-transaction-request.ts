@@ -5,24 +5,22 @@ export interface AcceptBudgetTransactionRequestObject {
 }
 
 export interface AcceptBudgetTransactionRequest {
-  budgetAccount: AcceptBudgetTransactionRequestBudgetAcccount;
+  budgetAccount: AcceptBudgetTransactionRequestBudgetAcccount[];
   budgetNotification: AcceptBudgetTransactionRequestBudgetNotification;
 }
 
 export interface AcceptBudgetTransactionRequestBudgetAcccount extends RequestId {
-
+  amount: number;
 }
 
 export interface AcceptBudgetTransactionRequestBudgetNotification extends RequestId {
 
 }
 
-export const CreateAcceptBudgetTransactionRequestObject = (budgetAccountId: number, budgetNotificationId: number): AcceptBudgetTransactionRequestObject => {
+export const CreateAcceptBudgetTransactionRequestObject = (budgetAccount: AcceptBudgetTransactionRequestBudgetAcccount[], budgetNotificationId: number): AcceptBudgetTransactionRequestObject => {
   let model: AcceptBudgetTransactionRequestObject = {
     request: {
-      budgetAccount: {
-        id: budgetAccountId
-      },
+      budgetAccount: budgetAccount,
       budgetNotification: {
         id: budgetNotificationId
       }

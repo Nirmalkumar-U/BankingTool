@@ -11,7 +11,7 @@
               <th scope="col">Budget Name</th>
               <th scope="col">Budget Number</th>
               <th scope="col">Balance</th>
-              <th scope="col">Budget Status</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody *ngIf="budgetList && budgetList != null && budgetList.length != 0; else noRecords">
@@ -19,7 +19,10 @@
               <td> <a style="cursor: pointer;" class="text-secondary" (click)="getBudgetTransactionList(trans.budgetAccountId)">{{ trans.budgetName }}</a></td>
               <td>{{ trans.budgetNumber }}</td>
               <td>{{ trans.balance }}</td>
-              <td>{{ trans.budgetStatus }}</td>
+              <td>
+                <button class="btn btn-primary" *ngIf="trans.budgetStatus == 'InActive'" (click)="changeStatus(trans.budgetAccountId)">Active</button>
+                <button class="btn btn-danger" *ngIf="trans.budgetStatus == 'Active'" (click)="changeStatus(trans.budgetAccountId)">InActive</button>
+              </td>
             </tr>
           </tbody>
           <ng-template #noRecords>

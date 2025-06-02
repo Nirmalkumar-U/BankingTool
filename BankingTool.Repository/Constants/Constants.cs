@@ -1,4 +1,4 @@
-﻿namespace BankingTool.Repository
+﻿    namespace BankingTool.Repository
 {
     public class Constants
     {
@@ -12,6 +12,11 @@
         public const string InActive = "InActive";
         public const string Deactivated = "Deactivated";
         public const string NotInUse = "NotInUse";
+    }
+    public class BudgetAccountStatus
+    {
+        public const string Active = "Active";
+        public const string InActive = "InActive";
     }
     public class CardType
     {

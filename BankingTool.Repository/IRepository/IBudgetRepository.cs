@@ -18,5 +18,6 @@ namespace BankingTool.Repository.IRepository
         Task<List<GetBudgetNotificationList>> GetBudgetNotificationList();
         Task<bool> AcceptBudgetTransaction(int BudgetAccountId, int BudgetNotificationId);
         Task<bool> RejectBudgetTransaction(int BudgetNotificationId);
+        Task<bool> ChangeBudgetAccountStatus(int budgetAccountId);
     }
 }

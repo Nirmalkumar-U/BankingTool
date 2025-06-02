@@ -85,13 +85,13 @@
               <tbody formArrayName="budgetAccount">
                 <tr *ngFor="let budget of budgetAccount.controls; let i = index" [formGroupName]="i">
                   <td>
-                    <select class="form-select" formControlName="budgetAccountId">
+                    <select class="form-select" formControlName="budgetAccountId" required>
                       <option value="">Select</option>
                       <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
                     </select>
                   </td>
                   <td>
-                    <input type="number" class="form-control" formControlName="budgetAmount" />
+                    <input type="number" class="form-control" formControlName="budgetAmount" required />
                   </td>
                   <td>
                     <button type="button" class="btn btn-danger btn-sm" (click)="removeBudgetAccount(i)">X</button>

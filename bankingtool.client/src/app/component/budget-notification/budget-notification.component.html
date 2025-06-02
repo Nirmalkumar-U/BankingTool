@@ -27,12 +27,7 @@
               <td>{{ trans.amount }}</td>
               <td>{{ trans.notificationStatus }}</td>
               <td>
-                <div>
-                  <select id="inputState" class="form-select" (change)="selectedBudgetAccount($event,trans.budgetNotificationId)" >
-                    <option value="" selected>Select</option>
-                    <option *ngFor="let state of budgetAccountList" value="{{state.key}}">{{ state.value }}</option>
-                  </select>
-                </div>
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="selectBudgetAccount(trans.budgetNotificationId)">Select</button>
               </td>
               <td>
                 <div>
@@ -55,3 +50,51 @@
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Select Budget Account</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="budgetAccountList && budgetAccountList.length != 0">
+          <form class="was-validated" novalidate [formGroup]="transferAmountForm">
+            <label class="form-label">Budget Allocation</label>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Budget Account</th>
+                  <th>Budget Amount</th>
+                  <th style="width: 50px;">Action</th>
+                </tr>
+              </thead>
+              <tbody formArrayName="budgetAccount">
+                <tr *ngFor="let budget of budgetAccount.controls; let i = index" [formGroupName]="i">
+                  <td>
+                    <select class="form-select" formControlName="budgetAccountId" required>
+                      <option value="">Select</option>
+                      <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control" formControlName="budgetAmount" required />
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="removeBudgetAccount(i)">X</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="addBudgetAccount()">Add Row</button>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Select</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -270,6 +270,12 @@ namespace BankingTool.Api.Validators
             RuleBuilder<RejectBudgetTransactionRequestObject>.For(x => x.Request.BudgetNotification).Required(),
             RuleBuilder<RejectBudgetTransactionRequestObject>.For(x => x.Request.BudgetNotification.Id).Required()
         };
+        public static List<ValidationRule> CreateChangeBudgetAccountStatusRequestRules = new()
+        {
+            RuleBuilder<ChangeBudgetAccountStatusRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<ChangeBudgetAccountStatusRequestObject>.For(x => x.Request.BudgetAccount).Required(),
+            RuleBuilder<ChangeBudgetAccountStatusRequestObject>.For(x => x.Request.BudgetAccount.Id).Required()
+        };
         #endregion BankAccountController
     }
 }
