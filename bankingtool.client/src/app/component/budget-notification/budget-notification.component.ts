@@ -30,6 +30,7 @@ export class BudgetNotificationComponent {
     const initialData: ResponseDto<GetBudgetNotificationListResponse> = this.activatedRoute.snapshot.data['DataResolver'];
     this.accountInfo = initialData.response;
     this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown
+    this.addBudgetAccount();
   }
   selectedBudgetAccount($event: any, budgetNotificationId: number) {
     $event.preventDefault();
@@ -83,7 +84,4 @@ export class BudgetNotificationComponent {
     this.budgetAccount.removeAt(index);
   }
 
-  @ViewChild('staticBackdrop') modalElement!: ElementRef;
-
- 
 }

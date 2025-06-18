@@ -32,11 +32,15 @@ namespace BankingTool.Api
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
+            string branch = ThisAssembly.Git.Branch;
+            string connectionString = branch.Contains("dev", StringComparison.OrdinalIgnoreCase)
+                ? Configuration.GetConnectionString("BankingToolConnection")
+                : Configuration.GetConnectionString("BankingToolConnection_Local");
+
             services.AddDbContext<DataContext>(option =>
             {
-                option.UseSqlServer(Configuration.GetConnectionString("BankingToolConnection"));
+                option.UseSqlServer(connectionString);
             });
-
             services.AddCors(opt =>
             {
                 opt.AddPolicy("AllowAllOrigins", builder =>
