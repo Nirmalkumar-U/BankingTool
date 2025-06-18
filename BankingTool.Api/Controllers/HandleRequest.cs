@@ -1,4 +1,6 @@
-﻿using BankingTool.Model;
+﻿using System.Security.Claims;
+using System.Text.Json;
+using BankingTool.Model;
 using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Repository;
 using BankingTool.Service.IService;
@@ -8,11 +10,24 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace BankingTool.Api.Controllers
 {
-    public class HandleRequest(IValidatorService validatorService, ICacheProvider cacheProvider) : ControllerBase
+    public class HandleRequest(IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : ControllerBase
     {
         private readonly IValidatorService _validatorService = validatorService;
         private readonly ICacheProvider _cacheProvider = cacheProvider;
 
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+
+        private string GetUserId()
+        {
+            if (_httpContextAccessor.HttpContext.User.Claims.Any())
+            {
+                List<ClaimDto> claims = JsonSerializer.Deserialize<List<ClaimDto>>(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(ClaimTypes.Email))?.Value);
+                var UserId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.UserId).Value);
+
+                return UserId.ToString();
+            }
+            return string.Empty;
+        }
         public async Task<IActionResult> HandleRequestAsync<TRequest, TResponse>(
                 TRequest model,
                 List<ValidationRule> ruleSet,
@@ -43,8 +58,8 @@ namespace BankingTool.Api.Controllers
 
             try
             {
-                string cacheKey = $"{serviceMethod.Method.Name}:{System.Text.Json.JsonSerializer.Serialize(model)}";
-                if (false)
+                string cacheKey = $"{GetUserId()}:{serviceMethod.Method.Name}:{JsonSerializer.Serialize(model)}";
+                if (addCache)
                 {
                     if (_cacheProvider.TryGetValue(cacheKey, out ResponseDto<TResponse> cached) && cached is not null)
                     {
@@ -56,8 +71,8 @@ namespace BankingTool.Api.Controllers
                     {
                         var cacheOption = new MemoryCacheEntryOptions
                         {
-                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
-                            SlidingExpiration = TimeSpan.FromMinutes(5),
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+                            SlidingExpiration = TimeSpan.FromMinutes(2),
                             Size = 5096
                         };
                         _cacheProvider.Set(cacheKey, result, cacheOption);
@@ -95,6 +110,11 @@ namespace BankingTool.Api.Controllers
             {
                 result.Message = result.Message ?? ErrorMessage.NotFound;
                 return NotFound(result);
+            }
+            else if (result.StatuCode == 400)
+            {
+                result.Message = result.Message ?? ErrorMessage.BadRequest;
+                return BadRequest(result);
             }
             else if (result.StatuCode == 200)
             {

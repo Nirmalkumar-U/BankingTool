@@ -9,7 +9,7 @@ namespace BankingTool.Api.Controllers
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
     public class ReportController(IReportService reportService,
-        IValidatorService validatorService, ICacheProvider cacheProvider) : HandleRequest(validatorService, cacheProvider)
+        IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)
     {
         private readonly IReportService _reportService = reportService;
 

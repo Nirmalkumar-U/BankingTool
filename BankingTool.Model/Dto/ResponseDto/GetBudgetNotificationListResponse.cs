@@ -13,5 +13,6 @@
         public int Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public string NotificationStatus { get; set; }
+        public bool IsSelected { get; set; } = false;
     }
 }

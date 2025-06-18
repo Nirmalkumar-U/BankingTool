@@ -9,7 +9,7 @@ namespace BankingTool.Api.Controllers
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
     public class NotificationController(INotificationService notificationService,
-        IValidatorService validatorService, ICacheProvider cacheProvider) : HandleRequest(validatorService, cacheProvider)
+        IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)
     {
         private readonly INotificationService _notificationService = notificationService;
 

@@ -10,4 +10,5 @@ export interface GetBudgetNotificationList {
   amount: number;
   transactionDate: Date;
   notificationStatus: string;
+  isSelected: boolean;
 }

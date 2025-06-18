@@ -14,7 +14,7 @@ namespace BankingTool.Api.Controllers
     [Route("api/[controller]/[action]")]
 
     public class UserController(IEncriptDecriptService encriptDecriptService, IUserService userService,
-        IValidatorService validatorService, ICacheProvider cacheProvider) : HandleRequest(validatorService, cacheProvider)
+        IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)
     {
         private readonly IEncriptDecriptService _encriptDecriptService = encriptDecriptService;
         private readonly IUserService _userService = userService;

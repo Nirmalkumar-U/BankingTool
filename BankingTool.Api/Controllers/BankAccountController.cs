@@ -14,7 +14,7 @@ namespace BankingTool.Api.Controllers
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
     public class BankAccountController(IBankAccountService bankAccountService,
-        IValidatorService validatorService, ICacheProvider cacheProvider) : HandleRequest(validatorService, cacheProvider)
+        IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)
     {
         private readonly IBankAccountService _bankAccountService = bankAccountService;
 

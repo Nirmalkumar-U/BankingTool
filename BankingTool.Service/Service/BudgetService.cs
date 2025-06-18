@@ -1,4 +1,6 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.BaseDto;
+using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
@@ -51,9 +53,37 @@ namespace BankingTool.Service.Service
             response.Message = createdBudgerAccount ? "Budget Account Created Successfully" : "Failed to create budget account";
             return response;
         }
-        public async Task<ResponseDto<bool>> AcceptBudgetTransaction(int BudgetAccountId, int BudgetNotificationId)
+        public async Task<ResponseDto<bool>> AcceptBudgetTransaction(List<AcceptBudgetTransactionRequestBudgetAcccount> BudgetAccount, int BudgetNotificationId)
         {
-            var isAccepted = await _budgetRepository.AcceptBudgetTransaction(BudgetAccountId, BudgetNotificationId);
+            if (BudgetAccount == null || BudgetAccount.Count == 0)
+            {
+                return new ResponseDto<bool>
+                {
+                    DropDownList = [],
+                    Errors = [],
+                    Message = "Failed to accept.",
+                    Response = false,
+                    StatuCode = 400,
+                    Status = false,
+                    ValidationErrors = [new ValidationResults { PropertyPath = "Request.BudgetAccount", PropertyName = "BudgetAccount", ErrorMessage = "BudgetAccount is required." }]
+                };
+            }
+            var budgetNotification = await _budgetRepository.GetBudgetNotification(BudgetNotificationId);
+            int sumOfBudgetAmount = BudgetAccount.Sum(x => x.Amount);
+            if (budgetNotification.Amount < sumOfBudgetAmount)
+            {
+                return new ResponseDto<bool>
+                {
+                    DropDownList = [],
+                    Errors = [],
+                    Message = "Failed to accept.",
+                    Response = false,
+                    StatuCode = 400,
+                    Status = false,
+                    ValidationErrors = [new ValidationResults { PropertyPath = "AcceptBudgetTransaction", PropertyName = "AcceptBudgetTransaction", ErrorMessage = "Sum of budget amount should be lesser than equal to budget notification amount." }]
+                };
+            }
+            var isAccepted = await _budgetRepository.AcceptBudgetTransaction(BudgetAccount, BudgetNotificationId);
             return new ResponseDto<bool>
             {
                 DropDownList = [],

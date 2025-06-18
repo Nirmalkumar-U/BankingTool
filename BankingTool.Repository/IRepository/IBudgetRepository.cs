@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 
@@ -16,8 +17,9 @@ namespace BankingTool.Repository.IRepository
         Task<BudgetTransaction> GetLastBudgetTransaction(int BudgetAccountId);
         Task<bool> IsCustomerAsBudgetAccount(int customerId);
         Task<List<GetBudgetNotificationList>> GetBudgetNotificationList();
-        Task<bool> AcceptBudgetTransaction(int BudgetAccountId, int BudgetNotificationId);
+        Task<bool> AcceptBudgetTransaction(List<AcceptBudgetTransactionRequestBudgetAcccount> BudgetAccount, int BudgetNotificationId);
         Task<bool> RejectBudgetTransaction(int BudgetNotificationId);
         Task<bool> ChangeBudgetAccountStatus(int budgetAccountId);
+        Task<BudgetNotification> GetBudgetNotification(int BudgetNotificationId);
     }
 }

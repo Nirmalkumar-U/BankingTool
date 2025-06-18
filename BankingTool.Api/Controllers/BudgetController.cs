@@ -13,7 +13,8 @@ namespace BankingTool.Api.Controllers
     [ApiController]
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
-    public class BudgetController(IBudgetService budgetService, IValidatorService validatorService, ICacheProvider cacheProvider) : HandleRequest(validatorService, cacheProvider)
+    public class BudgetController(IBudgetService budgetService, IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) 
+        : HandleRequest(validatorService, cacheProvider, httpContextAccessor)
     {
         private readonly IBudgetService _budgetService = budgetService;
 
@@ -71,7 +72,7 @@ namespace BankingTool.Api.Controllers
             return await HandleRequestAsync<AcceptBudgetTransactionRequestObject, bool>(
                 model,
                 ValidationRules.CreateAcceptBudgetTransactionRequestRules,
-                () => _budgetService.AcceptBudgetTransaction(model.Request.BudgetAccount.Id, model.Request.BudgetNotification.Id)
+                () => _budgetService.AcceptBudgetTransaction(model.Request.BudgetAccount, model.Request.BudgetNotification.Id)
             );
         }
         [HttpPost]

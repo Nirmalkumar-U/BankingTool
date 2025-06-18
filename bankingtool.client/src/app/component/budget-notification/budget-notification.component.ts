@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
@@ -8,7 +8,6 @@ import { CreateAcceptBudgetTransactionRequestObject } from '../../dto/request/bu
 import { CreateRejectBudgetTransactionRequestObject } from '../../dto/request/budget/reject-budget-transaction-request';
 import { ResponseDto } from '../../dto/response-dto';
 import { GetBudgetNotificationListResponse } from '../../dto/response/get-budget-notification-list-response';
-//import { Modal } from 'bootstrap';
 
 @Component({
   selector: 'app-budget-notification',
@@ -30,7 +29,6 @@ export class BudgetNotificationComponent {
     const initialData: ResponseDto<GetBudgetNotificationListResponse> = this.activatedRoute.snapshot.data['DataResolver'];
     this.accountInfo = initialData.response;
     this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown
-    this.addBudgetAccount();
   }
   selectedBudgetAccount($event: any, budgetNotificationId: number) {
     $event.preventDefault();
@@ -44,6 +42,7 @@ export class BudgetNotificationComponent {
         .filter(x => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount) && x.budgetNotificationId == this.selectedBudgetNotificationId)
         .map((z: any) => ({ id: z.budgetAccountId, amount: z.budgetAmount }));
       let model = CreateAcceptBudgetTransactionRequestObject(validBudgetAccounts, budgetNotificationId);
+      console.log(model);
       this.budgetService.acceptBudgetTransaction(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.response) {
           this.budgetService.getBudgetNotificationList().subscribe((data: ResponseDto<GetBudgetNotificationListResponse>) => {
@@ -63,8 +62,10 @@ export class BudgetNotificationComponent {
       }
     });
   }
-  selectBudgetAccount(budgetNotificationId: number) {
+  selectBudgetAccountFromList(budgetNotificationId: number) {
     this.selectedBudgetNotificationId = budgetNotificationId;
+    this.removeEmptyBudgetAccount();
+    this.addBudgetAccount();
   }
   get budgetAccount(): FormArray {
     return this.transferAmountForm.get('budgetAccount') as FormArray;
@@ -84,4 +85,47 @@ export class BudgetNotificationComponent {
     this.budgetAccount.removeAt(index);
   }
 
+  clearBudgetAccountWhenClose() {
+    this.budgetAccount.clear();
+    this.selectBudgetAccountForNotificationFromModel();
+  }
+
+  removeEmptyBudgetAccount(): void {
+    const formArray = this.transferAmountForm.get('budgetAccount') as FormArray;
+    const selectedId = this.selectedBudgetNotificationId;
+
+    const isEmpty = (value: any) =>
+      value === null || value === undefined || value === '';
+
+    for (let i = formArray.length - 1; i >= 0; i--) {
+      const group = formArray.at(i) as FormGroup;
+      const budgetAccountId = group.get('budgetAccountId')?.value;
+      const budgetAmount = group.get('budgetAmount')?.value;
+      const budgetNotificationId = group.get('budgetNotificationId')?.value;
+
+      const bothAccountEmpty = isEmpty(budgetAccountId);
+      const bothAmountEmpty = isEmpty(budgetAmount);
+      const notificationMismatch = budgetNotificationId !== selectedId;
+
+      if (bothAmountEmpty || bothAccountEmpty || notificationMismatch) {
+        formArray.removeAt(i);
+      }
+    }
+  }
+
+  isBudgetAccountForBudgetNotification(): void {
+    const formArray = this.transferAmountForm.get('budgetAccount') as FormArray;
+
+    this.accountInfo?.budgetNotificationList.forEach(notification => {
+      const isMatched = formArray.controls.some(control => {
+        return control.get('budgetNotificationId')?.value === notification.budgetNotificationId;
+      });
+      notification.isSelected = isMatched;
+    });
+  }
+
+  selectBudgetAccountForNotificationFromModel() {
+    this.removeEmptyBudgetAccount();
+    this.isBudgetAccountForBudgetNotification();
+  }
 }
