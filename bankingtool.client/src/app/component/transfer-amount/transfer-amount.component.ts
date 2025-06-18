@@ -77,6 +77,7 @@ export class TransferAmountComponent {
         this.balance = 0;
       }
     });
+    this.addBudgetAccount();
   }
   transferAmount() {
     this.messageList = [];
