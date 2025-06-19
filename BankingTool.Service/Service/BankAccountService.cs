@@ -305,6 +305,19 @@ namespace BankingTool.Service.Service
         public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate,
             string transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccounts)
         {
+            var account = await _bankAccountRepository.GetAccount(fromAccountId);
+            if(account.Balance <= amount)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = [new ValidationResults { PropertyPath = "Request.Account.Amount", PropertyName = "Amount", ErrorMessage = "Amount should be lesser equal to Transfer Amount." }],
+                    Errors = [],
+                    StatuCode = 400
+                };
+            }
+
             if (budgetAccounts != null && budgetAccounts.Count > 0)
             {
                 bool isInValid = budgetAccounts.Any(x => x.Id == null);

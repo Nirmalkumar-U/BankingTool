@@ -28,7 +28,7 @@
         </div>
         <div class="nav-item-divider"></div>
         <a href="#" class="dashboard-nav-item" (click)="logout()">
-          <fa-icon [icon]="aArrowAltCircleRight" size="lg"></fa-icon> <span class="p-1">Logout</span> 
+          <fa-icon [icon]="aArrowAltCircleRight" size="lg"></fa-icon> <span class="p-1">Logout</span>
         </a>
       </nav>
     </div>
@@ -66,4 +66,5 @@
     <router-outlet></router-outlet>
   </div>
   <app-loader *ngIf="isLoading"></app-loader>
+  <app-notification-popup></app-notification-popup>
 </body>

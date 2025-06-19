@@ -3,11 +3,12 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PageTitle } from '../../constant/constant';
 import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
 import { CreateGetToAccountListExcludedByAccountIdRequestObject, GetToAccountListExcludedByAccountIdRequestObject } from '../../dto/request/bank-account/get-to-account-list-excluded-by-account-id-request';
-import { getTransferAmountRequestObject, TransferAmountRequestBudgetAccount } from '../../dto/request/bank-account/transfer-amount-request';
+import { getTransferAmountRequestObject } from '../../dto/request/bank-account/transfer-amount-request';
 import { ResponseDto } from '../../dto/response-dto';
 
 @Component({
@@ -25,7 +26,8 @@ export class TransferAmountComponent {
   messageList: string[] = [];
   isSubmitted: boolean = false;
   reportName: string = '';
-  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService) {
+  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder,
+    private bankAccountService: BankAccountService, private notificationService: NotificationService) {
     let routeData: any = this.activatedRoute.snapshot.data;
     this.reportName = routeData.reportName;
     this.transferAmountForm = this.fb.group({
@@ -77,7 +79,7 @@ export class TransferAmountComponent {
         this.balance = 0;
       }
     });
-    this.addBudgetAccount();
+    //this.addBudgetAccount();
   }
   transferAmount() {
     this.messageList = [];
@@ -92,11 +94,14 @@ export class TransferAmountComponent {
       this.bankAccountService.transferAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
-          this.messageList.push("Amount transfered successfully.");
+          this.notificationService.show('Amount transfered successfully.', 'success');
         } else {
           if (Array.isArray(response?.errors) && response?.errors)
             this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
           this.messageList.push("Transfer failed");
+          this.messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error')
+          });
         }
       });
     }
