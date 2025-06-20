@@ -3,6 +3,7 @@ import { Observable, Observer } from 'rxjs';
 import { AppSettingsDto } from '../../dto/app-settings-dto';
 import { EmitterService } from '../emitter.service';
 import { LocalStorageService } from '../local-storage.service';
+import { NotificationService } from '../notificationService/notification-service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { LocalStorageService } from '../local-storage.service';
 export class HttpService {
 
   baseUrl = AppSettingsDto.baseUrl;
-  constructor(private localStoreService: LocalStorageService, private emitService: EmitterService) { }
+  constructor(private localStoreService: LocalStorageService, private emitService: EmitterService, private notificationService: NotificationService) { }
   requestObj = (method: string = 'GET', headerType: string = 'DEFAULT', body?: any) => {
     return {
       method,
@@ -39,11 +40,11 @@ export class HttpService {
           return this.handelResponse(response);
         })
         .then(result => {
-          if (!result.status) {
-            //alart
-          }
           if (isLoading) {
             this.emitService.loaderEmitter.emit(false);
+          }
+          if (result == null || result == undefined) {
+            this.notificationService.show("Internal server error", 'error');
           }
           observer.next(result);
           observer.complete();
@@ -115,9 +116,11 @@ export class HttpService {
       return;
     } else if (response && response.status >= 401) {
       this.emitService.loaderEmitter.emit(false);
+      this.notificationService.show("Internal server error " + response.status.toString(), 'error');
       throw response;
     } else if (response && response.status >= 500) {
       this.emitService.loaderEmitter.emit(false);
+      this.notificationService.show("Internal server error " + response.status.toString(), 'error');
       throw response;
     } else {
       return response.json()

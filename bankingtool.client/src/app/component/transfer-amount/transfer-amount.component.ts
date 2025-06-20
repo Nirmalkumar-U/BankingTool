@@ -23,7 +23,6 @@ export class TransferAmountComponent {
   budgetAccountList: DropDownDto[] = [];
   transactionTagList: DropDownDto[] = [];
   balance: number = 0;
-  messageList: string[] = [];
   isSubmitted: boolean = false;
   reportName: string = '';
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder,
@@ -45,7 +44,15 @@ export class TransferAmountComponent {
   }
   ngOnInit() {
     const initialData: ResponseDto<boolean> = this.activatedRoute.snapshot.data['DataResolver'];
-
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Transfer amount page load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error')
+      });
+    }
     if (this.reportName == PageTitle.transfer) {
       this.toList = initialData.dropDownList.find(x => x.name == "ToAccount")!.dropDown;
       this.fromList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
@@ -67,12 +74,32 @@ export class TransferAmountComponent {
           }
         }
         this.bankAccountService.getAccountBalance(model).subscribe((response: ResponseDto<number>) => {
-          this.balance = response.response;
+          if (response.status == true) {
+            this.balance = response.response;
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Get Account Balance failed");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error')
+            });
+          }
         });
         if (this.reportName == PageTitle.selfTransfer) {
           let model: GetToAccountListExcludedByAccountIdRequestObject = CreateGetToAccountListExcludedByAccountIdRequestObject(fromAccountId)
           this.bankAccountService.getToAccountListExcludedByAccountId(model).subscribe((response: ResponseDto<boolean>) => {
-            this.toList = response.dropDownList.find(x => x.name == "ToAccount")!.dropDown;
+            if (response.status == true) {
+              this.toList = response.dropDownList.find(x => x.name == "ToAccount")!.dropDown;
+            } else {
+              let messageList: string[] = [];
+              if (Array.isArray(response?.errors) && response?.errors)
+                messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+              messageList.push("Get Account Balance failed.");
+              messageList.forEach((msg) => {
+                this.notificationService.show(msg, 'error');
+              });
+            }
           });
         }
       } else {
@@ -82,7 +109,6 @@ export class TransferAmountComponent {
     //this.addBudgetAccount();
   }
   transferAmount() {
-    this.messageList = [];
     if (!this.transferAmountForm.invalid) {
       let budgetAccounts: any[] = this.transferAmountForm.get('budgetAccount')?.value;
       let validBudgetAccounts = budgetAccounts
@@ -96,10 +122,11 @@ export class TransferAmountComponent {
           this.isSubmitted = true;
           this.notificationService.show('Amount transfered successfully.', 'success');
         } else {
+          let messageList: string[] = [];
           if (Array.isArray(response?.errors) && response?.errors)
-            this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
-          this.messageList.push("Transfer failed");
-          this.messageList.forEach((msg) => {
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Transfer failed");
+          messageList.forEach((msg) => {
             this.notificationService.show(msg, 'error')
           });
         }

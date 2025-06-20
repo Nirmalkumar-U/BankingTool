@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ClaimKey } from '../../constant/constant';
 import { isAllEmptyOrNull, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { LocalStorageService } from '../../core/local-storage.service';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { GetAccountTypeDropDownListRequestObject } from '../../dto/request/bank-account/get-account-type-drop-down-list-request';
@@ -51,7 +52,7 @@ export class TransactionsListComponent {
     this.transactionFilterForm.patchValue({ toDate: value == null ? null : this.formatDateForInput(value) });
   }
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService,
-    private localStorageService: LocalStorageService) {
+    private localStorageService: LocalStorageService, private notificationService: NotificationService) {
     this.transactionForm = this.fb.group({
       bankId: ['', [Validators.required]],
       accountTypeId: ['', [Validators.required]]
@@ -73,6 +74,15 @@ export class TransactionsListComponent {
   }
   ngOnInit() {
     const initialData: ResponseDto<boolean> = this.activatedRoute.snapshot.data['DataResolver'];
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Transaction list page load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error')
+      });
+    }
     this.bankList = initialData.dropDownList.find(x => x.name == "Bank")!.dropDown;
 
     this.customerId = Number(this.localStorageService.getItem(ClaimKey.customerId));
@@ -90,12 +100,22 @@ export class TransactionsListComponent {
           }
         }
         this.bankAccountService.getAccountTypeDropDownListByCustomerIdAndBankId(model).subscribe((response: ResponseDto<boolean>) => {
-          this.accountTypeList = response.dropDownList.find(x => x.name == "AccountType")!.dropDown;
-          if (this.accountTypeList.length == 1) {
-            this.transactionForm.controls["accountTypeId"].setValue(this.accountTypeList[0].key);
+          if (response.status == true) {
+            this.accountTypeList = response.dropDownList.find(x => x.name == "AccountType")!.dropDown;
+            if (this.accountTypeList.length == 1) {
+              this.transactionForm.controls["accountTypeId"].setValue(this.accountTypeList[0].key);
+            }
+            else
+              this.transactionForm.controls["accountTypeId"].setValue('');
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Get Account Type Drop Down failed.");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error');
+            });
           }
-          else
-            this.transactionForm.controls["accountTypeId"].setValue('');
         });
       }
       else {
@@ -118,25 +138,44 @@ export class TransactionsListComponent {
           }
         }
         this.bankAccountService.transactionsListForCustomer(model).subscribe((response: ResponseDto<GetTransactionsListResponse>) => {
-          this.accountInfo = response.response.accountInfo;
-          this.cardInfo = response.response.cardInfo;
-          this.transactionsList = response.response.transactionsList;
-          this.transactionCategoryList = response.dropDownList.find(x => x.name == "TransactionCategory")!.dropDown;
-          this.transactionTagList = response.dropDownList.find(x => x.name == "TransactionTag")!.dropDown;
-          this.senderAccountList = response.dropDownList.find(x => x.name == "SenderAccount")!.dropDown;
-          this.receiverAccoountList = response.dropDownList.find(x => x.name == "ReceiverAccount")!.dropDown;
+          if (response.status == true) {
+            this.accountInfo = response.response.accountInfo;
+            this.cardInfo = response.response.cardInfo;
+            this.transactionsList = response.response.transactionsList;
+            this.transactionCategoryList = response.dropDownList.find(x => x.name == "TransactionCategory")!.dropDown;
+            this.transactionTagList = response.dropDownList.find(x => x.name == "TransactionTag")!.dropDown;
+            this.senderAccountList = response.dropDownList.find(x => x.name == "SenderAccount")!.dropDown;
+            this.receiverAccoountList = response.dropDownList.find(x => x.name == "ReceiverAccount")!.dropDown;
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Get transactions list failed.");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error');
+            });
+          }
         });
       }
     });
   }
   getTransactionList() {
     let values = this.transactionFilterForm.value;
-    //let isEmpty = isAllEmptyOrNull(values);
     if (!isNullOrEmpty(this.accountInfo!.accountId)) {
       let model = createTransactionListRequestObject(this.accountInfo!.accountId, values.receiverAccountId, values.senderAccountId, values.category,
         this.fromDate, values.transactionTag, this.toDate);
       this.bankAccountService.transactionList(model).subscribe((response: ResponseDto<GetTransactionsListResponse>) => {
-        this.transactionsList = response.response.transactionsList;
+        if (response.status == true) {
+          this.transactionsList = response.response.transactionsList;
+        } else {
+          let messageList: string[] = [];
+          if (Array.isArray(response?.errors) && response?.errors)
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Get transactions list failed.");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
+          });
+        }
       });
     }
   }

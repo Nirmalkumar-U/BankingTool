@@ -13,7 +13,7 @@ import { HttpService } from '../http/http.service';
 export class BudgetService {
   constructor(private httpService: HttpService) { }
 
-  getCreateAccountInitialLoad(model: CreateBudgetAccountRequestObject): Observable<any> {
+  createBudgetAccount(model: CreateBudgetAccountRequestObject): Observable<any> {
     return this.httpService.post('Budget/CreateBudgetAccount', model);
   }
   getBudgetList(): Observable<any> {

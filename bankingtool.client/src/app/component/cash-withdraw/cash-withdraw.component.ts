@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { CreateCashWithdrawRequestObject } from '../../dto/request/bank-account/cash-withdraw-request';
@@ -17,10 +18,9 @@ export class CashWithdrawComponent {
   cashWithdrawForm: FormGroup;
   accountList: DropDownDto[] = [];
   budgetAccountList: DropDownDto[] = [];
-  messageList: string[] = [];
   isSubmitted: boolean = false;
   balance: number = 0;
-  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService) {
+  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService, private notificationService: NotificationService) {
     this.cashWithdrawForm = this.fb.group({
       accountId: ['', [Validators.required]],
       amount: ['', [Validators.required]],
@@ -34,6 +34,15 @@ export class CashWithdrawComponent {
   }
   ngOnInit() {
     const initialData: ResponseDto<boolean> = this.activatedRoute.snapshot.data['DataResolver'];
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Cash withdraw page load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error')
+      });
+    }
     this.accountList = initialData.dropDownList.find(x => x.name == "FromAccount")!.dropDown;
     this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown;
 
@@ -47,7 +56,17 @@ export class CashWithdrawComponent {
           }
         }
         this.bankAccountService.getAccountBalance(model).subscribe((response: ResponseDto<number>) => {
-          this.balance = response.response;
+          if (response.status == true) {
+            this.balance = response.response;
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Get Account Balance failed.");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error');
+            });
+          }
         });
       } else {
         this.balance = 0;
@@ -55,7 +74,6 @@ export class CashWithdrawComponent {
     });
   }
   cashWithdraw() {
-    this.messageList = [];
     if (!this.cashWithdrawForm.invalid) {
       let model = CreateCashWithdrawRequestObject(this.cashWithdrawForm.get('accountId')?.value,
         this.cashWithdrawForm.get('amount')?.value, this.cashWithdrawForm.get('description')?.value
@@ -63,24 +81,30 @@ export class CashWithdrawComponent {
       this.bankAccountService.cashWithdraw(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
-          this.messageList.push("Cash withdraw successfully.");
+          this.notificationService.show("Cash withdraw successfully.", 'success');
         } else {
+          let messageList: string[] = [];
           if (Array.isArray(response?.errors) && response?.errors)
-            this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
-          this.messageList.push("Transfer failed.");
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Cash Withdraw failed.");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
+          });
         }
       });
     }
   }
   setTransferDate($event: any) {
     $event.preventDefault();
-    if (!isNullOrEmpty($event.target.value))
+    if (!isNullOrEmpty($event.target.value)) {
       this.cashWithdrawForm.patchValue({
         transferDate: formatDateForInput(new Date($event.target.value)),
       });
-    else
+    }
+    else {
       this.cashWithdrawForm.patchValue({
         transferDate: null
       });
+    }
   }
 }

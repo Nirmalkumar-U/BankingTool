@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { UserService } from '../../core/service/user.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { GetCityListRequestObject } from '../../dto/request/user/get-city-list-request';
@@ -20,9 +21,8 @@ export class AddEditUserComponent implements OnInit {
   stateDropDownList: DropDownDto[] = [];
   cityDropDownList: DropDownDto[] = [];
   roleDropDownList: DropDownDto[] = [];
-  messageList: string[] = [];
 
-  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private userService: UserService) {
+  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private userService: UserService, private notificationService: NotificationService) {
     this.userForm = this.fb.group({
       userId: [],
       email: ['', [Validators.required, Validators.email]],
@@ -36,6 +36,15 @@ export class AddEditUserComponent implements OnInit {
   }
   ngOnInit() {
     const initialData: ResponseDto<UserInitialLoadResponse> = this.activatedRoute.snapshot.data['DataResolver'];
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Add user page load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error')
+      });
+    }
     this.stateDropDownList = initialData.dropDownList.find(x => x.name == "State")!.dropDown;
     this.roleDropDownList = initialData.dropDownList.find(x => x.name == "Role")!.dropDown;
 
@@ -59,8 +68,18 @@ export class AddEditUserComponent implements OnInit {
             }
           }
         }
-        this.userService.getCityDropDownListByStateId(model).subscribe((cityList: ResponseDto<boolean>) => {
-          this.cityDropDownList = cityList.dropDownList.find(x => x.name == "City")!.dropDown;;
+        this.userService.getCityDropDownListByStateId(model).subscribe((response: ResponseDto<boolean>) => {
+          if (response.status == true) {
+            this.cityDropDownList = response.dropDownList.find(x => x.name == "City")!.dropDown;
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Get City Drop Down failed.");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error')
+            });
+          }
         });
       } else {
         this.cityDropDownList = [];
@@ -80,7 +99,6 @@ export class AddEditUserComponent implements OnInit {
       if (isNullOrEmpty(user.city)) isValid = false;
       if (isNullOrEmpty(user.role)) isValid = false;
       if (isValid) {
-        this.messageList = [];
         let model: SaveUserRequestObject = {
           request: {
             user: {
@@ -102,9 +120,16 @@ export class AddEditUserComponent implements OnInit {
         };
 
         this.userService.saveUser(model).subscribe((response: ResponseDto<number | null>) => {
-          this.messageList = [...response.errors.map(error => error.errorMessage), ...response.validationErrors.map(error => error.errorMessage)];
           if (response.status == true) {
-            this.messageList.push("User created successfully.")
+            this.notificationService.show("User created successfully.", 'error')
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Create User failed.");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error');
+            });
           }
         });
       }

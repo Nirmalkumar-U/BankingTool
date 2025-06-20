@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { BudgetService } from '../../core/service/budget.service';
 import { DropDownDto } from '../../dto/drop-down-dto';
 import { CreateAcceptBudgetTransactionRequestObject } from '../../dto/request/budget/accept-budget-transaction-request';
@@ -20,13 +21,23 @@ export class BudgetNotificationComponent {
   budgetAccountId: number | null = null;
   selectedBudgetNotificationId: number | null = null;
   transferAmountForm: FormGroup;
-  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private budgetService: BudgetService) {
+  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder,
+    private budgetService: BudgetService, private notificationService: NotificationService) {
     this.transferAmountForm = this.fb.group({
       budgetAccount: this.fb.array([])
     });
   }
   ngOnInit() {
     const initialData: ResponseDto<GetBudgetNotificationListResponse> = this.activatedRoute.snapshot.data['DataResolver'];
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Budget Notification List page load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error')
+      });
+    }
     this.accountInfo = initialData.response;
     this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown
   }
@@ -44,9 +55,27 @@ export class BudgetNotificationComponent {
       let model = CreateAcceptBudgetTransactionRequestObject(validBudgetAccounts, budgetNotificationId);
       console.log(model);
       this.budgetService.acceptBudgetTransaction(model).subscribe((response: ResponseDto<boolean>) => {
-        if (response.response) {
+        if (response.status == true) {
           this.budgetService.getBudgetNotificationList().subscribe((data: ResponseDto<GetBudgetNotificationListResponse>) => {
-            this.accountInfo = data.response;
+            if (data.status == true) {
+              this.accountInfo = data.response;
+            } else {
+              let messageList: string[] = [];
+              if (Array.isArray(data?.errors) && data?.errors)
+                messageList = [...data?.errors?.map(x => x.errorMessage), ...data?.validationErrors?.map(x => x.errorMessage)]
+              messageList.push("Get Budget Notification List failed.");
+              messageList.forEach((msg) => {
+                this.notificationService.show(msg, 'error');
+              });
+            }
+          });
+        } else {
+          let messageList: string[] = [];
+          if (Array.isArray(response?.errors) && response?.errors)
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Accept Budget Transaction failed.");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
           });
         }
       });
@@ -55,9 +84,17 @@ export class BudgetNotificationComponent {
   rejectBudgetAmount(budgetNotificationId: number) {
     let model = CreateRejectBudgetTransactionRequestObject(budgetNotificationId);
     this.budgetService.rejectBudgetTransaction(model).subscribe((response: ResponseDto<boolean>) => {
-      if (response.response) {
+      if (response.status == true) {
         this.budgetService.getBudgetNotificationList().subscribe((data: ResponseDto<GetBudgetNotificationListResponse>) => {
           this.accountInfo = data.response;
+        });
+      } else {
+        let messageList: string[] = [];
+        if (Array.isArray(response?.errors) && response?.errors)
+          messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+        messageList.push("Reject Budget Transaction failed.");
+        messageList.forEach((msg) => {
+          this.notificationService.show(msg, 'error');
         });
       }
     });

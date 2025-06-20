@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppRoute } from '../../constant/constant';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { ResponseDto } from '../../dto/response-dto';
 import { DashBoardAccountList, GetDashBoardInitialLoadResponse } from '../../dto/response/get-dash-board-initial-load-response';
 
@@ -15,10 +16,19 @@ export class HomeComponent {
   totalBalance: number = 0;
   totalAccounts: number = 0;
   totalSavingsAccounts: number = 0;
-  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private readonly router: Router) {
+  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private readonly router: Router, private notificationService: NotificationService) {
   }
   ngOnInit() {
     const initialData: ResponseDto<GetDashBoardInitialLoadResponse> = this.activatedRoute.snapshot.data['DataResolver'];
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Dashboard load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error')
+      });
+    }
     this.accountList = initialData.response.dashBoardAccountList;
     this.totalBalance = initialData.response.totalBalance;
     this.totalAccounts = this.accountList.length;

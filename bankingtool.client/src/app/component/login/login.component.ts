@@ -5,6 +5,7 @@ import { AppPaths, ClaimKey, Constant } from '../../constant/constant';
 import { EmitterService } from '../../core/emitter.service';
 import { IndexedDbServiceService } from '../../core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from '../../core/local-storage.service';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { UserService } from '../../core/service/user.service';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
 import { LoginRequestObject } from '../../dto/request/user/login-request';
@@ -25,7 +26,7 @@ export class LoginComponent {
 
   constructor(private loginService: UserService, private router: Router,
     private localStoreService: LocalStorageService, private emitService: EmitterService,
-    private formBuilder: FormBuilder, private indexedDbService: IndexedDbServiceService) {
+    private formBuilder: FormBuilder, private indexedDbService: IndexedDbServiceService, private notificationService: NotificationService) {
   }
 
   login() {
@@ -41,7 +42,7 @@ export class LoginComponent {
         }
       };
       this.loginService.login(model).subscribe((response: ResponseDto<LoggedInUserResponse>) => {
-        if (response.status) {
+        if (response.status == true) {
           let modelToken: CreateTokenRequestObject = {
             request: {
               role: {
@@ -56,7 +57,7 @@ export class LoginComponent {
             }
           }
           this.loginService.createToken(modelToken).subscribe((result: ResponseDto<TokenResponse>) => {
-            if (result.status) {
+            if (result.status == true) {
               this.localStoreService.setAllData(result.response.claims);
               this.localStoreService.setItem(ClaimKey.isLoggedIn, Constant.true);
               this.localStoreService.setItem(ClaimKey.accessToken, result.response.accessToken);
@@ -65,10 +66,27 @@ export class LoginComponent {
                   result.response.actionPaths.forEach((data: any) => {
                     this.indexedDbService.addData(Constant.actionTableName, data);
                   });
+                  this.notificationService.show("Logined successfully.", 'success');
                   this.emitService.loginEmitter.emit(true);
                   this.router.navigate([AppPaths.home]);
                 });
+            } else {
+              let messageList: string[] = [];
+              if (Array.isArray(result?.errors) && result?.errors)
+                messageList = [...result?.errors?.map(x => x.errorMessage), ...result?.validationErrors?.map(x => x.errorMessage)]
+              messageList.push("Create Token failed.");
+              messageList.forEach((msg) => {
+                this.notificationService.show(msg, 'error');
+              });
             }
+          });
+        } else {
+          let messageList: string[] = [];
+          if (Array.isArray(response?.errors) && response?.errors)
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Login failed");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
           });
         }
       });

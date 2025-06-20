@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Constant } from '../../constant/constant';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
 import { CreateAccountInitialLoadDto } from '../../dto/create-account-initial-load-dto';
 import { DropDownDto, YesOrNoDto } from '../../dto/drop-down-dto';
@@ -22,7 +23,6 @@ export class CreateAccountComponent {
   accountTypeList: DropDownDto[] = [];
   bankList: DropDownDto[] = [];
   yesOrNo: YesOrNoDto[] = Constant.yesOrNo;
-  messageList: string[] = [];
   isSubmitted: boolean = false;
   isCustAsCC: boolean = false;
   defaultValue: string = '';
@@ -37,7 +37,7 @@ export class CreateAccountComponent {
     return this.accountForm.controls["bankId"].value;
   }
 
-  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService) {
+  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private bankAccountService: BankAccountService, private notificationService: NotificationService) {
     this.accountForm = this.fb.group({
       bankId: [this.defaultValue, [Validators.required]],
       accountTypeId: [this.defaultValue, [Validators.required]],
@@ -48,6 +48,15 @@ export class CreateAccountComponent {
   }
   ngOnInit() {
     const initialData: ResponseDto<CreateAccountInitialLoadDto> = this.activatedRoute.snapshot.data['DataResolver'];
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Create Account page load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error');
+      });
+    }
     this.customerList = initialData.dropDownList.find(x => x.name == "Customer")!.dropDown;
     this.accountTypeList = initialData.dropDownList.find(x => x.name == "AccountType")!.dropDown;
 
@@ -81,10 +90,20 @@ export class CreateAccountComponent {
           }
         }
         this.bankAccountService.isCustomerHasCreditCardInThatBank(model).subscribe((response: ResponseDto<boolean>) => {
-          this.accountForm.setValue({
-            customerWantCreditCard: response.response
-          });
-          this.isCustAsCC = response.response;
+          if (response.status == true) {
+            this.accountForm.setValue({
+              customerWantCreditCard: response.response
+            });
+            this.isCustAsCC = response.response;
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Check Is Customer Has CreditCard failed.");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error');
+            });
+          }
         });
       } else {
         this.isCustAsCC = false;
@@ -104,8 +123,18 @@ export class CreateAccountComponent {
           }
         }
       }
-      this.bankAccountService.getBankDetailsDropDownWithoutCustomerAndAccountType(model).subscribe((bankList: ResponseDto<DropDownDto[]>) => {
-        this.bankList = bankList.dropDownList.find(x => x.name == "Bank")!.dropDown;
+      this.bankAccountService.getBankDetailsDropDownWithoutCustomerAndAccountType(model).subscribe((response: ResponseDto<DropDownDto[]>) => {
+        if (response.status == true) {
+          this.bankList = response.dropDownList.find(x => x.name == "Bank")!.dropDown;
+        } else {
+          let messageList: string[] = [];
+          if (Array.isArray(response?.errors) && response?.errors)
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Get Bank Details Drop Down failed.");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
+          });
+        }
       });
     } else {
       this.bankList = [];
@@ -114,7 +143,6 @@ export class CreateAccountComponent {
 
   createAccount() {
     if (!this.accountForm.invalid) {
-      this.messageList = [];
       let isValid: boolean = true;
       let values = this.accountForm.value;
       if (isNullOrEmpty(values.accountTypeId)) isValid = false;
@@ -141,10 +169,15 @@ export class CreateAccountComponent {
       this.bankAccountService.createAccount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
-          this.messageList.push("Account created successfully.");
+          this.notificationService.show("Account created successfully.", 'error');
         } else {
+          let messageList: string[] = [];
           if (Array.isArray(response?.errors) && response?.errors)
-            this.messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Create Account failed.");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
+          });
         }
       });
     }

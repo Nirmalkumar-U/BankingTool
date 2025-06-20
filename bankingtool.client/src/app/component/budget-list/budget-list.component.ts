@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppRoute } from '../../constant/constant';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { BudgetService } from '../../core/service/budget.service';
 import { CreateChangeBudgetAccountStatusRequestObject } from '../../dto/request/budget/change-budget-account-status-request';
 import { ResponseDto } from '../../dto/response-dto';
@@ -14,10 +14,20 @@ import { GetBudgetList, GetBudgetListResponse } from '../../dto/response/get-bud
 })
 export class BudgetListComponent {
   budgetList: GetBudgetList[] = [];
-  constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private budgetService: BudgetService, private readonly router: Router) {
+  constructor(private readonly activatedRoute: ActivatedRoute, private budgetService: BudgetService,
+    private readonly router: Router, private notificationService: NotificationService) {
   }
   ngOnInit() {
     const initialData: ResponseDto<GetBudgetListResponse> = this.activatedRoute.snapshot.data['DataResolver'];
+    if (initialData.status == false) {
+      let messageList: string[] = [];
+      if (Array.isArray(initialData?.errors) && initialData?.errors)
+        messageList = [...initialData?.errors?.map(x => x.errorMessage), ...initialData?.validationErrors?.map(x => x.errorMessage)]
+      messageList.push("Budget List page load failed.");
+      messageList.forEach((msg) => {
+        this.notificationService.show(msg, 'error')
+      });
+    }
     this.budgetList = initialData.response.budgetList;
   }
   getBudgetTransactionList(budgetAccountId: number) {
@@ -27,11 +37,20 @@ export class BudgetListComponent {
     if (budgetAccountId != null) {
       let model = CreateChangeBudgetAccountStatusRequestObject(budgetAccountId);
       this.budgetService.changeBudgetAccountStatus(model).subscribe((response: ResponseDto<boolean>) => {
-        if (response.response) {
+        if (response.status == true) {
           const budget = this.budgetList.find(item => item.budgetAccountId === budgetAccountId);
           if (budget) {
             budget.budgetStatus = budget.budgetStatus === 'Active' ? 'InActive' : 'Active';
-          } 
+          }
+          this.notificationService.show("Budget Account Status updated successfully.", 'success')
+        } else {
+          let messageList: string[] = [];
+          if (Array.isArray(response?.errors) && response?.errors)
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Budget Account Status updated failed.");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
+          });
         }
       });
     }

@@ -1,6 +1,0 @@
-<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
-  <div *ngFor="let notif of notifications" class="alert {{ getAlertClass(notif.status) }} alert-dismissible fade show shadow mb-2" role="alert">
-    {{ notif.message }}
-    <button type="button" class="btn-close" (click)="dismiss(notif.id)" aria-label="Close"></button>
-  </div>
-</div>

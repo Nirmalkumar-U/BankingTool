@@ -6,8 +6,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing.module';
 import { LoaderComponent } from './component/loader/loader.component';
-import { NotificationPopupComponent } from './component/notification-popup/notification-popup.component';
+import { NotificationPopupComponent } from './core/component/notification-popup/notification-popup.component';
 import { CoreModule } from './core/core.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { CoreModule } from './core/core.module';
     FormsModule,
     AppRoutingModule,
     CoreModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

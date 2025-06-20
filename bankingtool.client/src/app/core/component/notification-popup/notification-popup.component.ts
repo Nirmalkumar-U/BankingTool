@@ -1,10 +1,22 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
-import { NotificationData, NotificationService } from '../../core/notificationService/notification-service';
+import { NotificationData, NotificationService } from '../../notificationService/notification-service';
 
 @Component({
   selector: 'app-notification-popup',
   templateUrl: './notification-popup.component.html',
-  styleUrls: ['./notification-popup.component.css']
+  styleUrls: ['./notification-popup.component.css'],
+  animations: [
+    trigger('toastAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(20px)' }))
+      ])
+    ])
+  ]
 })
 export class NotificationPopupComponent {
   notifications: NotificationData[] = [];
