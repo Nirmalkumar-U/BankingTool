@@ -13,6 +13,7 @@ import { ResponseDto } from '../../dto/response-dto';
 })
 export class CreateBudgetAccountComponent {
   budgetAccountForm: FormGroup;
+  isSubmitted: boolean = false;
   constructor(private fb: FormBuilder, private budgetService: BudgetService, private notificationService: NotificationService) {
     this.budgetAccountForm = this.fb.group({
       budgetName: ['', [Validators.required]],
@@ -29,6 +30,7 @@ export class CreateBudgetAccountComponent {
       let model = CreateCreateBudgetAccountRequestObject(values.budgetName, values.amount);
       this.budgetService.createBudgetAccount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
+          this.isSubmitted = true;
           this.notificationService.show(response.message, 'success');
         } else {
           let messageList: string[] = [];

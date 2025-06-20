@@ -156,7 +156,7 @@ namespace BankingTool.Service.Service
         public async Task<ResponseDto<GetBudgetNotificationListResponse>> GetBudgetNotificationList()
         {
             var budgetList = await _budgetRepository.GetBudgetList();
-            var budgetDropdownList = budgetList.Select(x => new DropDownDto
+            var budgetDropdownList = budgetList.Where(z => z.BudgetStatus == BudgetAccountStatus.Active).Select(x => new DropDownDto
             {
                 Key = x.BudgetAccountId,
                 Value = x.BudgetName,
@@ -171,7 +171,8 @@ namespace BankingTool.Service.Service
                 Response = new GetBudgetNotificationListResponse
                 {
                     budgetNotificationList = await _budgetRepository.GetBudgetNotificationList()
-                }
+                },
+                Status = true
             };
         }
         private async Task<string> GetNewBudgetNumber()

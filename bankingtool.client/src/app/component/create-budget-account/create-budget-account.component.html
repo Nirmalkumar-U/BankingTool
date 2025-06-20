@@ -15,7 +15,7 @@
             <input type="text" class="form-control" formControlName="amount" required>
           </div>
           <div class="col-12">
-            <button type="submit" class="btn btn-primary">Create Budget Account</button>
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Create Budget Account</button>
           </div>
         </form>
       </div>

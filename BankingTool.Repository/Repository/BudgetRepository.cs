@@ -68,7 +68,7 @@ namespace BankingTool.Repository.Repository
         public async Task<List<GetBudgetList>> GetBudgetList()
         {
             var budgetAccountList = await dataContext.BudgetAccount
-                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetStatus == BudgetAccountStatus.Active && x.IsDeleted == false)
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.IsDeleted == false)
                 .Select(x => new GetBudgetList
                 {
                     BudgetAccountId = x.BudgetAccountId,
