@@ -6,8 +6,10 @@ using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.User;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Repository;
+using BankingTool.Service.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BankingTool.Service
 {
@@ -277,11 +279,15 @@ namespace BankingTool.Service
                 isCustomerNeedToInsert = true;
             }
             int? userId = _userRepository.CreateUser(userDetail, userRole, staff, customer, isCustomerNeedToInsert);
+            var mailService = new EmailService();
+            var isMailSent = await mailService.SendEmailAsync(userDetail.EmailId, "Welcome to Banking Tool.", $"Dear {userDetail.FirstName},<br><br>Your account has been created successfully.<br><br>Best Regards,<br>Banking Tool Team");
 
             if (userId.HasValue)
             {
                 response.Message = "User Created is successfully...";
                 response.StatuCode = 200;
+                if (!isMailSent)
+                    response.Errors.Add(new Errors { PropertyName = "Send Mail", ErrorMessage = "Failed to sent a mail." });
                 response.Status = true;
                 response.Response = userId.Value;
             }

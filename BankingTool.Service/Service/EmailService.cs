@@ -10,7 +10,7 @@ namespace BankingTool.Service.Service
             try
             {
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("Your Name", "yourgmail@gmail.com"));
+                message.From.Add(new MailboxAddress("Nirmal", "unirmal56@gmail.com"));
                 message.To.Add(MailboxAddress.Parse(toEmail));
                 message.Subject = subject;
 
@@ -21,15 +21,16 @@ namespace BankingTool.Service.Service
                 await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
 
                 // Use your Gmail address and App Password
-                await client.AuthenticateAsync("yourgmail@gmail.com", "your_app_password");
+                await client.AuthenticateAsync("unirmal56@gmail.com", "oqzzrggcemunawla");
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error sending email: {ex.Message}");
                 return false;
             }
+        }
     }
 }
