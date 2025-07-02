@@ -19,8 +19,8 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccount);
         Task<ResponseDto<bool>> GetSelfTransferInitialLoad();
         Task<ResponseDto<bool>> GetToAccountListExcludedByAccountId(int accountId);
-        Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId);
-        Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate, int? budgetAccountId);
+        Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, List<DepositAmountRequestBudgetAccount> budgetAccount);
+        Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate, List<CashWithdrawRequestBudgetAccount> budgetAccount);
         Task<ResponseDto<GetTransactionsListResponse>> TransactionsList(TransactionListRequest request);
         Task<ResponseDto<GetDashBoardInitialLoadResponse>> GetDashBoardInitialLoad();
     }

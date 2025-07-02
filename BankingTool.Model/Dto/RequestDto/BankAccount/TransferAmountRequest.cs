@@ -24,7 +24,7 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
         public DateTime TransactionDate { get; set; }
         public string TransactionTag { get; set; }
     }
-    public class TransferAmountRequestBudgetAccount : RequestNullableId
+    public class TransferAmountRequestBudgetAccount : RequestId
     {
         public int Amount { get; set; }
     }

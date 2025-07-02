@@ -336,8 +336,7 @@ namespace BankingTool.Repository.Repository
             }
         }
         public bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail,
-            bool isBudgetAccountAttached, BudgetAccount budgetAccount, BudgetTransaction budgetTransaction,
-            BudgetTransactionDetail budgetTransactionDetail)
+            bool isBudgetAccountAttached, List<BudgetTransactionDto> budgetTransactionDetail)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
@@ -348,10 +347,13 @@ namespace BankingTool.Repository.Repository
                 InsertTransactionDetail(transactionDetail);
                 if (isBudgetAccountAttached)
                 {
-                    UpdateBudgetAccount(budgetAccount);
-                    var budgetTransactionId = InsertBudgetTransaction(budgetTransaction);
-                    budgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
-                    var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
+                    foreach(var budgetAccount in budgetTransactionDetail)
+                    {
+                        UpdateBudgetAccount(budgetAccount.BudgetAccount);
+                        var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
+                        budgetAccount.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                        var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetAccount.BudgetTransactionDetail);
+                    }
                 }
                 sqlTransaction.Commit();
                 return true;

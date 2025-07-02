@@ -8,14 +8,14 @@ export interface CashWithdrawRequestObject {
 export interface CashWithdrawRequest {
   account: CashWithdrawRequestAccount;
   transaction: CashWithdrawRequestTransaction;
-  budgetAccount: CashWithdrawRequestBudgetAccount;
+  budgetAccount: CashWithdrawRequestBudgetAccount[];
 }
 
 export interface CashWithdrawRequestAccount extends RequestId {
 
 }
-export interface CashWithdrawRequestBudgetAccount extends RequestNullableId {
-
+export interface CashWithdrawRequestBudgetAccount extends RequestId {
+  amount: number;
 }
 
 export interface CashWithdrawRequestTransaction {
@@ -24,7 +24,7 @@ export interface CashWithdrawRequestTransaction {
   transactionDate: Date;
 }
 
-export const CreateCashWithdrawRequestObject = (accountId: number, amount: number, description: string, transactionDate: Date, budgetAccountId: number | null): CashWithdrawRequestObject => {
+export const CreateCashWithdrawRequestObject = (accountId: number, amount: number, description: string, transactionDate: Date, budgetAccount: CashWithdrawRequestBudgetAccount[]): CashWithdrawRequestObject => {
   let model: CashWithdrawRequestObject = {
     request: {
       account: {
@@ -35,9 +35,7 @@ export const CreateCashWithdrawRequestObject = (accountId: number, amount: numbe
         description: description,
         transactionDate: transactionDate
       },
-      budgetAccount: {
-        id: isNullOrEmpty(budgetAccountId) ? null : budgetAccountId
-      }
+      budgetAccount: budgetAccount
     }
   }
   return model;

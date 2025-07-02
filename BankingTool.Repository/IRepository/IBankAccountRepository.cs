@@ -42,8 +42,7 @@ namespace BankingTool.Repository.IRepository
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);
         bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
             TransactionDetail toTransactionDetail, List<BudgetTransactionDto> budgetTransactions, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount);
-        bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail, bool isBudgetAccountAttached, BudgetAccount budgetAccount,
-            BudgetTransaction budgetTransaction, BudgetTransactionDetail budgetTransactionDetail);
+        bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail, bool isBudgetAccountAttached, List<BudgetTransactionDto> budgetTransactions);
         Task<List<DashBoardAccountList>> GetDashBoardInitialLoad();
 
         void UpdateCustomer(Customer customer);

@@ -106,7 +106,6 @@ export class TransferAmountComponent {
         this.balance = 0;
       }
     });
-    //this.addBudgetAccount();
   }
   transferAmount() {
     if (!this.transferAmountForm.invalid) {

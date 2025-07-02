@@ -8,14 +8,14 @@ export interface DepositAmountRequestObject {
 export interface DepositAmountRequest {
   account: DepositAmountRequestAccount;
   transaction: DepositAmountRequestTransaction;
-  budgetAccount: DepositAmountRequestBudgetAccount;
+  budgetAccount: DepositAmountRequestBudgetAccount[];
 }
 
 export interface DepositAmountRequestAccount extends RequestId {
 
 }
-export interface DepositAmountRequestBudgetAccount extends RequestNullableId {
-
+export interface DepositAmountRequestBudgetAccount extends RequestId {
+  amount: number;
 }
 
 export interface DepositAmountRequestTransaction {
@@ -24,7 +24,7 @@ export interface DepositAmountRequestTransaction {
   transactionDate: Date;
 }
 
-export const CreateDepositAmountRequestObject = (accountId: number, amount: number, description: string, transactionDate: Date, budgetAccountId: number | null): DepositAmountRequestObject => {
+export const CreateDepositAmountRequestObject = (accountId: number, amount: number, description: string, transactionDate: Date, budgetAccount: DepositAmountRequestBudgetAccount[]): DepositAmountRequestObject => {
   let model: DepositAmountRequestObject = {
     request: {
       account: {
@@ -35,9 +35,7 @@ export const CreateDepositAmountRequestObject = (accountId: number, amount: numb
         description: description,
         transactionDate: transactionDate
       },
-      budgetAccount: {
-        id: isNullOrEmpty(budgetAccountId) ? null : budgetAccountId 
-      }
+      budgetAccount: budgetAccount
     }
   }
   return model;

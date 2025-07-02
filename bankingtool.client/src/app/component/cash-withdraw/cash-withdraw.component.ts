@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { NotificationService } from '../../core/notificationService/notification-service';
@@ -26,7 +26,7 @@ export class CashWithdrawComponent {
       amount: ['', [Validators.required]],
       description: ['', [Validators.required]],
       transferDate: ['', [Validators.required]],
-      budgetAccountId: ['']
+      budgetAccount: this.fb.array([])
     });
     this.cashWithdrawForm.patchValue({
       transferDate: formatDateForInput(new Date()),
@@ -75,9 +75,13 @@ export class CashWithdrawComponent {
   }
   cashWithdraw() {
     if (!this.cashWithdrawForm.invalid) {
+      let budgetAccounts: any[] = this.cashWithdrawForm.get('budgetAccount')?.value;
+      let validBudgetAccounts = budgetAccounts
+        .filter(x => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount))
+        .map((z: any) => ({ id: z.budgetAccountId, amount: z.budgetAmount }));
       let model = CreateCashWithdrawRequestObject(this.cashWithdrawForm.get('accountId')?.value,
         this.cashWithdrawForm.get('amount')?.value, this.cashWithdrawForm.get('description')?.value
-        , this.cashWithdrawForm.get('transferDate')?.value, this.cashWithdrawForm.get('budgetAccountId')?.value);
+        , this.cashWithdrawForm.get('transferDate')?.value, validBudgetAccounts);
       this.bankAccountService.cashWithdraw(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
@@ -106,5 +110,21 @@ export class CashWithdrawComponent {
         transferDate: null
       });
     }
+  }
+  get budgetAccount(): FormArray {
+    return this.cashWithdrawForm.get('budgetAccount') as FormArray;
+  }
+
+  addBudgetAccount(): void {
+    this.budgetAccount.push(
+      this.fb.group({
+        budgetAccountId: ['', Validators.required],
+        budgetAmount: ['', Validators.required]
+      })
+    );
+  }
+
+  removeBudgetAccount(index: number): void {
+    this.budgetAccount.removeAt(index);
   }
 }

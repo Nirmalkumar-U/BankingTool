@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { NotificationService } from '../../core/notificationService/notification-service';
@@ -25,7 +25,7 @@ export class DepositAmountComponent {
       amount: ['', [Validators.required]],
       description: ['', [Validators.required]],
       transferDate: ['', [Validators.required]],
-      budgetAccountId: ['']
+      budgetAccount: this.fb.array([])
     });
     this.depositAmountForm.patchValue({
       transferDate: formatDateForInput(new Date()),
@@ -48,9 +48,13 @@ export class DepositAmountComponent {
   depositAmount() {
     this.messageList = [];
     if (!this.depositAmountForm.invalid) {
+      let budgetAccounts: any[] = this.depositAmountForm.get('budgetAccount')?.value;
+      let validBudgetAccounts = budgetAccounts
+        .filter(x => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount))
+        .map((z: any) => ({ id: z.budgetAccountId, amount: z.budgetAmount }));
       let model = CreateDepositAmountRequestObject(this.depositAmountForm.get('accountId')?.value,
         this.depositAmountForm.get('amount')?.value, this.depositAmountForm.get('description')?.value,
-        this.depositAmountForm.get('transferDate')?.value, this.depositAmountForm.get('budgetAccountId')?.value);
+        this.depositAmountForm.get('transferDate')?.value, validBudgetAccounts);
       this.bankAccountService.depositAmount(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
           this.isSubmitted = true;
@@ -79,5 +83,21 @@ export class DepositAmountComponent {
         transferDate: null
       });
     }
+  }
+  get budgetAccount(): FormArray {
+    return this.depositAmountForm.get('budgetAccount') as FormArray;
+  }
+
+  addBudgetAccount(): void {
+    this.budgetAccount.push(
+      this.fb.group({
+        budgetAccountId: ['', Validators.required],
+        budgetAmount: ['', Validators.required]
+      })
+    );
+  }
+
+  removeBudgetAccount(index: number): void {
+    this.budgetAccount.removeAt(index);
   }
 }
