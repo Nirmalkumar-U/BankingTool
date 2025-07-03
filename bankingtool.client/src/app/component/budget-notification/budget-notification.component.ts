@@ -53,9 +53,9 @@ export class BudgetNotificationComponent {
         .filter(x => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount) && x.budgetNotificationId == this.selectedBudgetNotificationId)
         .map((z: any) => ({ id: z.budgetAccountId, amount: z.budgetAmount }));
       let model = CreateAcceptBudgetTransactionRequestObject(validBudgetAccounts, budgetNotificationId);
-      console.log(model);
       this.budgetService.acceptBudgetTransaction(model).subscribe((response: ResponseDto<boolean>) => {
         if (response.status == true) {
+          this.notificationService.show("Successfully Budget transaction completed.", 'success');
           this.budgetService.getBudgetNotificationList().subscribe((data: ResponseDto<GetBudgetNotificationListResponse>) => {
             if (data.status == true) {
               this.accountInfo = data.response;
