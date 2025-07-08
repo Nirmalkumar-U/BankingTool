@@ -557,10 +557,10 @@ namespace BankingTool.Service.Service
                         budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
                     }
                     var budgetAccount = await _budgetRepository.GetBudgetAccountById(bAccount.Id);
-                    budgetAccount.Balance = budgetAccount.Balance + amount;
+                    budgetAccount.Balance = budgetAccount.Balance + bAccount.Amount;
                     var budgetTransaction = new BudgetTransaction()
                     {
-                        Amount = amount,
+                        Amount = bAccount.Amount,
                         Description = description,
                         TransactionTime = budgetTransactionDate,
                         TransactionCategory = TransactionCatagory.Deposit,
@@ -684,10 +684,10 @@ namespace BankingTool.Service.Service
                         budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
                     }
                     BudgetAccount budgetAccount = await _budgetRepository.GetBudgetAccountById(bAccount.Id);
-                    budgetAccount.Balance = budgetAccount.Balance - amount;
+                    budgetAccount.Balance = budgetAccount.Balance - bAccount.Amount;
                     BudgetTransaction budgetTransaction = new BudgetTransaction()
                     {
-                        Amount = amount,
+                        Amount = bAccount.Amount,
                         Description = description,
                         TransactionTime = budgetTransactionDate,
                         TransactionCategory = TransactionCatagory.Withdraw,
