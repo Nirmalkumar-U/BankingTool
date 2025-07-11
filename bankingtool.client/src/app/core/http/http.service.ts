@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, Observer } from 'rxjs';
 import { AppSettingsDto } from '../../dto/app-settings-dto';
+import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
 import { EmitterService } from '../emitter.service';
 import { LocalStorageService } from '../local-storage.service';
 import { NotificationService } from '../notificationService/notification-service';
+import { AuthService } from '../service/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +14,9 @@ import { NotificationService } from '../notificationService/notification-service
 export class HttpService {
 
   baseUrl = AppSettingsDto.baseUrl;
-  constructor(private localStoreService: LocalStorageService, private emitService: EmitterService, private notificationService: NotificationService) { }
+  constructor(private localStoreService: LocalStorageService, private emitService: EmitterService,
+    private notificationService: NotificationService, private authService: AuthService
+  ) { }
   requestObj = (method: string = 'GET', headerType: string = 'DEFAULT', body?: any) => {
     return {
       method,
@@ -30,30 +35,48 @@ export class HttpService {
 
   executeRequest(url: string, requestObj: any, isLoading: boolean): Observable<any> {
     return new Observable((observer: Observer<any>) => {
-      let requestInit = this.getFetchObject(requestObj);
-      if (isLoading) {
-        this.emitService.loaderEmitter.emit(true);
-      }
-      console.log(this.baseUrl + url);
-      fetch(this.baseUrl + url, requestInit)
-        .then((response: any) => {
-          return this.handelResponse(response);
-        })
-        .then(result => {
+      const makeFetch = async (retry = false): Promise<void> => {
+        try {
+          let requestInit = this.getFetchObject(requestObj);
+          if (isLoading) {
+            this.emitService.loaderEmitter.emit(true);
+          }
+
+          const response = await fetch(this.baseUrl + url, requestInit);
+
+          if (response.status === 498 && !retry) {
+            const success = await this.refreshToken();
+            if (success) {
+              await makeFetch(true);
+              return;
+            } else {
+              throw new Error("Token refresh failed");
+            }
+          }
+
+          const result = await this.handelResponse(response);
+
           if (isLoading) {
             this.emitService.loaderEmitter.emit(false);
           }
-          if (result == null || result == undefined) {
+
+          if (result === null || result === undefined) {
             this.notificationService.show("Internal server error", 'error');
           }
+
           observer.next(result);
           observer.complete();
-        })
-        .catch(error => {
+        } catch (error) {
+          if (isLoading) {
+            this.emitService.loaderEmitter.emit(false);
+          }
           observer.error(error);
           observer.complete();
-        });
-    })
+        }
+      };
+
+      makeFetch();
+    });
   }
 
   getFetchObject(requestObj: any) {
@@ -116,7 +139,8 @@ export class HttpService {
       return;
     } else if (response && response.status >= 401) {
       this.emitService.loaderEmitter.emit(false);
-      this.notificationService.show("Internal server error " + response.status.toString(), 'error');
+      this.notificationService.show("Session expired...", 'error');
+      this.authService.logout();
       throw response;
     } else if (response && response.status >= 500) {
       this.emitService.loaderEmitter.emit(false);
@@ -125,6 +149,43 @@ export class HttpService {
     } else {
       return response.json()
     }
+  }
+
+  private refreshToken(): Promise<boolean> {
+    let roleId = localStorage.getItem('RoleId');
+    let emailId = localStorage.getItem('EmailId');
+    let userId = localStorage.getItem('UserId');
+    let userName = localStorage.getItem('UserName');
+    let name: string[] = userName?.split(' ')!;
+    let firstName = name[0];
+    let lastName = name[1];
+    let request: CreateTokenRequestObject = {
+      request: {
+        role: {
+          id: Number(roleId)
+        },
+        user: {
+          id: Number(userId),
+          email: emailId!,
+          firstName: firstName,
+          lastName: lastName
+        }
+      }
+    }
+
+    const requestObj = this.requestObj(methods.POST, methods.POST, JSON.stringify(request));
+    const requestInit = this.getFetchObject(requestObj);
+
+    return fetch(this.baseUrl + 'User/CreateToken', requestInit)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.response.accessToken) {
+          this.localStoreService.setItem('accessToken', data.response.accessToken);
+          return true;
+        }
+        return false;
+      })
+      .catch(() => false);
   }
 }
 

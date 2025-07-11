@@ -3,6 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using BankingTool.Repository;
+using BankingTool.Model;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace BankingTool.Api.Filter
 {
@@ -10,19 +15,6 @@ namespace BankingTool.Api.Filter
 
     public class TokenAuthorizationAttribute : Attribute, IAuthorizationFilter
     {
-        public void OnAuthorization1(AuthorizationFilterContext context)
-        {
-            bool isValidToken = ApplicationAppContext.HttpContext != null && ApplicationAppContext.HttpContext.User.Claims.Any();
-            if (isValidToken)
-            {
-                return;
-            }
-            else
-            {
-                context.Result = new UnauthorizedResult();
-                return;
-            }
-        }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var authHeader = context.HttpContext.Request.Headers.Authorization.FirstOrDefault();
@@ -62,6 +54,35 @@ namespace BankingTool.Api.Filter
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var principal = tokenHandler.ValidateToken(token, validateParameters, out var validatedToken);
                 context.HttpContext.User = principal;
+                List<ClaimDto> claims = JsonSerializer.Deserialize<List<ClaimDto>>(context.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(ClaimTypes.Email))?.Value);
+
+                var expireAtClaim = claims.FirstOrDefault(x => x.Key == AppClaimTypes.ExpiresAt)?.Value;
+                if (!string.IsNullOrEmpty(expireAtClaim) && DateTime.TryParse(expireAtClaim, out DateTime expireAt))
+                {
+                    var now = DateTime.UtcNow;
+
+                    if (expireAt < now)
+                    {
+                        var expiredDuration = now - expireAt;
+
+                        if (expiredDuration.TotalMinutes > 5)
+                        {
+                            context.Result = new ContentResult
+                            {
+                                StatusCode = StatusCodes.Status401Unauthorized,
+                                Content = "Token expired."
+                            };
+                        }
+                        else
+                        {
+                            context.Result = new ContentResult
+                            {
+                                StatusCode = 498, // Custom code for token expired, refresh required
+                                Content = "Token expired, refresh required."
+                            };
+                        }
+                    }
+                }
             }
             catch (SecurityTokenException ex)
             {

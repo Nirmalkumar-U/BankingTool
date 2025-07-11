@@ -7,6 +7,7 @@ import { LocalStorageService } from './core/local-storage.service';
 import { GetActionsByUserIdDto } from './dto/get-actions-by-user-id-dto';
 import { faBell, faHandshake, faMoneyBill1, faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from './core/service/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit {
   notificationMenus: Menu[] = []
 
   constructor(private emitService: EmitterService, private cdr: ChangeDetectorRef, private router: Router,
-    private localStorageService: LocalStorageService, private indexedDbService: IndexedDbServiceService) {
+    private localStorageService: LocalStorageService, private indexedDbService: IndexedDbServiceService, private authService: AuthService) {
     this.emitService.loaderEmitter.subscribe(loader => {
       this.isLoading = loader;
       this.cdr.detectChanges();
@@ -109,6 +110,9 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.authService.isLogined$.subscribe((state) => {
+      this.isLogined = state;
+    });
     let logined = this.localStorageService.getItem(ClaimKey.isLoggedIn) == Constant.true;
     this.isLogined = logined;
     let currentPage = this.router.url;
@@ -121,13 +125,7 @@ export class AppComponent implements OnInit {
   }
 
   logout() {
-    this.isLogined = false;
-    this.localStorageService.clear();
-    this.indexedDbService.initDb(Constant.actionDBName, Constant.dbVersion,
-      Constant.actionTablePrimaryKey, Constant.actionTableName, Constant.actionCoumns).then(() => {
-        this.indexedDbService.deleteDatabase(Constant.actionTableName).then(() => { });
-        this.indexedDbService.clearData(Constant.actionTableName).then(() => { });
-      });
+    this.authService.logout();
   }
 
   toggleDropdown(dropdown: any): void {

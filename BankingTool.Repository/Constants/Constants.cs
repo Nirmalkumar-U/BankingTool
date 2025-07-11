@@ -94,6 +94,7 @@
         public const string Actions = nameof(Actions);
         public const string StaffId = nameof(StaffId);
         public const string CustomerId = nameof(CustomerId);
+        public const string ExpiresAt = nameof(ExpiresAt);
     }
     public static class ErrorMessage
     {

@@ -9,7 +9,6 @@ using BankingTool.Repository;
 using BankingTool.Service.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BankingTool.Service
 {
@@ -89,6 +88,8 @@ namespace BankingTool.Service
             var customer = await _userRepository.GetCustomerByUserId(user.Id);
             Staff staff = await _userRepository.GetStaffByUserId(user.Id);
             var act = string.Join(",", actions);
+
+            DateTime expiresAt = DateTime.UtcNow.AddSeconds(expiresInSeconds);
             var claimsList = new List<ClaimDto>
                     {
                         new() { Key = AppClaimTypes.UserId, Value = user.Id.ToString()},
@@ -97,34 +98,17 @@ namespace BankingTool.Service
                         new() { Key = AppClaimTypes.RoleId, Value = roleId.ToString()},
                         new() { Key = AppClaimTypes.Actions, Value = act},
                         new() { Key = AppClaimTypes.StaffId, Value = staff != null? staff.StaffId.ToString():"0"},
-                        new() { Key = AppClaimTypes.CustomerId, Value = customer != null? customer.CustomerId.ToString():"0"}
+                        new() { Key = AppClaimTypes.CustomerId, Value = customer != null? customer.CustomerId.ToString():"0"},
+                        new() { Key = AppClaimTypes.ExpiresAt, Value = expiresAt.ToString()}
                     };
             var json = JsonSerializer.Serialize(claimsList);
             var claims = new List<ClaimDto>
                     {
-                        //new() { Key = AppClaimTypes.UserId, Value = user.Id.ToString()},
-                        //new() { Key = AppClaimTypes.AccountHolderName, Value = user.FirstName + " " + user.LastName },
                         new() { Key = nameof(ClaimTypes.Email), Value = json },
-                        //new() { Key = nameof(ClaimTypes.Role), Value = roleId.ToString()},
-                        //new() { Key = AppClaimTypes.Actions, Value = act},
-                        //new() { Key = AppClaimTypes.BankStaffId, Value = staff != null? staff.StaffId.ToString():""},
-                        //new() { Key = AppClaimTypes.CustomerId, Value = customer != null? customer.CustomerId.ToString():""}
                     };
 
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(claims.Select(c => new Claim(c.Key, c.Value)), "Custom"),
-            //    IssuedAt = DateTime.Now,
-            //    Audience = audience,
-            //    Issuer = issuer,
-            //    SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256)
-            //};
-            //tokenDescriptor.Expires = DateTime.Now.AddSeconds(expiresInSeconds);
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-
             var actionPaths = await _userRepository.GetActionsByUserId(user.Id);
-            //var accessToken = tokenHandler.WriteToken(token);
-            var accessToken = GenerateToken(user.Id.ToString(), claims, securityKey, issuer, audience, expiresInSeconds);
+            var accessToken = GenerateToken(user.Id.ToString(), claims, securityKey, issuer, audience, expiresAt);
 
             response.Response = new()
             {
@@ -137,21 +121,11 @@ namespace BankingTool.Service
             response.Status = true;
             return response;
         }
-        public string GenerateToken(string userId, List<ClaimDto> extraClaims, string securityKey, string issuer, string audience, int expiresInSeconds)
+        public string GenerateToken(string userId, List<ClaimDto> extraClaims, string securityKey, string issuer, string audience, DateTime expiresAt)
         {
             var securityKeySym = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(securityKey));
             var credentials = new SigningCredentials(securityKeySym, SecurityAlgorithms.HmacSha256);
 
-            DateTime expiresAt = DateTime.UtcNow.AddSeconds(expiresInSeconds);
-            //long exp = new DateTimeOffset(expiresAt).ToUnixTimeSeconds();
-            //Claim[] claims = new Claim[]
-            //{
-            //    new Claim(JwtRegisteredClaimNames.Sub, userId),
-            //    //new Claim(JwtRegisteredClaimNames.Iss, issuer),
-            //    //new Claim(JwtRegisteredClaimNames.Aud, audience),
-            //    //new Claim(JwtRegisteredClaimNames.Exp, exp.ToString()),
-            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            //};
             Claim[] claims = [];
             claims = claims.Concat(extraClaims.Select(c => new Claim(c.Key, c.Value))).ToArray();
             var token = new JwtSecurityToken(
