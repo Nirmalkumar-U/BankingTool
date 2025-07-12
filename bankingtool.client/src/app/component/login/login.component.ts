@@ -6,6 +6,7 @@ import { EmitterService } from '../../core/emitter.service';
 import { IndexedDbServiceService } from '../../core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from '../../core/local-storage.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
+import { AuthService } from '../../core/service/auth.service';
 import { LoaderService } from '../../core/service/loader.service';
 import { UserService } from '../../core/service/user.service';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
@@ -26,7 +27,7 @@ export class LoginComponent {
   });
 
   constructor(private loginService: UserService, private router: Router,
-    private localStoreService: LocalStorageService, private emitService: EmitterService,
+    private localStoreService: LocalStorageService, private emitService: EmitterService, private authService: AuthService,
     private formBuilder: FormBuilder, private indexedDbService: IndexedDbServiceService, private notificationService: NotificationService) {
   }
 
@@ -59,6 +60,7 @@ export class LoginComponent {
           }
           this.loginService.createToken(modelToken).subscribe((result: ResponseDto<TokenResponse>) => {
             if (result.status == true) {
+              this.authService.setLoginState(true);
               this.localStoreService.setAllData(result.response.claims);
               this.localStoreService.setItem(ClaimKey.isLoggedIn, Constant.true);
               this.localStoreService.setItem(ClaimKey.accessToken, result.response.accessToken);
