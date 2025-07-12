@@ -6,6 +6,7 @@ import { EmitterService } from '../../core/emitter.service';
 import { IndexedDbServiceService } from '../../core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from '../../core/local-storage.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
+import { LoaderService } from '../../core/service/loader.service';
 import { UserService } from '../../core/service/user.service';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
 import { LoginRequestObject } from '../../dto/request/user/login-request';
@@ -67,7 +68,6 @@ export class LoginComponent {
                     this.indexedDbService.addData(Constant.actionTableName, data);
                   });
                   this.notificationService.show("Logined successfully.", 'success');
-                  this.emitService.loginEmitter.emit(true);
                   this.router.navigate([AppPaths.home]);
                 });
             } else {

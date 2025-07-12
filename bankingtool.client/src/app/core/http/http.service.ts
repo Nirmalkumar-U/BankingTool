@@ -7,6 +7,7 @@ import { EmitterService } from '../emitter.service';
 import { LocalStorageService } from '../local-storage.service';
 import { NotificationService } from '../notificationService/notification-service';
 import { AuthService } from '../service/auth.service';
+import { LoaderService } from '../service/loader.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class HttpService {
 
   baseUrl = AppSettingsDto.baseUrl;
   constructor(private localStoreService: LocalStorageService, private emitService: EmitterService,
-    private notificationService: NotificationService, private authService: AuthService
+    private notificationService: NotificationService, private authService: AuthService, private loaderService: LoaderService
   ) { }
   requestObj = (method: string = 'GET', headerType: string = 'DEFAULT', body?: any) => {
     return {
@@ -39,7 +40,7 @@ export class HttpService {
         try {
           let requestInit = this.getFetchObject(requestObj);
           if (isLoading) {
-            this.emitService.loaderEmitter.emit(true);
+            this.loaderService.show();
           }
 
           const response = await fetch(this.baseUrl + url, requestInit);
@@ -57,7 +58,7 @@ export class HttpService {
           const result = await this.handelResponse(response);
 
           if (isLoading) {
-            this.emitService.loaderEmitter.emit(false);
+            this.loaderService.hide();
           }
 
           if (result === null || result === undefined) {
@@ -68,7 +69,7 @@ export class HttpService {
           observer.complete();
         } catch (error) {
           if (isLoading) {
-            this.emitService.loaderEmitter.emit(false);
+            this.loaderService.hide();
           }
           observer.error(error);
           observer.complete();
@@ -138,12 +139,12 @@ export class HttpService {
     } else if (!response || response.status === 204) {
       return;
     } else if (response && response.status >= 401) {
-      this.emitService.loaderEmitter.emit(false);
+      this.loaderService.hide();
       this.notificationService.show("Session expired...", 'error');
       this.authService.logout();
       throw response;
     } else if (response && response.status >= 500) {
-      this.emitService.loaderEmitter.emit(false);
+      this.loaderService.hide();
       this.notificationService.show("Internal server error " + response.status.toString(), 'error');
       throw response;
     } else {

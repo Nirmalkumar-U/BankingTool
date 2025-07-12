@@ -15,7 +15,6 @@ import { AuthService } from './core/service/auth.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  isLoading: boolean = false;
   isLogined: boolean = false;
   appPaths = AppPaths;
   logggedInUserName: string = 'Logged In';
@@ -47,10 +46,6 @@ export class AppComponent implements OnInit {
 
   constructor(private emitService: EmitterService, private cdr: ChangeDetectorRef, private router: Router,
     private localStorageService: LocalStorageService, private indexedDbService: IndexedDbServiceService, private authService: AuthService) {
-    this.emitService.loaderEmitter.subscribe(loader => {
-      this.isLoading = loader;
-      this.cdr.detectChanges();
-    });
     this.emitService.loginEmitter.subscribe(us => {
       this.isLogined = us;
       this.logggedInUserName = this.localStorageService.getItem(ClaimKey.userName)!;
