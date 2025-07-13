@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppPaths, ClaimKey, Constant } from '../../constant/constant';
@@ -28,8 +28,8 @@ export class LoginComponent {
 
   constructor(private loginService: UserService, private router: Router,
     private localStoreService: LocalStorageService, private emitService: EmitterService, private authService: AuthService,
-    private formBuilder: FormBuilder, private indexedDbService: IndexedDbServiceService, private notificationService: NotificationService) {
-  }
+    private formBuilder: FormBuilder, private indexedDbService: IndexedDbServiceService, private notificationService: NotificationService,
+    private ngZone: NgZone) { }
 
   login() {
     if (!this.loginForm.invalid) {
@@ -60,18 +60,26 @@ export class LoginComponent {
           }
           this.loginService.createToken(modelToken).subscribe((result: ResponseDto<TokenResponse>) => {
             if (result.status == true) {
-              this.authService.setLoginState(true);
-              this.localStoreService.setAllData(result.response.claims);
-              this.localStoreService.setItem(ClaimKey.isLoggedIn, Constant.true);
-              this.localStoreService.setItem(ClaimKey.accessToken, result.response.accessToken);
-              this.indexedDbService.initDb(Constant.actionDBName, Constant.dbVersion,
-                Constant.actionTablePrimaryKey, Constant.actionTableName, Constant.actionCoumns).then(() => {
-                  result.response.actionPaths.forEach((data: any) => {
-                    this.indexedDbService.addData(Constant.actionTableName, data);
+              this.ngZone.run(() => {
+                this.authService.setLoginState(true);
+                this.localStoreService.setAllData(result.response.claims);
+                this.localStoreService.setItem(ClaimKey.isLoggedIn, Constant.true);
+                this.localStoreService.setItem(ClaimKey.accessToken, result.response.accessToken);
+
+                this.indexedDbService.initDb(Constant.actionDBName, Constant.dbVersion,
+                  Constant.actionTablePrimaryKey, Constant.actionTableName, Constant.actionCoumns).then(() => {
+
+                    result.response.actionPaths.forEach((data: any) => {
+                      this.indexedDbService.addData(Constant.actionTableName, data);
+                    });
+                    setTimeout(() => {
+                      this.emitService.loginEmitter.emit(true);
+                    }, 100); 
+
+                    this.notificationService.show("Logged in successfully.", 'success');
+                    this.router.navigate([AppPaths.home]);
                   });
-                  this.notificationService.show("Logined successfully.", 'success');
-                  this.router.navigate([AppPaths.home]);
-                });
+              });
             } else {
               let messageList: string[] = [];
               if (Array.isArray(result?.errors) && result?.errors)
