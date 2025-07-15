@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { AppPaths, PageTitle } from '../constant/constant';
+import { SharedModule } from '../core/component/shared.module';
 import { AccountNotificationResolver } from '../core/resolver/account-notification.resolver';
 import { AccountStatementReportResolver } from '../core/resolver/account-statement-report.resolver';
 import { AddEditUserResolver } from '../core/resolver/add-edit-user.resolver';
@@ -177,7 +178,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     CommonModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SharedModule 
   ]
 })
 export class ComponentModule { }

@@ -1,0 +1,11 @@
+<div class="mb-3">
+  <label class="form-label">{{ label }}</label>
+  <input [type]="type"
+         class="form-control"
+         [formControl]="formControl"
+         [attr.required]="required ? true : null" />
+
+  <div *ngIf="formControl?.invalid && (formControl?.touched || formControl?.dirty)" class="invalid-feedback">
+    {{ label }} is required.
+  </div>
+</div>

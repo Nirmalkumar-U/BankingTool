@@ -1,0 +1,12 @@
+<div class="mb-3">
+  <label class="form-label">{{ label }}</label>
+  <select class="form-select" [formControl]="control" [required]="required">
+    <option value="">Select</option>
+    <option *ngFor="let option of options" [ngValue]="option.key">
+      {{ option.value }}
+    </option>
+  </select>
+  <div class="invalid-feedback" *ngIf="required">
+    Please select {{ label.toLowerCase() }}...
+  </div>
+</div>
