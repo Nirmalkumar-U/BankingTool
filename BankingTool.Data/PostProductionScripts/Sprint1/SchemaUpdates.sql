@@ -107,3 +107,26 @@ CREATE TABLE [BudgetNotification] (
 	ModifiedDate DATETIME NULL,
 	ModifiedBy VARCHAR(30) NULL,
 	IsDeleted BIT DEFAULT 0)
+---------------------------------------------------------------------------------------------------------
+If(OBJECT_ID('[FK_Notes_Users_UserId]') Is Not Null)
+BEGIN
+	ALTER TABLE [Note] DROP CONSTRAINT [FK_Notes_Users_UserId]
+END
+GO
+IF EXISTS (SELECT * FROM sys.tables where name = N'Note')
+BEGIN
+	DROP TABLE [Note]
+END
+GO
+CREATE TABLE [dbo].[Note] (
+    [NoteId] INT IDENTITY(1,1) PRIMARY KEY,
+    [UserId] INT CONSTRAINT FK_Notes_Users_UserId FOREIGN KEY (UserId) REFERENCES Users(UserId) NOT NULL,
+    [Title] NVARCHAR(200) NOT NULL,
+    [Content] NVARCHAR(MAX) NOT NULL,
+    [CreatedDate] DATETIME2 NOT NULL DEFAULT GETDATE(),
+    [CreatedBy] NVARCHAR(100) NOT NULL,
+    [ModifiedDate] DATETIME2 NULL,
+    [ModifiedBy] NVARCHAR(100) NULL,
+    [IsDeleted] BIT NOT NULL DEFAULT 0,
+);
+
