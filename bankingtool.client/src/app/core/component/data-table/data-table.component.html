@@ -1,0 +1,97 @@
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2" *ngIf="data.length > 0">
+  <button class="btn btn-sm btn-outline-success" (click)="exportToCSV()">
+    <i class="bi bi-file-earmark-excel me-1"></i> Export to Excel
+  </button>
+
+  <div class="input-group input-group-sm" style="max-width: 300px;">
+    <input type="text"
+           class="form-control"
+           placeholder="Search..."
+           [(ngModel)]="searchTerm"
+           (input)="onSearchChange()" />
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+  </div>
+</div>
+
+<div [ngClass]="{ 'bg-dark text-light': darkMode, 'bg-white text-dark': !darkMode }" class="table-responsive rounded shadow-sm">
+  <table class="table table-hover align-middle mb-0"
+         [ngClass]="{ 'table-dark table-striped-columns': darkMode, 'table-striped': !darkMode }">
+    <thead [ngClass]="{ 'table-light': !darkMode, 'table-dark text-white': darkMode }" class="sticky-top">
+      <tr>
+        <th *ngFor="let col of columns" [style.width]="col.width" class="text-nowrap">
+          <div (click)="changeSort(col)" [style.cursor]="col.sortable ? 'pointer' : 'default'" class="d-flex align-items-center gap-1">
+            {{ col.header }}
+            <span *ngIf="col.sortable">
+              <i *ngIf="sortColumn === col.field && sortDirection === 'asc'" class="bi bi-caret-up-fill text-primary"></i>
+              <i *ngIf="sortColumn === col.field && sortDirection === 'desc'" class="bi bi-caret-down-fill text-primary"></i>
+            </span>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody *ngIf="visibleData && visibleData.length; else noData">
+      <tr *ngFor="let row of visibleData">
+        <td *ngFor="let col of columns" class="text-nowrap">
+          {{ formatCell(row[col.field], col) }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noData>
+    <tr>
+      <td [attr.colspan]="columns.length" class="text-center">No records found</td>
+    </tr>
+  </ng-template>
+</div>
+
+<!-- Pagination -->
+<div *ngIf="data.length > 0" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2"
+     [ngClass]="darkMode ? 'text-light' : 'text-dark'">
+  <div class="d-flex align-items-center gap-3 flex-wrap">
+    <div class="small">
+      Showing {{ (currentPage - 1) * pageSize + 1 }} to
+      {{ math.min(currentPage * pageSize, data.length) }} of {{ data.length }} entries
+    </div>
+
+    <!-- Toolbar above the table -->
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-1">
+        <label for="pageSizeSelect" class="form-label m-0 small">Show</label>
+        <select id="pageSizeSelect" class="form-select form-select-sm"
+                [ngClass]="{ 'bg-dark text-light border-secondary': darkMode }"
+                style="width: auto;"
+                [(ngModel)]="pageSize"
+                (change)="changePageSize()">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+        </select>
+        <span class="small">entries</span>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <button class="btn btn-sm"
+            [ngClass]="{ 'btn-outline-light': darkMode, 'btn-outline-secondary': !darkMode }"
+            [disabled]="currentPage === 1"
+            (click)="changePage(currentPage - 1)">
+      ‹ Prev
+    </button>
+
+    <ng-container *ngFor="let page of [].constructor(totalPages()); let i = index">
+      <button class="btn btn-sm"
+              [ngClass]="{
+            'btn-primary': currentPage === i + 1,
+            'btn-outline-light': darkMode && currentPage !== i + 1,
+            'btn-outline-secondary': !darkMode && currentPage !== i + 1
+          }"
+              (click)="changePage(i + 1)">
+        {{ i + 1 }}
+      </button>
+    </ng-container>
+    <button class="btn btn-sm"
+            [ngClass]="{ 'btn-outline-light': darkMode, 'btn-outline-secondary': !darkMode }"
+            [disabled]="currentPage === totalPages()"
+            (click)="changePage(currentPage + 1)">
+      Next ›
+    </button>
+  </div>
+</div>

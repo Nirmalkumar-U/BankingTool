@@ -24,37 +24,10 @@
           </div>
         </div>
         <hr />
-        <table class="table caption-top">
-          <thead>
-            <tr>
-              <th scope="col" width="13%">Budget AccountName</th>
-              <th scope="col" width="8%">Tag</th>
-              <th scope="col" width="11%">Date</th>
-              <th scope="col" width="18%">Description</th>
-              <th scope="col" width="8%">Credit</th>
-              <th scope="col" width="8%">Debit</th>
-              <th scope="col" width="12%">Stage Balance</th>
-            </tr>
-          </thead>
-          <tbody *ngIf="accountInfo && accountInfo.budgetTransactionList && accountInfo.budgetTransactionList != null && accountInfo.budgetTransactionList.length != 0; else noRecords">
-            <tr *ngFor="let trans of accountInfo.budgetTransactionList">
-              <td>{{ trans.accountName }}</td>
-              <td>{{ trans.transactionTag }}</td>
-              <td>{{ trans.transactionDate | date:'dd-MM-yyyy' }}</td>
-              <td>{{ trans.description }}</td>
-              <td>{{ trans.receiverAmount }}</td>
-              <td>{{ trans.senderAmount }}</td>
-              <td>{{ trans.stageBalance }}</td>
-            </tr>
-          </tbody>
-          <ng-template #noRecords>
-            <tbody>
-              <tr>
-                <td colspan="7" class="text-center">No records found</td>
-              </tr>
-            </tbody>
-          </ng-template>
-        </table>
+        <app-data-table [columns]="columns"
+                        [data]="accountInfo?.budgetTransactionList || []">
+        </app-data-table>
+
       </div>
     </div>
   </div>

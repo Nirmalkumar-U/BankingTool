@@ -1,0 +1,101 @@
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+  .table td,
+  .table th {
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    box-shadow: 0 1px 0 #dee2e6;
+  }
+
+  /* Light mode header (default) */
+  .table:not(.table-dark) thead th {
+    background-color: #f8f9fa;
+  }
+
+/* Dark mode header override */
+.table-dark thead th {
+  background-color: #212529; /* Bootstrap dark bg */
+  color: #fff !important;
+}
+
+th {
+  position: relative;
+  white-space: nowrap;
+}
+
+  th span {
+    user-select: none;
+  }
+.table-dark thead th {
+  color: white !important;
+}
+.pagination.bg-dark .page-link {
+  background-color: #212529;
+  color: #f8f9fa;
+  border-color: #343a40;
+}
+
+  .pagination.bg-dark .page-link:hover {
+    background-color: #343a40;
+    color: #ffffff;
+  }
+
+.pagination.bg-dark .page-item.active .page-link {
+  background-color: #0d6efd; /* Bootstrap primary */
+  border-color: #0d6efd;
+  color: #ffffff;
+}
+
+.pagination.bg-dark .page-item.disabled .page-link {
+  background-color: #212529;
+  color: #6c757d;
+  border-color: #343a40;
+}
+.pagination.bg-white .page-link {
+  color: #212529;
+}
+
+.pagination.bg-white .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+button.btn-sm {
+  min-width: 36px;
+}
+
+/* Base dark mode buttons */
+.btn-outline-light {
+  color: #f8f9fa;
+  border-color: #6c757d;
+}
+
+  .btn-outline-light:hover {
+    background-color: #343a40;
+    border-color: #adb5bd;
+    color: #ffffff;
+  }
+
+/* Active page in dark mode */
+.btn.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
+/* Disabled button in dark mode */
+.btn-outline-light:disabled {
+  background-color: transparent;
+  color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.6;
+}

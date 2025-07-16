@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ClaimKey } from '../../constant/constant';
 import { isAllEmptyOrNull, isNullOrEmpty } from '../../core/commonFunction/common-function';
+import { TableColumn } from '../../core/component/data-table/data-table.component';
 import { LocalStorageService } from '../../core/local-storage.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
@@ -21,6 +22,18 @@ import { TransactionsListAccountInfoDto } from '../../dto/transactions-list-acco
   styleUrls: ['./transactions-list.component.css']
 })
 export class TransactionsListComponent {
+  columns: TableColumn[] = [
+    { field: 'fromAccountId', header: 'Transfer From', sortable: true, width: '13%' },
+    { field: 'toAccountId', header: 'Transfer To', sortable: true, width: '13%' },
+    { field: 'transactionCategory', header: 'Category', sortable: true, width: '10%' },
+    { field: 'transactionTag', header: 'Tag', sortable: true, width: '8%' },
+    { field: 'transactionDate', header: 'Date', sortable: true, width: '11%', format: 'date', dateFormat: 'dd/MM/yyyy' },
+    { field: 'description', header: 'Description', width: '18%' },
+    { field: 'creditAmount', header: 'Credit', sortable: true, width: '8%' },
+    { field: 'debitAmount', header: 'Debit', sortable: true, width: '8%' },
+    { field: 'stageBalance', header: 'Stage Balance', sortable: true, width: '12%' }
+  ];
+
   transactionForm: FormGroup;
   transactionFilterForm: FormGroup;
   bankList: DropDownDto[] = [];
@@ -141,7 +154,11 @@ export class TransactionsListComponent {
           if (response.status == true) {
             this.accountInfo = response.response.accountInfo;
             this.cardInfo = response.response.cardInfo;
-            this.transactionsList = response.response.transactionsList;
+            this.transactionsList = response.response.transactionsList.map(trans => ({
+              ...trans,
+              creditAmount: trans.transactionType === 'Credit' ? trans.amount : '',
+              debitAmount: trans.transactionType === 'Debit' ? trans.amount : ''
+            }));
             this.transactionCategoryList = response.dropDownList.find(x => x.name == "TransactionCategory")!.dropDown;
             this.transactionTagList = response.dropDownList.find(x => x.name == "TransactionTag")!.dropDown;
             this.senderAccountList = response.dropDownList.find(x => x.name == "SenderAccount")!.dropDown;
@@ -166,7 +183,11 @@ export class TransactionsListComponent {
         this.fromDate, values.transactionTag, this.toDate);
       this.bankAccountService.transactionList(model).subscribe((response: ResponseDto<GetTransactionsListResponse>) => {
         if (response.status == true) {
-          this.transactionsList = response.response.transactionsList;
+          this.transactionsList = response.response.transactionsList.map(trans => ({
+            ...trans,
+            creditAmount: trans.transactionType === 'Credit' ? trans.amount : '',
+            debitAmount: trans.transactionType === 'Debit' ? trans.amount : ''
+          }));
         } else {
           let messageList: string[] = [];
           if (Array.isArray(response?.errors) && response?.errors)
