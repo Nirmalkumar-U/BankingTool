@@ -1,4 +1,3 @@
-import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppPaths, ClaimKey, Constant } from './constant/constant';
 import { EmitterService } from './core/emitter.service';
@@ -8,6 +7,7 @@ import { GetActionsByUserIdDto } from './dto/get-actions-by-user-id-dto';
 import { faBell, faHandshake, faMoneyBill1, faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './core/service/auth.service';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -125,6 +125,10 @@ export class AppComponent implements OnInit {
       this.cdr.detectChanges();
     });
   }
+  openNotesPopup(): void {
+    console.log("Open Notes Popup");
+  }
+
 }
 
 interface MenuItem {

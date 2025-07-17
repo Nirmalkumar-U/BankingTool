@@ -7,6 +7,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing.module';
 import { LoaderComponent } from './component/loader/loader.component';
+import { NoteComponent } from './component/note/note.component';
 import { NotificationPopupComponent } from './core/component/notification-popup/notification-popup.component';
 import { CoreModule } from './core/core.module';
 
@@ -14,7 +15,8 @@ import { CoreModule } from './core/core.module';
   declarations: [
     AppComponent,
     LoaderComponent,
-    NotificationPopupComponent
+    NotificationPopupComponent,
+    NoteComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
