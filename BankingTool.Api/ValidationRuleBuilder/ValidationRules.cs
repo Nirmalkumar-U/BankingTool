@@ -1,6 +1,7 @@
 ﻿using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.RequestDto.Budget;
+using BankingTool.Model.Dto.RequestDto.Note;
 using BankingTool.Model.Dto.RequestDto.User;
 
 namespace BankingTool.Api.Validators
@@ -276,5 +277,28 @@ namespace BankingTool.Api.Validators
             RuleBuilder<ChangeBudgetAccountStatusRequestObject>.For(x => x.Request.BudgetAccount.Id).Required()
         };
         #endregion BankAccountController
+        #region Note
+        public static List<ValidationRule> SaveNoteRequestRules = new()
+        {
+            RuleBuilder<SaveNoteRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<SaveNoteRequestObject>.For(x => x.Request.Note).Required(),
+            RuleBuilder<SaveNoteRequestObject>.For(x => x.Request.Note.Title)
+                .Required()
+                .WithStringRules(r => {
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<SaveNoteRequestObject>.For(x => x.Request.Note.Content)
+                .Required()
+                .WithStringRules(r => {
+                    r.MaxLength = 5000;
+                }),
+        };
+        public static List<ValidationRule> DeleteNoteRequestRules = new()
+        {
+            RuleBuilder<DeleteNoteRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<DeleteNoteRequestObject>.For(x => x.Request.Note).Required(),
+            RuleBuilder<DeleteNoteRequestObject>.For(x => x.Request.Note.Id).Required()
+        };
+        #endregion Note
     }
 }

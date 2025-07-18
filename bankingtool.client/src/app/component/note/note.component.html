@@ -21,22 +21,30 @@
               <div class="note-title">{{ note.title }}</div>
               <div class="note-snippet">{{ note.content | slice:0:60 }}...</div>
             </div>
-            <button class="delete-icon" (click)="deleteNote(note)">🗑</button>
+            <button class="delete-icon" (click)="deleteNote(note.noteId)">🗑</button>
           </li>
 
         </ul>
       </div>
-
-
       <!-- Note Editor -->
       <div *ngIf="selectedNote">
-        <form (ngSubmit)="saveNote()">
-          <input type="text" class="form-control note-input mb-2" placeholder="Title" [(ngModel)]="selectedNote.title" name="title" required>
-          <textarea class="form-control" rows="6" placeholder="Write your note here..." [(ngModel)]="selectedNote.content" name="content"></textarea>
-          <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary btn-sm">💾 Save</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closeEditor()">Cancel</button>
-          </div>
+        <form>
+          <input type="text" class="form-control note-input mb-2"
+                 placeholder="Title"
+                 [(ngModel)]="selectedNote.title"
+                 name="title"
+                 (ngModelChange)="triggerAutoSave()" />
+
+          <textarea class="form-control" rows="6"
+                    placeholder="Write your note here..."
+                    [(ngModel)]="selectedNote.content"
+                    name="content"
+                    (ngModelChange)="triggerAutoSave()"></textarea>
+
+          <!--<div class="d-flex justify-content-between">-->
+          <!--<button type="submit" class="btn btn-primary btn-sm">💾 Save</button>-->
+          <!--<button type="button" class="btn btn-outline-secondry btn-sm" (click)="closeEditor()">Cancel</button>
+          </div>-->
         </form>
       </div>
     </div>
