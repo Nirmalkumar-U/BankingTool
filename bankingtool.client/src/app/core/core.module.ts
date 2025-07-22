@@ -2,8 +2,6 @@ import { APP_INITIALIZER, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InitializerService } from '../core/initailizerService/initializer.service';
 
-
-
 @NgModule({
   declarations: [],
   imports: [
