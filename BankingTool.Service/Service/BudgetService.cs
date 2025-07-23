@@ -1,10 +1,12 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.BaseDto;
+using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
+using BankingTool.Repository.Repository;
 using BankingTool.Service.IService;
 
 namespace BankingTool.Service.Service
@@ -175,11 +177,165 @@ namespace BankingTool.Service.Service
                 Status = true
             };
         }
+        public async Task<ResponseDto<bool>> GetBudgetDropdownList()
+        {
+            return new ResponseDto<bool>()
+            {
+                Errors = [],
+                ValidationErrors = [],
+                Response = true,
+                Status = true,
+                StatuCode = 200,
+                DropDownList = [new DropDownListDto { Name = "FromBudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() }]
+            };
+        }
+        public async Task<ResponseDto<int>> GetToBudgetDropdownListAndBalanceOfBudgetAccount(int bugetAccountId)
+        {
+            return new ResponseDto<int>()
+            {
+                Errors = [],
+                ValidationErrors = [],
+                Response = await _budgetRepository.GetBudgetAccountBalance(bugetAccountId),
+                Status = true,
+                StatuCode = 200,
+                DropDownList = [new DropDownListDto { Name = "ToBudgetAccountId", DropDown = await _budgetRepository.GetBudgetAccountDropdownExceptBudgetAccountId(bugetAccountId) }]
+            };
+        }
+        public async Task<ResponseDto<bool>> BudgetTransfer(int fromAccountId, List<SaveBudgetTransactionRequestToBudgetAccount> toAccounts, int amount, string description)
+        {
+            var fromBudgetAccount = await _budgetRepository.GetBudgetAccountById(fromAccountId);
+            var sumOfToAccountAmount = toAccounts.Sum(x => x.Amount);
+            if (sumOfToAccountAmount != amount)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = [new ValidationResults { PropertyPath = "Request.FromBudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "From amount and to amount should be equal." }],
+                    Errors = [],
+                    StatuCode = 400
+                };
+            }
+            if(fromBudgetAccount.Balance < amount)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = [new ValidationResults { PropertyPath = "Request.FromBudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "From amount should be lesser than Budget Account Balance." }],
+                    Errors = [],
+                    StatuCode = 400
+                };
+            }
+            var validateBalance = ValidateBalance(fromBudgetAccount.Balance, amount);
+            if (validateBalance != null)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = validateBalance,
+                    Errors = [],
+                    StatuCode = 400
+                };
+            }
+            var lastTransaction = await _budgetRepository.GetLastBudgetTransaction(fromAccountId);
+            var transactionTime = DateTime.Now.Date;
+            if (lastTransaction.TransactionTime.Date == transactionTime)
+            {
+                transactionTime = lastTransaction.TransactionTime.AddMinutes(5);
+            }
+            fromBudgetAccount.Balance -= amount;
+            BudgetTransaction budgetTransaction = new()
+            {
+                Amount = amount,
+                Description = description,
+                TransactionTime = transactionTime,
+                TransactionCategory = TransactionCatagory.Transfer,
+                TransactionTag = TransactionTag.Transfer
+            };
+            BudgetTransactionDetail senderBudgetTransactionDetails = new()
+            {
+                TransactionType = TransactionType.Debit,
+                StageBalance = fromBudgetAccount.Balance,
+                TransactionRole = TransactionRole.Sender,
+                AccountId = 1,
+                BudgetAccountId = fromAccountId
+            };
+
+            List<BudgetTransactionDto> budgetAccountList = [];
+            foreach (var toAccount in toAccounts)
+            {
+                var lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(toAccount.Id);
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionTime.Date)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = [],
+                        Errors = [new Errors { PropertyName = "BudgetTransferAmount", ErrorMessage = "Budget Transaction Date should be greater then last transaction date." }]
+                    };
+                }
+                var budgetTransactionDate = transactionTime;
+                if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
+                {
+                    budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
+                    budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
+                }
+
+                var toBudgerAccount = await _budgetRepository.GetBudgetAccountById(toAccount.Id);
+                toBudgerAccount.Balance += toAccount.Amount;
+
+                BudgetTransaction toBudgetTransaction = new()
+                {
+                    Amount = toAccount.Amount,
+                    Description = description,
+                    TransactionTime = budgetTransactionDate,
+                    TransactionCategory = TransactionCatagory.Transfer,
+                    TransactionTag = TransactionTag.Transfer
+                };
+                BudgetTransactionDetail receiverBudgetTransactionDetails = new()
+                {
+                    TransactionType = TransactionType.Credit,
+                    StageBalance = toBudgerAccount.Balance,
+                    TransactionRole = TransactionRole.Receiver,
+                    AccountId = 1,
+                    BudgetAccountId = toAccount.Id
+                };
+                BudgetTransactionDto budgetTransactions = new BudgetTransactionDto()
+                {
+                    BudgetAccount = toBudgerAccount,
+                    BudgetTransaction = toBudgetTransaction,
+                    BudgetTransactionDetail = receiverBudgetTransactionDetails
+                };
+                budgetAccountList.Add(budgetTransactions);
+            }
+            var isTransfered = await _budgetRepository.SaveBudgetTransfer(fromBudgetAccount, budgetTransaction, senderBudgetTransactionDetails, budgetAccountList);
+            return new ResponseDto<bool>
+            {
+                Response = isTransfered,
+                Status = isTransfered,
+                ValidationErrors = [],
+                Errors = isTransfered ? [] : [new Errors { PropertyName = "Budget Amount transfer.", ErrorMessage = "Budget Amount transfer failed." }],
+                StatuCode = isTransfered ? 200 : 400,
+                DropDownList = []
+            };
+        }
+        #region Private
         private async Task<string> GetNewBudgetNumber()
         {
             var lastBudgetAccount = await _budgetRepository.GetLastBudgetAccount();
             return ((lastBudgetAccount != null && long.TryParse(lastBudgetAccount.BudgetNumber, out long lastNumber)) ? lastNumber + 1 : 60000000).ToString();
         }
+        private static List<ValidationResults> ValidateBalance(int balance, int amount)
+        {
+            if (balance < amount)
+            {
+                return [new ValidationResults { PropertyPath = "Request.BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Amount should be lesser equal to Account Balance." }];
+            }
+            return null;
+        }
+        #endregion Private
     }
 }
-

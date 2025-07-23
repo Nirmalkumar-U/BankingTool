@@ -23,8 +23,8 @@ USING (VALUES
  ,(19,N'Budget',NULL,N'Menu',NULL,1,NULL,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(20,N'Create Budget Account',N'/createBudgetAccount',N'Menu',N'R',2,19,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(21,N'Create Budget Account',N'/createBudgetAccount',N'Menu',N'RW',2,19,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
- ,(22,N'Budget Transaction List',N'/budgetTransactionList',N'Menu',N'R',2,19,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
- ,(23,N'Budget Transaction List',N'/budgetTransactionList',N'Menu',N'RW',2,19,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(22,N'Budget Transaction List',N'/budgetTransactionList',N'Action',N'R',NULL,19,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(23,N'Budget Transaction List',N'/budgetTransactionList',N'Action',N'RW',NULL,19,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(24,N'Notification',NULL,N'ActionMenu',NULL,1,NULL,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(25,N'Budget Notification',N'/budgetNotification',N'Action',N'R',2,24,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(26,N'Budget Notification',N'/budgetNotification',N'Action',N'RW',2,24,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
@@ -35,6 +35,10 @@ USING (VALUES
  ,(31,N'Account Statement Report',N'/accountStatementReport',N'Menu',N'RW',2,29,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(32,N'Budget Statement Report',N'/budgetStatementReport',N'Menu',N'R',2,29,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(33,N'Budget Statement Report',N'/budgetStatementReport',N'Menu',N'RW',2,29,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(34,N'Budget List',N'/budgetList',N'Menu',N'R',2,19,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(35,N'Budget List',N'/budgetList',N'Menu',N'RW',2,19,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(36,N'Budget Transfer',N'/budgetTransfer',N'Menu',N'R',2,19,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(37,N'Budget Transfer',N'/budgetTransfer',N'Menu',N'RW',2,19,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
 ) AS Source ([ActionId],[ActionName],[ActionPath],[ActionType],[Access],[MenuLevel],[ParrentMenuId],[Sequence],[CreatedDate],[CreatedBy],[ModifiedDate],[ModifiedBy],[IsDeleted])
 ON (Target.[ActionId] = Source.[ActionId])
 WHEN MATCHED AND (
@@ -109,4 +113,6 @@ Values (1,1),
 (1,28),
 (2,29),
 (2,31),
-(2,33)
+(2,33),
+(2,35),
+(2,37)

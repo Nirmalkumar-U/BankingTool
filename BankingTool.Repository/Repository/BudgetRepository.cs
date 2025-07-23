@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model;
+using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
@@ -64,6 +65,25 @@ namespace BankingTool.Repository.Repository
                     IsSelected = false
                 }).ToListAsync();
             return budgetAccount;
+        }
+
+        public async Task<List<DropDownDto>> GetBudgetAccountDropdownExceptBudgetAccountId(int budgetAccountId)
+        {
+            var budgetAccount = await dataContext.BudgetAccount
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetAccountId != budgetAccountId && x.BudgetStatus == "Active" && x.IsDeleted == false)
+                .Select(x => new DropDownDto
+                {
+                    Key = x.BudgetAccountId,
+                    Value = x.BudgetName,
+                    IsSelected = false
+                }).ToListAsync();
+            return budgetAccount;
+        }
+        public async Task<int> GetBudgetAccountBalance(int budgetAccountId)
+        {
+            var budgetAccount = await dataContext.BudgetAccount
+                .FirstOrDefaultAsync(x => x.CustomerId == dataContext.CustomerId && x.BudgetAccountId == budgetAccountId && x.BudgetStatus == "Active" && x.IsDeleted == false);
+            return budgetAccount.Balance;
         }
         public async Task<List<GetBudgetList>> GetBudgetList()
         {
@@ -249,8 +269,37 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
+        public async Task<bool> SaveBudgetTransfer(BudgetAccount fromBudgetAccount, BudgetTransaction budgetTransaction,
+            BudgetTransactionDetail fromBudgetTransactionDetail, List<BudgetTransactionDto> budgetAccountList)
+        {
+            using var sqlTransaction = dataContext.Database.BeginTransaction();
+            try
+            {
+                UpdateBudgetAccount(fromBudgetAccount);
+                var fromBudgetTransactionId = InsertBudgetTransaction(budgetTransaction);
+                fromBudgetTransactionDetail.BudgetTransactionId = fromBudgetTransactionId.Value;
+                InsertBudgetTransactionDetail(fromBudgetTransactionDetail);
 
-        public int? InsertBudgetAccount(BudgetAccount BudgetAccount)
+                foreach (var toAccount in budgetAccountList)
+                {
+                    UpdateBudgetAccount(toAccount.BudgetAccount);
+                    var toBudgetTransactionId = InsertBudgetTransaction(toAccount.BudgetTransaction);
+                    toAccount.BudgetTransactionDetail.BudgetTransactionId = toBudgetTransactionId.Value;
+                    InsertBudgetTransactionDetail(toAccount.BudgetTransactionDetail);
+                }
+
+                sqlTransaction.Commit();
+                return await Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                sqlTransaction.Rollback();
+                return await Task.FromResult(false);
+            }
+        }
+        #region Private
+        private int? InsertBudgetAccount(BudgetAccount BudgetAccount)
         {
             BudgetAccount.CreatedBy = dataContext.UserEmail;
             BudgetAccount.CreatedDate = DateTime.Now;
@@ -260,13 +309,13 @@ namespace BankingTool.Repository.Repository
             var isInserted = Insert(BudgetAccount);
             return isInserted ? BudgetAccount.BudgetAccountId : null;
         }
-        public void UpdateBudgetAccount(BudgetAccount BudgetAccount)
+        private void UpdateBudgetAccount(BudgetAccount BudgetAccount)
         {
             BudgetAccount.ModifiedBy = dataContext.UserEmail;
             BudgetAccount.ModifiedDate = DateTime.Now;
             Update(BudgetAccount);
         }
-        public int? InsertBudgetTransaction(BudgetTransaction BudgetTransaction)
+        private int? InsertBudgetTransaction(BudgetTransaction BudgetTransaction)
         {
             BudgetTransaction.CreatedBy = dataContext.UserEmail;
             BudgetTransaction.CreatedDate = DateTime.Now;
@@ -276,20 +325,17 @@ namespace BankingTool.Repository.Repository
             var isInserted = Insert(BudgetTransaction);
             return isInserted ? BudgetTransaction.BudgetTransactionId : null;
         }
-        public int? InsertBudgetTransactionDetail(BudgetTransactionDetail BudgetTransactionDetail)
+        private int? InsertBudgetTransactionDetail(BudgetTransactionDetail BudgetTransactionDetail)
         {
             var isInserted = Insert(BudgetTransactionDetail);
             return isInserted ? BudgetTransactionDetail.BudgetTransactionDetailId : null;
         }
-        public void UpdateBudgetTransactionDetail(BudgetTransactionDetail model)
-        {
-            Update(model);
-        }
-        public void UpdateBudgetNotification(BudgetNotification model)
+        private void UpdateBudgetNotification(BudgetNotification model)
         {
             model.ModifiedBy = dataContext.UserEmail;
             model.ModifiedDate = DateTime.Now;
             Update(model);
         }
+        #endregion Private
     }
 }

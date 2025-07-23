@@ -13,5 +13,8 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> AcceptBudgetTransaction(List<AcceptBudgetTransactionRequestBudgetAcccount> BudgetAccount, int BudgetNotificationId);
         Task<ResponseDto<bool>> RejectBudgetTransaction(int BudgetNotificationId);
         Task<ResponseDto<bool>> ChangeBudgetAccountStatus(int budgetAccountId);
+        Task<ResponseDto<bool>> GetBudgetDropdownList();
+        Task<ResponseDto<int>> GetToBudgetDropdownListAndBalanceOfBudgetAccount(int bugetAccountId);
+        Task<ResponseDto<bool>> BudgetTransfer(int fromAccountId, List<SaveBudgetTransactionRequestToBudgetAccount> toAccounts, int amount, string description);
     }
 }

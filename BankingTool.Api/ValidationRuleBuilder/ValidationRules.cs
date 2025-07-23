@@ -300,5 +300,36 @@ namespace BankingTool.Api.Validators
             RuleBuilder<DeleteNoteRequestObject>.For(x => x.Request.Note.Id).Required()
         };
         #endregion Note
+        #region Budget
+        public static List<ValidationRule> SaveBudgetTransactionRequestRules = new()
+        {
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request.FromBudgetAccount).Required(),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request.ToBudgetAccount).Required(),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request.FromBudgetAccount.Id).Required(),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request.ToBudgetAccount).Required()
+                .WithCollectionRules(r => {
+                    r.CollectionMinCount = 1;
+                }),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request.FromBudgetAccount.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request.FromBudgetAccount.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                })
+        };
+        public static List<ValidationRule> GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestRules = new()
+        {
+            RuleBuilder<GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount).Required(),
+            RuleBuilder<GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount.Id).Required()
+        };
+        #endregion Budget
     }
 }

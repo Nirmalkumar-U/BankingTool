@@ -36,6 +36,7 @@ export class AppPaths {
   public static createBudgetAccount: string = 'createBudgetAccount';
   public static budgetTransactionList: string = 'budgetTransactionList/:id';
   public static budgetList: string = 'budgetList';
+  public static budgetTransfer: string = 'budgetTransfer';
 
   //Notification
   public static budgetNotification: string = 'budgetNotification';
@@ -69,6 +70,7 @@ export class AppRoute {
   // Budget
   public static createBudgetAccount: string = '/createBudgetAccount';
   public static budgetList: string = '/budgetList';
+  public static budgetTransfer: string = '/budgetTransfer';
   public static budgetTransactionList = (id: number): string => { return `/budgetTransactionList/${id}`; }
 
   //Notification
@@ -103,6 +105,7 @@ export class PageTitle {
   public static createBudgetAccount: string = 'Create Budget Account';
   public static budgetTransactionList: string = 'Budget Transaction List';
   public static budgetList: string = 'Budget List';
+  public static budgetTransfer: string = 'Budget Transfer';
 
   // Notification
   public static budgetNotification: string = 'Budget Notification';

@@ -4,7 +4,9 @@ import { AcceptBudgetTransactionRequestObject } from '../../dto/request/budget/a
 import { ChangeBudgetAccountStatusRequestObject } from '../../dto/request/budget/change-budget-account-status-request';
 import { CreateBudgetAccountRequestObject } from '../../dto/request/budget/create-budget-account-request';
 import { GetBudgetTransactionListRequestObject } from '../../dto/request/budget/get-budget-transaction-list-request';
+import { GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject } from '../../dto/request/budget/get-to-budget-dropdown-list-and-balance-of-budget-account-request';
 import { RejectBudgetTransactionRequestObject } from '../../dto/request/budget/reject-budget-transaction-request';
+import { SaveBudgetTransactionRequestObject } from '../../dto/request/budget/save-budget-transaction-request';
 import { HttpService } from '../http/http.service';
 
 @Injectable({
@@ -33,5 +35,14 @@ export class BudgetService {
   }
   changeBudgetAccountStatus(model: ChangeBudgetAccountStatusRequestObject): Observable<any> {
     return this.httpService.post('Budget/ChangeBudgetAccountStatus', model);
+  }
+  getBudgetDropdownList(): Observable<any> {
+    return this.httpService.get('Budget/GetBudgetDropdownList');
+  }
+  getToBudgetDropdownListAndBalanceOfBudgetAccount(model: GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject): Observable<any> {
+    return this.httpService.post('Budget/GetToBudgetDropdownListAndBalanceOfBudgetAccount', model);
+  }
+  saveBudgetTransaction(model: SaveBudgetTransactionRequestObject): Observable<any> {
+    return this.httpService.post('Budget/SaveBudgetTransaction', model);
   }
 }

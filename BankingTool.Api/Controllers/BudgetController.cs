@@ -13,7 +13,7 @@ namespace BankingTool.Api.Controllers
     [ApiController]
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
-    public class BudgetController(IBudgetService budgetService, IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) 
+    public class BudgetController(IBudgetService budgetService, IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor)
         : HandleRequest(validatorService, cacheProvider, httpContextAccessor)
     {
         private readonly IBudgetService _budgetService = budgetService;
@@ -95,6 +95,40 @@ namespace BankingTool.Api.Controllers
                 model,
                 ValidationRules.CreateChangeBudgetAccountStatusRequestRules,
                 () => _budgetService.ChangeBudgetAccountStatus(model.Request.BudgetAccount.Id)
+            );
+        }
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> GetBudgetDropdownList()
+        {
+            return await HandleRequestAsync<bool?, bool>(
+                null,
+                null,
+                () => _budgetService.GetBudgetDropdownList()
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<int>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<int>), 400)]
+        public async Task<IActionResult> GetToBudgetDropdownListAndBalanceOfBudgetAccount(GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject model)
+        {
+            return await HandleRequestAsync<GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject, int>(
+                model,
+                ValidationRules.GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestRules,
+                () => _budgetService.GetToBudgetDropdownListAndBalanceOfBudgetAccount(model.Request.BudgetAccount.Id)
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> SaveBudgetTransaction(SaveBudgetTransactionRequestObject model)
+        {
+            return await HandleRequestAsync<SaveBudgetTransactionRequestObject, bool>(
+                model,
+                ValidationRules.SaveBudgetTransactionRequestRules,
+                () => _budgetService.BudgetTransfer(model.Request.FromBudgetAccount.Id, model.Request.ToBudgetAccount, 
+                model.Request.FromBudgetAccount.Amount, model.Request.FromBudgetAccount.Description)
             );
         }
     }

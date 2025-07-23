@@ -37,6 +37,8 @@ import { RoleListComponent } from './role-list/role-list.component';
 import { TransactionsListComponent } from './transactions-list/transactions-list.component';
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
 import { UserListComponent } from './user-list/user-list.component';
+import { BudgetTransferComponent } from './budget-transfer/budget-transfer.component';
+import { BudgetTransferResolver } from '../core/resolver/budget-transfer.resolver';
 
 const routes: Routes = [
   {
@@ -150,6 +152,12 @@ const routes: Routes = [
     title: PageTitle.budgetList,
     component: BudgetListComponent,
     resolve: { DataResolver: BudgetListResolver }
+  },
+  {
+    path: AppPaths.budgetTransfer,
+    title: PageTitle.budgetTransfer,
+    component: BudgetTransferComponent,
+    resolve: { DataResolver: BudgetTransferResolver }
   }
 ];
 
@@ -172,7 +180,8 @@ const routes: Routes = [
     AccountNotificationComponent,
     AccountStatementReportComponent,
     BudgetStatementReportComponent,
-    BudgetListComponent
+    BudgetListComponent,
+    BudgetTransferComponent
   ],
   imports: [
     RouterModule.forChild(routes),
