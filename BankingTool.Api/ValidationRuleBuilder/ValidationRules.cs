@@ -322,7 +322,10 @@ namespace BankingTool.Api.Validators
                     r.NotEmpty = true;
                     r.MinLength = 1;
                     r.MaxLength = 100;
-                })
+                }),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(x=>x.Request.ToBudgetAccount, x => x.Id).Required(),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(x=>x.Request.ToBudgetAccount, x => x.Amount).Required(),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(x=>x.Request.ToBudgetAccount, x => x.Amount).WithNumericRules(r => r.GreaterThan = 0),
         };
         public static List<ValidationRule> GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestRules = new()
         {

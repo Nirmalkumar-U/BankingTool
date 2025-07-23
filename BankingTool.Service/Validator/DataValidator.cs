@@ -1,10 +1,8 @@
 ﻿using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
-using System.IO;
 using System.Text.RegularExpressions;
 using BankingTool.Model.Dto.BaseDto;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BankingTool.Service.Validator
 {
@@ -227,16 +225,5 @@ namespace BankingTool.Service.Validator
 
             return paths;
         }
-        //object ConvertRuleValue(object ruleValue)
-        //{
-        //    try
-        //    {
-        //        return Convert.ChangeType(ruleValue, valueType);
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-        //}
     }
 }

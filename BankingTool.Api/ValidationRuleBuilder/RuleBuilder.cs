@@ -22,6 +22,17 @@ namespace BankingTool.Api.Validators
                 PropertyPath = PropertyPathHelper.GetPath(expression)
             };
         }
+        public static ValidationRule ForCollectionItem<TItem, TProp>(
+            Expression<Func<T, IEnumerable<TItem>>> collectionExpression,
+            Expression<Func<TItem, TProp>> itemExpression)
+        {
+            var collectionPath = PropertyPathHelper.GetPath(collectionExpression);
+            var itemPath = PropertyPathHelper.GetPath(itemExpression);
+            return new ValidationRule
+            {
+                PropertyPath = $"{collectionPath}[*].{itemPath}"
+            };
+        }
     }
     public static class RuleBuilderExtensions
     {
