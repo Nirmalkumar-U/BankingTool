@@ -39,6 +39,7 @@ import { TransferAmountComponent } from './transfer-amount/transfer-amount.compo
 import { UserListComponent } from './user-list/user-list.component';
 import { BudgetTransferComponent } from './budget-transfer/budget-transfer.component';
 import { BudgetTransferResolver } from '../core/resolver/budget-transfer.resolver';
+import { CalenderComponent } from './calender/calender.component';
 
 const routes: Routes = [
   {
@@ -158,6 +159,11 @@ const routes: Routes = [
     title: PageTitle.budgetTransfer,
     component: BudgetTransferComponent,
     resolve: { DataResolver: BudgetTransferResolver }
+  },
+  {
+    path: AppPaths.calender,
+    title: PageTitle.calender,
+    component: CalenderComponent
   }
 ];
 
@@ -181,7 +187,8 @@ const routes: Routes = [
     AccountStatementReportComponent,
     BudgetStatementReportComponent,
     BudgetListComponent,
-    BudgetTransferComponent
+    BudgetTransferComponent,
+    CalenderComponent
   ],
   imports: [
     RouterModule.forChild(routes),

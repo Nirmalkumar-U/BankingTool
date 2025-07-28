@@ -39,6 +39,9 @@ USING (VALUES
  ,(35,N'Budget List',N'/budgetList',N'Menu',N'RW',2,19,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(36,N'Budget Transfer',N'/budgetTransfer',N'Menu',N'R',2,19,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(37,N'Budget Transfer',N'/budgetTransfer',N'Menu',N'RW',2,19,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(38,N'Calender',NULL,N'ActionMenu',NULL,1,NULL,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(39,N'Calender',N'/calender',N'Action',N'R',2,38,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(40,N'Calender',N'/calender',N'Action',N'RW',2,38,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
 ) AS Source ([ActionId],[ActionName],[ActionPath],[ActionType],[Access],[MenuLevel],[ParrentMenuId],[Sequence],[CreatedDate],[CreatedBy],[ModifiedDate],[ModifiedBy],[IsDeleted])
 ON (Target.[ActionId] = Source.[ActionId])
 WHEN MATCHED AND (
@@ -114,5 +117,5 @@ Values (1,1),
 (2,29),
 (2,31),
 (2,33),
-(2,35),
-(2,37)
+(2,38),
+(2,40)

@@ -45,6 +45,9 @@ export class AppPaths {
   //Report
   public static accountStatementReport: string = 'accountStatementReport';
   public static budgetStatementReport: string = 'budgetStatementReport';
+
+  //Calender
+  public static calender: string = 'calender';
 }
 
 export class AppRoute {
@@ -80,6 +83,9 @@ export class AppRoute {
   //Report
   public static accountStatementReport: string = '/accountStatementReport';
   public static budgetStatementReport: string = '/budgetStatementReport';
+
+  //Calender
+  public static calender: string = '/calender';
 }
 export class PageTitle {
   public static home: string = 'Home';
@@ -114,6 +120,9 @@ export class PageTitle {
   //Report
   public static accountStatementReport: string = 'Account Statement Report';
   public static budgetStatementReport: string = 'Budget Statement Report';
+
+  //Calender
+  public static calender: string = 'Calender';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';
