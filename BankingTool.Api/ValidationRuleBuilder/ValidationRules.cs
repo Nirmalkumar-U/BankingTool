@@ -245,11 +245,7 @@ namespace BankingTool.Api.Validators
                     r.MinLength = 1;
                     r.MaxLength = 100;
                 }),
-            RuleBuilder<CreateBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount.Amount)
-                .Required()
-                .WithNumericRules(r => {
-                    r.GreaterThan = 0;
-                }),
+            RuleBuilder<CreateBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount.Amount).Required(),
         };
         public static List<ValidationRule> CreateGetBudgetTransactionListRequestObjectRules = new()
         {
