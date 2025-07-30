@@ -5,8 +5,12 @@ import { SelectControlComponent } from './select-control/select-control.componen
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableComponent } from './data-table/data-table.component';
 import { ResizableColumnDirective } from './directive/resizable-column.directive';
-
-
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -23,7 +27,13 @@ import { ResizableColumnDirective } from './directive/resizable-column.directive
   exports: [
     TextboxControlComponent,
     SelectControlComponent,
-    DataTableComponent
+    DataTableComponent,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatCheckboxModule
   ]
 })
 export class SharedModule { }

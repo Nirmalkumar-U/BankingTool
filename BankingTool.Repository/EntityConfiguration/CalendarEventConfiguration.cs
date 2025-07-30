@@ -1,8 +1,7 @@
-﻿using BankingTool.Model.Enums;
+﻿using BankingTool.Model;
 using BankingTool.Model.Model;
-using BankingTool.Model;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BankingTool.Repository.EntityConfiguration
 {
@@ -35,18 +34,15 @@ namespace BankingTool.Repository.EntityConfiguration
             builder.Property(e => e.EndDateTime);
 
             builder.Property(e => e.EventType)
-                   .HasConversion<string>()
                    .IsRequired()
                    .HasMaxLength(50);
 
             builder.Property(e => e.Recurrence)
-                   .HasConversion<string>()
                    .HasMaxLength(50);
 
-            builder.Property(e => e.RecurrenceInterval);
+            builder.Property(e => e.Duration);
 
             builder.Property(e => e.Priority)
-                   .HasConversion<string>()
                    .IsRequired()
                    .HasMaxLength(50);
 

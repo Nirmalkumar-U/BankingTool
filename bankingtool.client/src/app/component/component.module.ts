@@ -3,6 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
+import { FullCalendarModule } from '@fullcalendar/angular';
 import { AppPaths, PageTitle } from '../constant/constant';
 import { SharedModule } from '../core/component/shared.module';
 import { AccountNotificationResolver } from '../core/resolver/account-notification.resolver';
@@ -12,6 +13,7 @@ import { BudgetListResolver } from '../core/resolver/budget-list.resolver';
 import { BudgetNotificationResolver } from '../core/resolver/budget-notification.resolver';
 import { BudgetStatementReportResolver } from '../core/resolver/budget-statement-report.resolver';
 import { BudgetTransactionListResolver } from '../core/resolver/budget-transaction-list.resolver';
+import { BudgetTransferResolver } from '../core/resolver/budget-transfer.resolver';
 import { CashWithdrawResolver } from '../core/resolver/cash-withdraw.resolver';
 import { CreateAccountResolver } from '../core/resolver/create-account.resolver';
 import { HomeResolver } from '../core/resolver/home.resolver';
@@ -27,6 +29,8 @@ import { BudgetListComponent } from './budget-list/budget-list.component';
 import { BudgetNotificationComponent } from './budget-notification/budget-notification.component';
 import { BudgetStatementReportComponent } from './budget-statement-report/budget-statement-report.component';
 import { BudgetTransactionListComponent } from './budget-transaction-list/budget-transaction-list.component';
+import { BudgetTransferComponent } from './budget-transfer/budget-transfer.component';
+import { CalenderComponent } from './calender/calender.component';
 import { CashWithdrawComponent } from './cash-withdraw/cash-withdraw.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { CreateBudgetAccountComponent } from './create-budget-account/create-budget-account.component';
@@ -37,9 +41,7 @@ import { RoleListComponent } from './role-list/role-list.component';
 import { TransactionsListComponent } from './transactions-list/transactions-list.component';
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
 import { UserListComponent } from './user-list/user-list.component';
-import { BudgetTransferComponent } from './budget-transfer/budget-transfer.component';
-import { BudgetTransferResolver } from '../core/resolver/budget-transfer.resolver';
-import { CalenderComponent } from './calender/calender.component';
+import { AddEventDialogComponent } from './calender/add-event-dialog/add-event-dialog.component';
 
 const routes: Routes = [
   {
@@ -166,7 +168,6 @@ const routes: Routes = [
     component: CalenderComponent
   }
 ];
-
 @NgModule({
   declarations: [
     HomeComponent,
@@ -188,14 +189,16 @@ const routes: Routes = [
     BudgetStatementReportComponent,
     BudgetListComponent,
     BudgetTransferComponent,
-    CalenderComponent
+    CalenderComponent,
+    AddEventDialogComponent
   ],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
     HttpClientModule,
     ReactiveFormsModule,
-    SharedModule 
+    SharedModule,
+    FullCalendarModule
   ]
 })
 export class ComponentModule { }

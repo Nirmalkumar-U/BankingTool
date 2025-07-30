@@ -1,1 +1,17 @@
-<p>calender works!</p>
+<!--<div class="dashboard-content">
+  <div class="calendar-wrapper">
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <h2><i class="fa fa-calendar-alt"></i> My Calendar</h2>
+      </div>
+      <div class="calendar-body">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+      </div>
+    </div>
+  </div>
+</div>-->
+
+<div class="calendar-container">
+  <full-calendar [options]="calendarOptions"></full-calendar>
+  <button (click)="addEvent()">Add Event</button>
+</div>

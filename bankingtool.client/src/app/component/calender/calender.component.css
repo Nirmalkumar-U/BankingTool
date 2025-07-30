@@ -1,0 +1,117 @@
+/*.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.calendar-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  width: 100%;
+  max-width: 900px;
+  transition: all 0.3s ease-in-out;
+}
+
+  .calendar-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+.calendar-header {
+  background: linear-gradient(90deg, #3f51b5, #2196f3);
+  color: white;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+  .calendar-header i {
+    margin-right: 10px;
+  }
+
+.calendar-body {
+  padding: 12px;
+}*/
+
+/* FullCalendar Overrides */
+/*.fc .fc-toolbar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.fc .fc-daygrid-day-number {
+  font-weight: 500;
+}
+
+.fc .fc-day-today {
+  background: #e3f2fd !important;
+}*/
+
+/* Reduce overall calendar height */
+/*:host ::ng-deep .fc {
+  max-height: 650px;
+}*/
+
+/* Reduce day cell height */
+/*:host ::ng-deep .fc-daygrid-day {
+  min-height: 75px;
+}*/
+
+/* Common event style */
+/*.fc .fc-event {
+  border-radius: 20px;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: white !important;
+  border: none !important;
+  transition: all 0.2s ease-in-out;
+}*/
+
+  /* Event type colors - distinct and visually appealing */
+  /*.fc .fc-event.Holiday {
+    background-color: #ff6f00 !important;*/ /* Vibrant Amber for Holidays */
+  /*}
+
+  .fc .fc-event.Event {
+    background-color: #0288d1 !important;*/ /* Bright Blue for Events */
+  /*}
+
+  .fc .fc-event.Note {
+    background-color: #388e3c !important;*/ /* Forest Green for Notes */
+  /*}
+
+  .fc .fc-event.Reminder {
+    background-color: #d81b60 !important;*/ /* Vivid Pink for Reminders */
+  /*}*/
+
+  /* Hover effect */
+  /*.fc .fc-event:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+  }*/
+
+
+.calendar-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+  button:hover {
+    background-color: #0056b3;
+  }
