@@ -22,7 +22,7 @@ namespace BankingTool.Repository.Repository
         public async Task<List<DropDownDto>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId)
         {
             var aa = await (from a in dataContext.Account.AsNoTracking()
-                            where a.CustomerId == customerId && a.AccountTypeId == accountTypeId
+                            where a.CustomerId == customerId && a.AccountTypeId == accountTypeId && a.IsDeleted == false
                             select a.BankId).ToListAsync();
 
             return await dataContext.Bank.Where(x => !aa.Contains(x.BankId)).Select(z => new DropDownDto
@@ -44,7 +44,7 @@ namespace BankingTool.Repository.Repository
         {
             return await (from a in dataContext.Account.AsNoTracking()
                           join c in dataContext.Card.AsNoTracking() on a.AccountId equals c.AccountId
-                          where a.CustomerId == customerId && a.BankId == bankId && c.CardType == CardType.CreditCard
+                          where a.CustomerId == customerId && a.BankId == bankId && c.CardType == CardType.CreditCard && a.IsDeleted == false
                           select c).AnyAsync();
         }
         public async Task<List<DropDownDto>> GetAllActiveCustomerDropDown()
@@ -72,7 +72,7 @@ namespace BankingTool.Repository.Repository
         }
         public async Task<bool> IsAnyAccountForThisCustomer(int customerId)
         {
-            return await dataContext.Account.AnyAsync(x => x.CustomerId == customerId);
+            return await dataContext.Account.AnyAsync(x => x.CustomerId == customerId && x.IsDeleted == false);
         }
         public async Task<Customer> GetCustomerByCustomerId(int customerId)
         {
@@ -173,7 +173,7 @@ namespace BankingTool.Repository.Repository
         public async Task<(int, string, string, string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId)
         {
             var accType = await dataContext.CodeValue.FirstOrDefaultAsync(x => x.CodeValueId == accountTypeId);
-            var account = await dataContext.Account.FirstOrDefaultAsync(x => x.BankId == bankId && x.AccountTypeId == accType.CodeValueId && x.CustomerId == customerId);
+            var account = await dataContext.Account.FirstOrDefaultAsync(x => x.BankId == bankId && x.AccountTypeId == accType.CodeValueId && x.CustomerId == customerId && x.IsDeleted == false);
             var name = await (from u in dataContext.Users.AsNoTracking()
                               join c in dataContext.Customer.AsNoTracking() on u.UserId equals c.UserId
                               where c.CustomerId == customerId
@@ -185,7 +185,7 @@ namespace BankingTool.Repository.Repository
         {
             return await (from a in dataContext.Account.AsNoTracking()
                           join b in dataContext.Bank.AsNoTracking() on a.BankId equals b.BankId
-                          where a.CustomerId == dataContext.CustomerId
+                          where a.CustomerId == dataContext.CustomerId && a.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = b.BankId,
@@ -196,7 +196,7 @@ namespace BankingTool.Repository.Repository
         {
             return await (from a in dataContext.Account.AsNoTracking()
                           join cv in dataContext.CodeValue.AsNoTracking() on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == customerId && a.BankId == BankId
+                          where a.CustomerId == customerId && a.BankId == BankId && a.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = cv.CodeValueId,
@@ -211,7 +211,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == dataContext.CustomerId && a.AccountStatus == AccountStatus.Active
+                          where a.CustomerId == dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -225,7 +225,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == dataContext.CustomerId && a.AccountId != accountId && a.AccountStatus == AccountStatus.Active
+                          where a.CustomerId == dataContext.CustomerId && a.AccountId != accountId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -385,7 +385,7 @@ namespace BankingTool.Repository.Repository
         {
             var accountDetailList = await dataContext.Account
                 .Include(c => c.Bank)
-                .Where(z => z.CustomerId == dataContext.CustomerId)
+                .Where(z => z.CustomerId == dataContext.CustomerId && z.IsDeleted == false)
                 .Select(x => new DashBoardAccountList
                 {
                     BankName = x.Bank.BankAbbrivation,
