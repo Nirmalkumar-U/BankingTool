@@ -1,12 +1,16 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { CalendarOptions, EventClickArg, EventMountArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
+import rrulePlugin from '@fullcalendar/rrule';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import rrulePlugin from '@fullcalendar/rrule'
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { CalenderService } from '../../core/service/calender.service';
+import { CreateAddEventRequest } from '../../dto/request/calender/add-event-request';
 import { CalendarEventDto } from '../../dto/request/calender/calendar-event-dto';
 import { ResponseDto } from '../../dto/response-dto';
+import { AddEventModalComponent } from './add-event-modal/add-event-modal.component';
 
 export interface CalendarEvent {
   id: string;
@@ -49,7 +53,8 @@ export class CalenderComponent {
     eventDidMount: this.handleEventDidMount.bind(this) // Add eventDidMount to set colors dynamically
   };
 
-  constructor(private calendarService: CalenderService, private cdr: ChangeDetectorRef) { }
+  constructor(private calendarService: CalenderService, private cdr: ChangeDetectorRef,
+    private dialog: MatDialog, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.loadEvents();
@@ -72,6 +77,14 @@ export class CalenderComponent {
           }
         }));
         this.calendarOptions.events = mappedEvents;
+      } else {
+        let messageList: string[] = [];
+        if (Array.isArray(response?.errors) && response?.errors)
+          messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+        messageList.push("Get Account Balance failed.");
+        messageList.forEach((msg) => {
+          this.notificationService.show(msg, 'error');
+        });
       }
       this.cdr.detectChanges();
     });
@@ -109,28 +122,29 @@ export class CalenderComponent {
   }
 
   addEvent(): void {
-    // Example: Add a new event (customize based on your form/modal)
-    const today = new Date();
-    const plus7Days = new Date();
-    plus7Days.setDate(today.getDate() + 7);
-    const newEvent: CalendarEvent = {
-      id: Math.random().toString(),
-      title: 'New Event',
-      start: new Date().toISOString(),
-      end: plus7Days.toISOString(),
-      extendedProps: {
-        type: 'event',
-        description: 'Default description for new event'
+    const dialogRef = this.dialog.open(AddEventModalComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe((result: CalendarEventDto) => {
+      if (result) {
+        let model = CreateAddEventRequest(result);
+        this.calendarService.addEvent(model).subscribe((response: ResponseDto<number | null>) => {
+          if (response.status == true) {
+            this.notificationService.show("Event Added successfully", 'success');
+            this.loadEvents()
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Get Account Balance failed.");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error');
+            });
+          }
+        });
       }
-    };
-    this.sampleEvents.push(newEvent);
-    this.loadEvents();
-    //this.calendarService.addEvent(newEvent).subscribe(() => {
-    //  this.loadEvents();
-    //});
+    });
   }
 
-
-  private sampleEvents: CalendarEvent[] = [];
-  
 }

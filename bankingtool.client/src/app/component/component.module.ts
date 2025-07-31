@@ -42,6 +42,7 @@ import { TransactionsListComponent } from './transactions-list/transactions-list
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { AddEventDialogComponent } from './calender/add-event-dialog/add-event-dialog.component';
+import { AddEventModalComponent } from './calender/add-event-modal/add-event-modal.component';
 
 const routes: Routes = [
   {
@@ -190,7 +191,7 @@ const routes: Routes = [
     BudgetListComponent,
     BudgetTransferComponent,
     CalenderComponent,
-    AddEventDialogComponent
+    AddEventModalComponent
   ],
   imports: [
     RouterModule.forChild(routes),

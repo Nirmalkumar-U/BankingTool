@@ -1,6 +1,8 @@
 ﻿using BankingTool.Api.Filter;
+using BankingTool.Api.Validators;
 using BankingTool.Model;
 using BankingTool.Model.Dto.InternalDto;
+using BankingTool.Model.Dto.RequestDto.Calender;
 using BankingTool.Service.IService;
 using LazyCache;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +26,17 @@ namespace BankingTool.Api.Controllers
                 null,
                 null,
                 () => _calenderService.GetCalendarEventList()
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<int?>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<int?>), 400)]
+        public Task<IActionResult> AddEvent(AddEventRequestObject model)
+        {
+            return HandleRequestAsync<AddEventRequestObject, int?>(
+                model,
+                ValidationRules.AddEventRequestRules,
+                () => _calenderService.AddEvent(model.Request.CalendarEvent)
             );
         }
     }

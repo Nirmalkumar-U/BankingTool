@@ -18,7 +18,7 @@ namespace BankingTool.Repository.Repository
                     UserId = x.UserId,
                     Title = x.Title,
                     Description = x.Description,
-                    EventType = CalenderEventTypeEnum.MapCalendarEventType(x.EventType),
+                    EventType = CalenderEventTypeEnum.MapCalendarEventTypeStringToEnum(x.EventType),
                     StartDateTime = x.StartDateTime,
                     EndDateTime = x.EndDateTime,
                     IsAllDay = x.IsAllDay,
@@ -26,6 +26,22 @@ namespace BankingTool.Repository.Repository
                     Recurrence = x.Recurrence
                 }).ToListAsync();
             return calendarEventList;
+        }
+
+        public async Task<int?> InsertEvent(CalendarEvent model)
+        {
+            model.UserId = dataContext.UserId;
+            return await Task.FromResult(InsertCalendarEvent(model));
+        }
+        private int? InsertCalendarEvent(CalendarEvent model)
+        {
+            model.CreatedBy = dataContext.UserEmail;
+            model.CreatedDate = DateTime.Now;
+            model.ModifiedBy = null;
+            model.ModifiedDate = null;
+            model.IsDeleted = false;
+            var isInserted = Insert(model);
+            return isInserted ? model.CalendarEventId : null;
         }
     }
 }

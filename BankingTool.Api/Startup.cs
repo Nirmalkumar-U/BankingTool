@@ -1,5 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Autofac;
 using BankingTool.Api.CustomeDI;
 using BankingTool.Model;
@@ -49,6 +51,12 @@ namespace BankingTool.Api
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
+            });
+
+            services.AddControllers().AddJsonOptions(option =>
+            {
+                option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                option.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             });
 
             services.AddMemoryCache();

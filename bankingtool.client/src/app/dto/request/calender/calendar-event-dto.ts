@@ -6,7 +6,7 @@ export interface CalendarEventDto {
   startDateTime: string;
   endDateTime: string | null;
   eventType: 'meeting' | 'reminder' | 'notes' | 'event' | 'holiday';
-  recurrence: string;
-  duration: string;
+  recurrence: string | null;
+  duration: string | null;
   isAllDay: boolean;
 }

@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app.routing.module';
 import { LoaderComponent } from './component/loader/loader.component';
 import { NoteComponent } from './component/note/note.component';
 import { NotificationPopupComponent } from './core/component/notification-popup/notification-popup.component';
+import { SharedModule } from './core/component/shared.module';
 import { CoreModule } from './core/core.module';
 
 @NgModule({
@@ -25,7 +26,8 @@ import { CoreModule } from './core/core.module';
     AppRoutingModule,
     CoreModule,
     FontAwesomeModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    SharedModule // Add for shared components/modules
   ],
   providers: [],
   bootstrap: [AppComponent]

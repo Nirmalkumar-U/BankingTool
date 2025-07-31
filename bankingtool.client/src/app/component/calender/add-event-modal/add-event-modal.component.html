@@ -1,0 +1,61 @@
+<div class="modal-container">
+  <h2 mat-dialog-title>Add New Event</h2>
+  <mat-dialog-content>
+    <form #eventForm="ngForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill">
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="newEvent.title" name="title" placeholder="Event Title" required>
+        <mat-error *ngIf="eventForm.controls['title']?.hasError('required')">Title is required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" *ngIf="!newEvent.isAllDay">
+        <mat-label>Start Date & Time</mat-label>
+        <input matInput [(ngModel)]="newEvent.startDateTime" name="startDateTime" type="datetime-local">
+      </mat-form-field>
+      <mat-form-field appearance="fill" *ngIf="newEvent.isAllDay">
+        <mat-label>Start Date</mat-label>
+        <input matInput [(ngModel)]="newEvent.startDate" name="startDate" type="date">
+      </mat-form-field>
+      <mat-form-field appearance="fill" *ngIf="!newEvent.isAllDay">
+        <mat-label>End Date & Time</mat-label>
+        <input matInput [(ngModel)]="newEvent.endDateTime" name="endDateTime" type="datetime-local">
+      </mat-form-field>
+      <mat-form-field appearance="fill" *ngIf="newEvent.isAllDay">
+        <mat-label>End Date</mat-label>
+        <input matInput [(ngModel)]="newEvent.endDate" name="endDate" type="date">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Event Type</mat-label>
+        <mat-select [(ngModel)]="newEvent.eventType" name="eventType" required>
+          <mat-option value="meeting">Meeting</mat-option>
+          <mat-option value="reminder">Reminder</mat-option>
+          <mat-option value="notes">Notes</mat-option>
+          <mat-option value="event">Event</mat-option>
+          <mat-option value="holiday">Holiday</mat-option>
+        </mat-select>
+        <mat-error *ngIf="eventForm.controls['eventType']?.hasError('required')">Event Type is required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="newEvent.description" name="description" placeholder="Event Description"></textarea>
+      </mat-form-field>
+      <mat-checkbox [(ngModel)]="newEvent.isAllDay" name="isAllDay">All Day</mat-checkbox>
+      <mat-form-field appearance="fill">
+        <mat-label>Recurrence</mat-label>
+        <mat-select [(ngModel)]="newEvent.recurrenceFreq" name="recurrenceFreq">
+          <mat-option value="">None</mat-option>
+          <mat-option value="DAILY">Daily</mat-option>
+          <mat-option value="WEEKLY">Weekly</mat-option>
+          <mat-option value="MONTHLY">Monthly</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Interval (e.g., 2 for every 2 weeks)</mat-label>
+        <input matInput [(ngModel)]="newEvent.interval" name="interval" type="number" min="1" placeholder="Interval">
+      </mat-form-field>
+      <mat-dialog-actions>
+        <button mat-button type="button" (click)="onCancel()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!eventForm.valid">Add Event</button>
+      </mat-dialog-actions>
+    </form>
+  </mat-dialog-content>
+</div>

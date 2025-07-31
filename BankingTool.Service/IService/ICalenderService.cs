@@ -6,5 +6,6 @@ namespace BankingTool.Service.IService
     public interface ICalenderService
     {
         Task<ResponseDto<List<CalendarEventDto>>> GetCalendarEventList();
+        Task<ResponseDto<int?>> AddEvent(CalendarEventDto model);
     }
 }

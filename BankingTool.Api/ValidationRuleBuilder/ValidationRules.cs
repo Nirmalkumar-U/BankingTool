@@ -1,6 +1,7 @@
 ﻿using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.RequestDto.Budget;
+using BankingTool.Model.Dto.RequestDto.Calender;
 using BankingTool.Model.Dto.RequestDto.Note;
 using BankingTool.Model.Dto.RequestDto.User;
 
@@ -330,5 +331,26 @@ namespace BankingTool.Api.Validators
             RuleBuilder<GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject>.For(x => x.Request.BudgetAccount.Id).Required()
         };
         #endregion Budget
+        #region Calendar
+        public static List<ValidationRule> AddEventRequestRules = new()
+        {
+            RuleBuilder<AddEventRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<AddEventRequestObject>.For(x => x.Request.CalendarEvent).Required(),
+            RuleBuilder<AddEventRequestObject>.For(x => x.Request.CalendarEvent.Title)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<AddEventRequestObject>.For(x => x.Request.CalendarEvent.Description).Required()
+                .WithStringRules(r => {
+                    r.MaxLength = 500;
+                }),
+            RuleBuilder<AddEventRequestObject>.For(x => x.Request.CalendarEvent.EventType).Required(),
+            RuleBuilder<AddEventRequestObject>.For(x => x.Request.CalendarEvent.StartDateTime).Required(),
+            RuleBuilder<AddEventRequestObject>.For(x => x.Request.CalendarEvent.IsAllDay).Required()
+        };
+        #endregion Calendar
     }
 }
