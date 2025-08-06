@@ -29,24 +29,3 @@ CREATE TABLE CalendarEvent (
     IsDeleted BIT NOT NULL
 );
 ------------------------------------------------------------------------------------------------------------------------
-If(OBJECT_ID('[FK_CalendarNote_Users_UserId]') Is Not Null)
-BEGIN
-	ALTER TABLE CalendarNote DROP CONSTRAINT [FK_CalendarNote_Users_UserId]
-END
-GO
-IF EXISTS (SELECT * FROM sys.tables where name = N'CalendarNote')
-BEGIN
-	DROP TABLE CalendarNote
-END
-GO
-CREATE TABLE CalendarNote (
-    CalendarNoteId INT IDENTITY(1,1) PRIMARY KEY,
-    [UserId] INT CONSTRAINT FK_CalendarNote_Users_UserId FOREIGN KEY (UserId) REFERENCES Users(UserId) NOT NULL,
-    Message NVARCHAR(MAX) NOT NULL,
-    Date DATE NOT NULL,
-    CreatedDate DATETIME2 NOT NULL,
-    CreatedBy NVARCHAR(100) NOT NULL,
-    ModifiedDate DATETIME2 NULL,
-    ModifiedBy NVARCHAR(100) NULL,
-    IsDeleted BIT NOT NULL
-);
