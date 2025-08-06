@@ -14,6 +14,7 @@ namespace BankingTool.Model
         public virtual Users User { get; set; }
         public virtual ICollection<Account> Account { get; set; }
         public virtual ICollection<BudgetAccount> BudgetAccount { get; set; }
+        public virtual ICollection<WalletAccount> WalletAccount { get; set; }
         public virtual CreditScore CreditScore { get; set; }
     }
 }

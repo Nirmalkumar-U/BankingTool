@@ -30,7 +30,7 @@ USING (VALUES
  ,(26,N'Budget Notification',N'/budgetNotification',N'Action',N'RW',2,24,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(27,N'Account Notification',N'/accountNotification',N'Action',N'R',2,24,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(28,N'Account Notification',N'/accountNotification',N'Action',N'RW',2,24,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
- ,(29,N'Report',NULL,N'Menu',NULL,1,NULL,4,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(29,N'Report',NULL,N'Menu',NULL,1,NULL,5,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(30,N'Account Statement Report',N'/accountStatementReport',N'Menu',N'R',2,29,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(31,N'Account Statement Report',N'/accountStatementReport',N'Menu',N'RW',2,29,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(32,N'Budget Statement Report',N'/budgetStatementReport',N'Menu',N'R',2,29,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
@@ -42,6 +42,15 @@ USING (VALUES
  ,(38,N'Calender',NULL,N'ActionMenu',NULL,1,NULL,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(39,N'Calender',N'/calender',N'Action',N'R',2,38,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(40,N'Calender',N'/calender',N'Action',N'RW',2,38,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(41,N'Wallet',NULL,N'Menu',NULL,1,NULL,4,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(42,N'Create Wallet',N'/createWallet',N'Menu',N'R',2,41,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(43,N'Create Wallet',N'/createWallet',N'Menu',N'RW',2,41,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(44,N'Wallet List',N'/walletList',N'Menu',N'R',2,41,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(45,N'Wallet List',N'/walletList',N'Menu',N'RW',2,41,2,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(46,N'Wallet Transfer',N'/walletTransfer',N'Menu',N'R',2,41,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(47,N'Wallet Transfer',N'/walletTransfer',N'Menu',N'RW',2,41,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(48,N'Wallet Transaction List',N'/walletTransactionList',N'Action',N'R',NULL,41,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(49,N'Wallet Transaction List',N'/walletTransactionList',N'Action',N'RW',NULL,41,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
 ) AS Source ([ActionId],[ActionName],[ActionPath],[ActionType],[Access],[MenuLevel],[ParrentMenuId],[Sequence],[CreatedDate],[CreatedBy],[ModifiedDate],[ModifiedBy],[IsDeleted])
 ON (Target.[ActionId] = Source.[ActionId])
 WHEN MATCHED AND (
@@ -118,4 +127,9 @@ Values (1,1),
 (2,31),
 (2,33),
 (2,38),
-(2,40)
+(2,40),
+(2,41),
+(2,43),
+(2,45),
+(2,47),
+(2,49)

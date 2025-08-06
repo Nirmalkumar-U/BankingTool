@@ -26,7 +26,6 @@ export interface CalendarEvent {
   };
 }
 
-
 @Component({
   selector: 'app-calender',
   templateUrl: './calender.component.html',
@@ -37,7 +36,7 @@ export class CalenderComponent {
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, listPlugin, rrulePlugin],
-    initialView: 'dayGridMonth',
+    initialView: 'timeGridWeek',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',

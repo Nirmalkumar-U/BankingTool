@@ -29,3 +29,74 @@ CREATE TABLE CalendarEvent (
     IsDeleted BIT NOT NULL
 );
 ------------------------------------------------------------------------------------------------------------------------
+If(OBJECT_ID('[FK_WalletAccount_CustomerId]') Is Not Null)
+BEGIN
+	ALTER TABLE [WalletAccount] DROP CONSTRAINT [FK_WalletAccount_CustomerId]
+END
+GO
+
+If(OBJECT_ID('[FK_WalletTransactionDetail_WalletTransactionId]') Is Not Null)
+BEGIN
+	ALTER TABLE [WalletTransactionDetail] DROP CONSTRAINT [FK_WalletTransactionDetail_WalletTransactionId]
+END
+GO
+
+If(OBJECT_ID('[FK_WalletTransactionDetail_WalletAccountId]') Is Not Null)
+BEGIN
+	ALTER TABLE [WalletTransactionDetail] DROP CONSTRAINT [FK_WalletTransactionDetail_WalletAccountId]
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.tables where name = N'WalletAccount')
+BEGIN
+	DROP TABLE [WalletAccount]
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.tables where name = N'WalletTransaction')
+BEGIN
+	DROP TABLE [WalletTransaction]
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.tables where name = N'WalletTransactionDetail')
+BEGIN
+	DROP TABLE [WalletTransactionDetail]
+END
+GO
+
+CREATE TABLE [WalletAccount] (
+	WalletAccountId INT CONSTRAINT [PK_WalletAccount] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
+	CustomerId INT NOT NULL CONSTRAINT [FK_WalletAccount_CustomerId] FOREIGN KEY REFERENCES Customer(CustomerId),
+	WalletName VARCHAR(50) NOT NULL,
+	WalletNumber VARCHAR(8) NOT NULL,
+	Balance INT NOT NULL,
+	WalletStatus VARCHAR(10) NOT NULL,
+	CreatedDate DATETIME NOT NULL,
+	CreatedBy VARCHAR(30) NOT NULL,
+	ModifiedDate DATETIME NULL,
+	ModifiedBy VARCHAR(30) NULL,
+	IsDeleted BIT DEFAULT 0)
+
+CREATE TABLE [WalletTransaction] (
+    WalletTransactionId INT CONSTRAINT [PK_WalletTransaction] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
+    TransactionCategory VARCHAR(20) NOT NULL,
+    Amount INT NOT NULL,
+    Description VARCHAR(500),
+    TransactionTime DATETIME NOT NULL DEFAULT GETDATE(),
+	TransactionTag VARCHAR(50) NULL,
+    CreatedBy VARCHAR(30) NOT NULL,
+    CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
+    ModifiedBy VARCHAR(30) NULL,
+    ModifiedDate DATETIME NULL,
+    IsDeleted BIT DEFAULT 0
+);
+
+CREATE TABLE [WalletTransactionDetail] (
+    WalletTransactionDetailId INT CONSTRAINT [PK_WalletTransactionDetail] PRIMARY KEY IDENTITY(1,1),
+    WalletTransactionId INT NOT NULL CONSTRAINT [FK_WalletTransactionDetail_WalletTransactionId] FOREIGN KEY REFERENCES [WalletTransaction](WalletTransactionId),
+	WalletAccountId INT NOT NULL CONSTRAINT [FK_WalletTransactionDetail_WalletAccountId] FOREIGN KEY REFERENCES WalletAccount(WalletAccountId),
+    TransactionRole VARCHAR(10) NOT NULL,
+    TransactionType VARCHAR(10) NOT NULL,
+    StageBalance INT NOT NULL
+);
