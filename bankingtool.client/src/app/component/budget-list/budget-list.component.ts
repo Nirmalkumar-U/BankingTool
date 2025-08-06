@@ -14,6 +14,7 @@ import { GetBudgetList, GetBudgetListResponse } from '../../dto/response/get-bud
 })
 export class BudgetListComponent {
   budgetList: GetBudgetList[] = [];
+  inActiveBudgetList: GetBudgetList[] = [];
   constructor(private readonly activatedRoute: ActivatedRoute, private budgetService: BudgetService,
     private readonly router: Router, private notificationService: NotificationService) {
   }
@@ -28,7 +29,8 @@ export class BudgetListComponent {
         this.notificationService.show(msg, 'error')
       });
     }
-    this.budgetList = initialData.response.budgetList;
+    this.budgetList = initialData.response.budgetList.filter(x => x.budgetStatus == 'Active');
+    this.inActiveBudgetList = initialData.response.budgetList.filter(x => x.budgetStatus == 'InActive');
   }
   getBudgetTransactionList(budgetAccountId: number) {
     this.router.navigate([AppRoute.budgetTransactionList(budgetAccountId)]);
@@ -41,6 +43,10 @@ export class BudgetListComponent {
           const budget = this.budgetList.find(item => item.budgetAccountId === budgetAccountId);
           if (budget) {
             budget.budgetStatus = budget.budgetStatus === 'Active' ? 'InActive' : 'Active';
+          }
+          const inActiveBudget = this.inActiveBudgetList.find(item => item.budgetAccountId === budgetAccountId);
+          if (inActiveBudget) {
+            inActiveBudget.budgetStatus = inActiveBudget.budgetStatus === 'Active' ? 'InActive' : 'Active';
           }
           this.notificationService.show("Budget Account Status updated successfully.", 'success')
         } else {

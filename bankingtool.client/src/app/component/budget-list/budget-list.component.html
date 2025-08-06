@@ -5,6 +5,7 @@
         <h1>Budget List</h1>
       </div>
       <div class='card-body'>
+        <h3 class="fw-bold">Active Budget List</h3>
         <table class="table caption-top">
           <thead>
             <tr>
@@ -26,6 +27,37 @@
             </tr>
           </tbody>
           <ng-template #noRecords>
+            <tbody>
+              <tr>
+                <td colspan="9" class="text-center">No records found</td>
+              </tr>
+            </tbody>
+          </ng-template>
+        </table>
+      </div>
+      <div class='card-body'>
+        <h3 class="fw-bold">InActive Budget List</h3>
+        <table class="table caption-top">
+          <thead>
+            <tr>
+              <th scope="col">Budget Name</th>
+              <th scope="col">Budget Number</th>
+              <th scope="col">Balance</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="inActiveBudgetList && inActiveBudgetList != null && inActiveBudgetList.length != 0; else inActiveNoRecords">
+            <tr *ngFor="let trans of inActiveBudgetList">
+              <td> <a style="cursor: pointer;" class="text-secondary" (click)="getBudgetTransactionList(trans.budgetAccountId)">{{ trans.budgetName }}</a></td>
+              <td>{{ trans.budgetNumber }}</td>
+              <td>{{ trans.balance }}</td>
+              <td>
+                <button class="btn btn-primary" *ngIf="trans.budgetStatus == 'InActive'" (click)="changeStatus(trans.budgetAccountId)">Active</button>
+                <button class="btn btn-danger" *ngIf="trans.budgetStatus == 'Active'" (click)="changeStatus(trans.budgetAccountId)">InActive</button>
+              </td>
+            </tr>
+          </tbody>
+          <ng-template #inActiveNoRecords>
             <tbody>
               <tr>
                 <td colspan="9" class="text-center">No records found</td>
