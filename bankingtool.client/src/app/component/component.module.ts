@@ -41,7 +41,6 @@ import { RoleListComponent } from './role-list/role-list.component';
 import { TransactionsListComponent } from './transactions-list/transactions-list.component';
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
 import { UserListComponent } from './user-list/user-list.component';
-import { AddEventDialogComponent } from './calender/add-event-dialog/add-event-dialog.component';
 import { AddEventModalComponent } from './calender/add-event-modal/add-event-modal.component';
 
 const routes: Routes = [

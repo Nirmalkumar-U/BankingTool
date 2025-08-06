@@ -56,7 +56,6 @@ namespace BankingTool.Repository
         public DbSet<BudgetNotification> BudgetNotification { get; set; }
         public DbSet<Note> Note { get; set; }
         public DbSet<CalendarEvent> CalendarEvent { get; set; }
-        public DbSet<CalendarNote> CalendarNote { get; set; }
 
         // SP
         public DbSet<GetActionsByUserIdDto> GetActionsByUserIdDto { get; set; }
@@ -89,7 +88,6 @@ namespace BankingTool.Repository
             modelBuilder.ApplyConfiguration(new BudgetNotificationConfiguration());
             modelBuilder.ApplyConfiguration(new NoteConfiguration());
             modelBuilder.ApplyConfiguration(new CalendarEventConfiguration());
-            modelBuilder.ApplyConfiguration(new CalendarNoteConfiguration());
 
             //SPs
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());
