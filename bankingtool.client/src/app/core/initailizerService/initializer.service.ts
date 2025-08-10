@@ -2,7 +2,7 @@ import { PlatformLocation } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { IntegrateService } from './integrate.service';
 import * as _ from 'lodash';
-import { AppSettingsDto } from '../../dto/app-settings-dto';
+import { AppSettingsDto } from '../../dto/internal-dto/app-settings-dto';
 
 @Injectable({
   providedIn: 'root'

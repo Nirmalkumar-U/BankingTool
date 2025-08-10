@@ -51,6 +51,8 @@ USING (VALUES
  ,(47,N'Wallet Transfer',N'/walletTransfer',N'Menu',N'RW',2,41,3,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(48,N'Wallet Transaction List',N'/walletTransactionList',N'Action',N'R',NULL,41,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
  ,(49,N'Wallet Transaction List',N'/walletTransactionList',N'Action',N'RW',NULL,41,1,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(50,N'Wallet Transfer',N'/walletTransfer',N'Menu',N'R',2,41,4,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
+ ,(51,N'Deposit Wallet',N'/depositWallet',N'Menu',N'RW',2,41,4,'2025-02-21T19:36:29.653',N'Admin',NULL,NULL,0)
 ) AS Source ([ActionId],[ActionName],[ActionPath],[ActionType],[Access],[MenuLevel],[ParrentMenuId],[Sequence],[CreatedDate],[CreatedBy],[ModifiedDate],[ModifiedBy],[IsDeleted])
 ON (Target.[ActionId] = Source.[ActionId])
 WHEN MATCHED AND (
@@ -132,4 +134,5 @@ Values (1,1),
 (2,43),
 (2,45),
 (2,47),
-(2,49)
+(2,49),
+(2,51)

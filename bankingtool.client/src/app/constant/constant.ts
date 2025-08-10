@@ -1,5 +1,5 @@
 import { CreateIndexedDb } from "../core/indexedDBService/indexed-db-service.service";
-import { DropDownDto, YesOrNoDto } from "../dto/drop-down-dto";
+import { YesOrNoDto } from "../dto/internal-dto/drop-down-dto";
 
 export class Constant {
   public static true: string = 'true';
@@ -48,6 +48,13 @@ export class AppPaths {
 
   //Calender
   public static calender: string = 'calender';
+
+  //Wallet
+  public static createWallet: string = 'createWallet';
+  public static walletTransactionList: string = 'walletTransactionList/:id';
+  public static walletList: string = 'walletList';
+  public static walletTransfer: string = 'walletTransfer';
+  public static walletDeposit: string = 'depositWallet';
 }
 
 export class AppRoute {
@@ -86,6 +93,13 @@ export class AppRoute {
 
   //Calender
   public static calender: string = '/calender';
+
+  //Wallet
+  public static createWallet: string = '/createWallet';
+  public static walletTransactionList = (id: number): string => { return `/walletTransactionList/${id}`; }
+  public static walletList: string = '/walletList';
+  public static walletTransfer: string = '/walletTransfer';
+  public static walletDeposit: string = '/depositWallet';
 }
 export class PageTitle {
   public static home: string = 'Home';
@@ -123,6 +137,13 @@ export class PageTitle {
 
   //Calender
   public static calender: string = 'Calender';
+
+  //Wallet
+  public static createWallet: string = 'Create Wallet';
+  public static walletTransactionList: string = 'Wallet Transaction List';
+  public static walletList: string = 'Wallet List';
+  public static walletTransfer: string = 'Wallet Transfer';
+  public static walletDeposit: string = 'Wallet Deposit';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';

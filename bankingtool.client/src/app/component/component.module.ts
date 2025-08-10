@@ -42,6 +42,11 @@ import { TransactionsListComponent } from './transactions-list/transactions-list
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { AddEventModalComponent } from './calender/add-event-modal/add-event-modal.component';
+import { CreateWalletComponent } from './create-wallet/create-wallet.component';
+import { WalletListComponent } from './wallet-list/wallet-list.component';
+import { WalletTransferComponent } from './wallet-transfer/wallet-transfer.component';
+import { DepositWalletComponent } from './deposit-wallet/deposit-wallet.component';
+import { WalletTransactionListComponent } from './wallet-transaction-list/wallet-transaction-list.component';
 
 const routes: Routes = [
   {
@@ -166,6 +171,31 @@ const routes: Routes = [
     path: AppPaths.calender,
     title: PageTitle.calender,
     component: CalenderComponent
+  },
+  {
+    path: AppPaths.createWallet,
+    title: PageTitle.createWallet,
+    component: CreateWalletComponent
+  },
+  {
+    path: AppPaths.walletList,
+    title: PageTitle.walletList,
+    component: WalletListComponent
+  },
+  {
+    path: AppPaths.walletDeposit,
+    title: PageTitle.walletDeposit,
+    component: DepositWalletComponent
+  },
+  {
+    path: AppPaths.walletTransfer,
+    title: PageTitle.walletTransfer,
+    component: WalletTransferComponent
+  },
+  {
+    path: AppPaths.walletTransactionList,
+    title: PageTitle.walletTransactionList,
+    component: WalletTransactionListComponent
   }
 ];
 @NgModule({
@@ -190,7 +220,12 @@ const routes: Routes = [
     BudgetListComponent,
     BudgetTransferComponent,
     CalenderComponent,
-    AddEventModalComponent
+    AddEventModalComponent,
+    CreateWalletComponent,
+    WalletListComponent,
+    WalletTransferComponent,
+    DepositWalletComponent,
+    WalletTransactionListComponent
   ],
   imports: [
     RouterModule.forChild(routes),

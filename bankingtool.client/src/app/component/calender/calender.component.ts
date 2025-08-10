@@ -7,9 +7,9 @@ import rrulePlugin from '@fullcalendar/rrule';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { CalenderService } from '../../core/service/calender.service';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { CreateAddEventRequest } from '../../dto/request/calender/add-event-request';
 import { CalendarEventDto } from '../../dto/request/calender/calendar-event-dto';
-import { ResponseDto } from '../../dto/response-dto';
 import { AddEventModalComponent } from './add-event-modal/add-event-modal.component';
 
 export interface CalendarEvent {

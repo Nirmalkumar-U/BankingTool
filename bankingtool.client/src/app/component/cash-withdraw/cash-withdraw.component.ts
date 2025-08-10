@@ -4,10 +4,10 @@ import { ActivatedRoute } from '@angular/router';
 import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
-import { DropDownDto } from '../../dto/drop-down-dto';
+import { DropDownDto } from '../../dto/internal-dto/drop-down-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { CreateCashWithdrawRequestObject } from '../../dto/request/bank-account/cash-withdraw-request';
 import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
-import { ResponseDto } from '../../dto/response-dto';
 
 @Component({
   selector: 'app-cash-withdraw',

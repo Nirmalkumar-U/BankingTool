@@ -4,12 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { UserService } from '../../core/service/user.service';
-import { DropDownDto } from '../../dto/drop-down-dto';
+import { DropDownDto } from '../../dto/internal-dto/drop-down-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { SaveUserDto } from '../../dto/internal-dto/save-user-dto';
 import { GetCityListRequestObject } from '../../dto/request/user/get-city-list-request';
 import { SaveUserRequestObject } from '../../dto/request/user/save-user-request';
-import { ResponseDto } from '../../dto/response-dto';
 import { UserInitialLoadResponse } from '../../dto/response/user-initial-load-response';
-import { SaveUserDto } from '../../dto/save-user-dto';
 
 @Component({
   selector: 'app-add-edit-user',

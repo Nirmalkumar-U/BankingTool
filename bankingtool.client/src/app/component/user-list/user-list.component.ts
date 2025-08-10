@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NotificationService } from '../../core/notificationService/notification-service';
-import { ResponseDto } from '../../dto/response-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { UserListResponse } from '../../dto/response/user-list-response';
 
 @Component({

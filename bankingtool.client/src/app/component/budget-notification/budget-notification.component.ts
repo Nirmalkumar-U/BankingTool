@@ -4,10 +4,10 @@ import { ActivatedRoute } from '@angular/router';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BudgetService } from '../../core/service/budget.service';
-import { DropDownDto } from '../../dto/drop-down-dto';
+import { DropDownDto } from '../../dto/internal-dto/drop-down-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { CreateAcceptBudgetTransactionRequestObject } from '../../dto/request/budget/accept-budget-transaction-request';
 import { CreateRejectBudgetTransactionRequestObject } from '../../dto/request/budget/reject-budget-transaction-request';
-import { ResponseDto } from '../../dto/response-dto';
 import { GetBudgetNotificationListResponse } from '../../dto/response/get-budget-notification-list-response';
 
 @Component({

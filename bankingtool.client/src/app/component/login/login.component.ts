@@ -9,9 +9,9 @@ import { NotificationService } from '../../core/notificationService/notification
 import { AuthService } from '../../core/service/auth.service';
 import { LoaderService } from '../../core/service/loader.service';
 import { UserService } from '../../core/service/user.service';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
 import { LoginRequestObject } from '../../dto/request/user/login-request';
-import { ResponseDto } from '../../dto/response-dto';
 import { LoggedInUserResponse } from '../../dto/response/logged-in-user-response';
 import { TokenResponse } from '../../dto/response/token-response';
 

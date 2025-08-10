@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppRoute } from '../../constant/constant';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BudgetService } from '../../core/service/budget.service';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { CreateChangeBudgetAccountStatusRequestObject } from '../../dto/request/budget/change-budget-account-status-request';
-import { ResponseDto } from '../../dto/response-dto';
 import { GetBudgetList, GetBudgetListResponse } from '../../dto/response/get-budget-list-response';
 
 @Component({

@@ -2,9 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { debounceTime, Subject } from "rxjs";
 import { NotificationService } from "../../core/notificationService/notification-service";
 import { NoteService } from "../../core/service/note.service";
+import { ResponseDto } from "../../dto/internal-dto/response-dto";
 import { CreateDeleteNoteRequestObject } from "../../dto/request/note/delete-note-request";
 import { CreateSaveNoteRequestObject } from "../../dto/request/note/save-note-request";
-import { ResponseDto } from "../../dto/response-dto";
 import { NoteDto } from "../../dto/response/notes-dto";
 
 @Component({

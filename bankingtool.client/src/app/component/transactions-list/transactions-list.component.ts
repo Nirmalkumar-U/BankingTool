@@ -8,13 +8,13 @@ import { TableColumn } from '../../core/component/data-table/data-table.componen
 import { LocalStorageService } from '../../core/local-storage.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
-import { DropDownDto } from '../../dto/drop-down-dto';
+import { DropDownDto } from '../../dto/internal-dto/drop-down-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { TransactionsListAccountInfoDto } from '../../dto/internal-dto/transactions-list-account-info-dto';
 import { GetAccountTypeDropDownListRequestObject } from '../../dto/request/bank-account/get-account-type-drop-down-list-request';
 import { createTransactionListRequestObject } from '../../dto/request/bank-account/transaction-list-request';
 import { TransactionsListForCustomerRequestObject } from '../../dto/request/bank-account/transactions-list-for-customer-request';
-import { ResponseDto } from '../../dto/response-dto';
 import { GetTransactionsListResponse, GetTransactionsListResponseCardInfo, GetTransactionsListResponseTransactionList } from '../../dto/response/get-transactions-list-response';
-import { TransactionsListAccountInfoDto } from '../../dto/transactions-list-account-info-dto';
 
 @Component({
   selector: 'app-transactions-list',

@@ -1,5 +1,5 @@
-import { ClaimDto } from "../claim-dto";
-import { GetActionsByUserIdDto } from "../get-actions-by-user-id-dto";
+import { ClaimDto } from "../internal-dto/claim-dto";
+import { GetActionsByUserIdDto } from "../internal-dto/get-actions-by-user-id-dto";
 
 export interface TokenResponse {
   accessToken: string;

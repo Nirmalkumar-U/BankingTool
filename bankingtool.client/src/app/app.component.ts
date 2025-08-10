@@ -3,11 +3,11 @@ import { AppPaths, ClaimKey, Constant } from './constant/constant';
 import { EmitterService } from './core/emitter.service';
 import { IndexedDbServiceService } from './core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from './core/local-storage.service';
-import { GetActionsByUserIdDto } from './dto/get-actions-by-user-id-dto';
 import { faBell, faHandshake, faMoneyBill1, faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './core/service/auth.service';
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
+import { GetActionsByUserIdDto } from './dto/internal-dto/get-actions-by-user-id-dto';
 
 @Component({
   selector: 'app-root',

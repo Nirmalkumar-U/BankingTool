@@ -4,9 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
-import { DropDownDto } from '../../dto/drop-down-dto';
+import { DropDownDto } from '../../dto/internal-dto/drop-down-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { CreateDepositAmountRequestObject } from '../../dto/request/bank-account/deposit-amount-request';
-import { ResponseDto } from '../../dto/response-dto';
 
 @Component({
   selector: 'app-deposit-amount',

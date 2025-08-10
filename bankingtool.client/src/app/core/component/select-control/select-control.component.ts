@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DropDownDto } from '../../../dto/drop-down-dto';
+import { DropDownDto } from '../../../dto/internal-dto/drop-down-dto';
 
 @Component({
   selector: 'app-select-control',

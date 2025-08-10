@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TableColumn } from '../../core/component/data-table/data-table.component';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BudgetService } from '../../core/service/budget.service';
-import { ResponseDto } from '../../dto/response-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { GetBudgetTransactionListResponse } from '../../dto/response/get-budget-transaction-list-response';
 
 @Component({

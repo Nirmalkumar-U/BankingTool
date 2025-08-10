@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppRoute } from '../../constant/constant';
 import { NotificationService } from '../../core/notificationService/notification-service';
-import { ResponseDto } from '../../dto/response-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { DashBoardAccountList, GetDashBoardInitialLoadResponse } from '../../dto/response/get-dash-board-initial-load-response';
 
 @Component({

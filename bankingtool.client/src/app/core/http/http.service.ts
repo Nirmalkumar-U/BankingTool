@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Observer } from 'rxjs';
-import { AppSettingsDto } from '../../dto/app-settings-dto';
+import { AppSettingsDto } from '../../dto/internal-dto/app-settings-dto';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
 import { EmitterService } from '../emitter.service';
 import { LocalStorageService } from '../local-storage.service';

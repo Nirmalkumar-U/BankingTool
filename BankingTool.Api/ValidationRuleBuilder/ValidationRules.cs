@@ -4,6 +4,7 @@ using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.RequestDto.Calender;
 using BankingTool.Model.Dto.RequestDto.Note;
 using BankingTool.Model.Dto.RequestDto.User;
+using BankingTool.Model.Dto.RequestDto.Wallet;
 
 namespace BankingTool.Api.Validators
 {
@@ -352,5 +353,21 @@ namespace BankingTool.Api.Validators
             RuleBuilder<AddEventRequestObject>.For(x => x.Request.CalendarEvent.IsAllDay).Required()
         };
         #endregion Calendar
+        #region Wallet
+        public static List<ValidationRule> CreateWalletAccountRequestRules = new()
+        {
+            RuleBuilder<CreateWalletRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<CreateWalletRequestObject>.For(x => x.Request.Wallet).Required(),
+            RuleBuilder<CreateWalletRequestObject>.For(x => x.Request.Wallet.WalletName)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<CreateWalletRequestObject>.For(x => x.Request.Wallet.Amount)
+                .Required()
+        };
+        #endregion Wallet
     }
 }

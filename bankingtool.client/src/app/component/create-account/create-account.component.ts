@@ -5,12 +5,12 @@ import { Constant } from '../../constant/constant';
 import { isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
-import { CreateAccountInitialLoadDto } from '../../dto/create-account-initial-load-dto';
-import { DropDownDto, YesOrNoDto } from '../../dto/drop-down-dto';
+import { CreateAccountInitialLoadDto } from '../../dto/internal-dto/create-account-initial-load-dto';
+import { DropDownDto, YesOrNoDto } from '../../dto/internal-dto/drop-down-dto';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { CreateAccountRequestObject } from '../../dto/request/bank-account/create-account-request';
 import { GetBankDetailWithoutCustomerAndAccountTypeRequestObject } from '../../dto/request/bank-account/get-bank-detail-without-customer-and-account-type-request';
 import { IsCustomerHasCreditCardInThatBankRequestObject } from '../../dto/request/bank-account/is-customer-has-credit-card-in-that-bank-request';
-import { ResponseDto } from '../../dto/response-dto';
 
 @Component({
   selector: 'app-create-account',
