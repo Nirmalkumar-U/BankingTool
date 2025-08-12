@@ -74,6 +74,7 @@
     <None Include="Scripts\ConsolidateScript.sql" />
     <None Include="Scripts\Schema\ScalarFunction.sql" />
     <None Include="PostProductionScripts\Sprint1\StoreProcedure.sql" />
+    <None Include="PostProductionScripts\Sprint2\StoreProcedure.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\MergeScripts\ConsolidateMergeScripts.sql" />

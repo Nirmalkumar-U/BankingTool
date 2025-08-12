@@ -6,7 +6,6 @@ using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
-using BankingTool.Repository.Repository;
 using BankingTool.Service.IService;
 
 namespace BankingTool.Service.Service
@@ -119,7 +118,7 @@ namespace BankingTool.Service.Service
                 ValidationErrors = [],
                 Response = new GetBudgetListResponse
                 {
-                    budgetList = await _budgetRepository.GetBudgetList()
+                    BudgetList = await _budgetRepository.GetBudgetList()
                 },
                 Status = true,
                 StatuCode = 200

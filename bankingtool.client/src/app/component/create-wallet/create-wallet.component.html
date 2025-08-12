@@ -1,1 +1,24 @@
-<p>create-wallet works!</p>
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Create Wallet</h1>
+      </div>
+      <div class='card-body'>
+        <form class="row g-3 was-validated" novalidate [formGroup]="walletForm" (ngSubmit)="createWallet()">
+          <div class="col-md-3">
+            <label class="form-label">Wallet Name</label>
+            <input type="text" class="form-control" formControlName="walletName" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Wallet Amount</label>
+            <input type="text" class="form-control" formControlName="amount" required>
+          </div>
+          <div class="col-12">
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Create Wallet</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

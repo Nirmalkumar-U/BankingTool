@@ -368,6 +368,12 @@ namespace BankingTool.Api.Validators
             RuleBuilder<CreateWalletRequestObject>.For(x => x.Request.Wallet.Amount)
                 .Required()
         };
+        public static List<ValidationRule> GetWalletTransactionListRequestRules = new()
+        {
+            RuleBuilder<GetWalletTransactionListRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<GetWalletTransactionListRequestObject>.For(x => x.Request.Wallet).Required(),
+            RuleBuilder<GetWalletTransactionListRequestObject>.For(x => x.Request.Wallet.Id).Required()
+        };
         #endregion Wallet
     }
 }

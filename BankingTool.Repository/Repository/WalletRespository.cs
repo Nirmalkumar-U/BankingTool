@@ -1,4 +1,5 @@
-﻿using BankingTool.Model.Model;
+﻿using BankingTool.Model.Dto.ResponseDto;
+using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,14 +7,12 @@ namespace BankingTool.Repository.Repository
 {
     public class WalletRespository(DataContext dataContext) : EntityRepository<WalletAccount>(dataContext), IWalletRespository
     {
-
         public async Task<WalletAccount> GetLastWalletAccount()
         {
             if (dataContext.WalletAccount.Any())
                 return await dataContext.WalletAccount.OrderByDescending(a => a.WalletAccountId).FirstOrDefaultAsync();
             return null;
         }
-
         public async Task<bool> CreateWalletAccount(WalletAccount walletAccount, WalletTransaction walletTransaction, WalletTransactionDetail walletTransactionDetails)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
@@ -35,6 +34,39 @@ namespace BankingTool.Repository.Repository
                 return await Task.FromResult(false);
             }
         }
+        public async Task<List<GetWalletList>> GetWalletList()
+        {
+            return await dataContext.WalletAccount
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.IsDeleted == false)
+                .Select(x => new GetWalletList
+                {
+                    WalletId = x.WalletAccountId,
+                    WalletName = x.WalletName,
+                    WalletNumber = x.WalletNumber,
+                    Balance = x.Balance,
+                    WalletStatus = x.WalletStatus
+                }).ToListAsync();
+        }
+        public async Task<WalletAccount> GetWalletById(int walletId)
+        {
+            return await dataContext.WalletAccount
+                .FirstOrDefaultAsync(x => x.WalletAccountId == walletId);
+        }
+        public async Task<List<GetWalletTransactionList>> GetWalletTransactionList(int walletId)
+        {
+            var sql = "EXEC GetWalletAccountTransactions @WalletId";
+            var parameters = new[]
+                            {
+                                new Microsoft.Data.SqlClient.SqlParameter("@WalletId", walletId.ToString())
+                            };
+
+            var transactions = await dataContext.Set<GetWalletTransactionList>()
+                    .FromSqlRaw(sql, parameters)
+                    .ToListAsync();
+
+            return transactions;
+        }
+
         #region Private
         private int? InsertWalletAccount(WalletAccount model)
         {

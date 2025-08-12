@@ -2,7 +2,7 @@
 {
     public class GetBudgetListResponse
     {
-        public List<GetBudgetList> budgetList { get; set; }
+        public List<GetBudgetList> BudgetList { get; set; }
     }
     public class GetBudgetList
     {

@@ -12,4 +12,7 @@ export class WalletService {
   createWallet(model: CreateWalletRequestObject): Observable<any> {
     return this.httpService.post('Wallet/CreateWallet', model);
   }
+  getWalletList(): Observable<any> {
+    return this.httpService.get('Wallet/GetWalletList');
+  }
 }

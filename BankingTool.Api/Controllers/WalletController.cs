@@ -1,7 +1,9 @@
 ﻿using BankingTool.Api.Filter;
 using BankingTool.Api.Validators;
 using BankingTool.Model;
+using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.RequestDto.Wallet;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Service.IService;
 using LazyCache;
 using Microsoft.AspNetCore.Mvc;
@@ -28,28 +30,28 @@ namespace BankingTool.Api.Controllers
             );
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(typeof(ResponseDto<GetBudgetListResponse>), 200)]
-        //[ProducesResponseType(typeof(ResponseDto<GetBudgetListResponse>), 400)]
-        //public async Task<IActionResult> GetBudgetList()
-        //{
-        //    return await HandleRequestAsync<bool?, GetBudgetListResponse>(
-        //        null,
-        //        null,
-        //        () => _budgetService.GetBudgetList()
-        //    );
-        //}
-        //[HttpPost]
-        //[ProducesResponseType(typeof(ResponseDto<GetBudgetTransactionListResponse>), 200)]
-        //[ProducesResponseType(typeof(ResponseDto<GetBudgetTransactionListResponse>), 400)]
-        //public async Task<IActionResult> GetBudgetTransactionList(GetBudgetTransactionListRequestObject model)
-        //{
-        //    return await HandleRequestAsync<GetBudgetTransactionListRequestObject, GetBudgetTransactionListResponse>(
-        //        model,
-        //        ValidationRules.CreateGetBudgetTransactionListRequestObjectRules,
-        //        () => _budgetService.GetBudgetTransactionList(model.Request.BudgetAccount.Id)
-        //    );
-        //}
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<GetWalletListResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetWalletListResponse>), 400)]
+        public async Task<IActionResult> GetWalletList()
+        {
+            return await HandleRequestAsync<bool?, GetWalletListResponse>(
+                null,
+                null,
+                () => _budgetService.GetWalletList()
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<GetWalletTransactionListResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<GetWalletTransactionListResponse>), 400)]
+        public async Task<IActionResult> GetBudgetTransactionList(GetWalletTransactionListRequestObject model)
+        {
+            return await HandleRequestAsync<GetWalletTransactionListRequestObject, GetWalletTransactionListResponse>(
+                model,
+                ValidationRules.GetWalletTransactionListRequestRules,
+                () => _budgetService.GetWalletTransactionList(model.Request.Wallet.Id)
+            );
+        }
 
         //[HttpPost]
         //[ProducesResponseType(typeof(ResponseDto<bool>), 200)]
