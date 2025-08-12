@@ -1,1 +1,35 @@
-<p>wallet-transaction-list works!</p>
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Wallet Transactions</h1>
+      </div>
+      <div class='card-body'>
+        <div class="row p-2" *ngIf="accountInfo && accountInfo != null">
+          <div class="col-md-3">
+            <h4 class="fw-bold">Wallet Name</h4>
+            <h5 class="fw-bold">{{accountInfo.walletName}}</h5>
+          </div>
+          <div class="col-md-3">
+            <h4 class="fw-bold">Wallet Number</h4>
+            <h5 class="fw-bold">{{accountInfo.walletNumber}}</h5>
+          </div>
+          <div class="col-md-3">
+            <h4 class="fw-bold">Wallet Status</h4>
+            <h5 class="fw-bold">{{accountInfo.walletStatus}}</h5>
+          </div>
+          <div class="col-md-3">
+            <h4 class="fw-bold">Balance</h4>
+            <h5 class="fw-bold">{{accountInfo.balance}}</h5>
+          </div>
+        </div>
+        <hr />
+        <app-data-table [columns]="columns"
+                        [data]="accountInfo?.walletTransactionList || []">
+        </app-data-table>
+
+      </div>
+    </div>
+  </div>
+</div>
+

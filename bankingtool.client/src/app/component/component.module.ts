@@ -48,6 +48,7 @@ import { WalletTransferComponent } from './wallet-transfer/wallet-transfer.compo
 import { DepositWalletComponent } from './deposit-wallet/deposit-wallet.component';
 import { WalletTransactionListComponent } from './wallet-transaction-list/wallet-transaction-list.component';
 import { WalletListResolver } from '../core/resolver/wallet-list.resolver';
+import { WalletTransactionListResolver } from '../core/resolver/wallet-transaction-list.resolver';
 
 const routes: Routes = [
   {
@@ -197,7 +198,8 @@ const routes: Routes = [
   {
     path: AppPaths.walletTransactionList,
     title: PageTitle.walletTransactionList,
-    component: WalletTransactionListComponent
+    component: WalletTransactionListComponent,
+    resolve: { DataResolver: WalletTransactionListResolver }
   }
 ];
 @NgModule({

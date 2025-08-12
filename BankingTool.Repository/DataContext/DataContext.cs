@@ -67,6 +67,7 @@ namespace BankingTool.Repository
         public DbSet<GetSenderAccount> GetSenderAccount { get; set; }
         public DbSet<GetReceiverAccount> GetReceiverAccount { get; set; }
         public DbSet<GetBudgetTransactionList> GetBudgetTransactionList { get; set; }
+        public DbSet<GetWalletTransactionList> GetWalletTransactionList { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Tables
@@ -102,6 +103,7 @@ namespace BankingTool.Repository
             modelBuilder.Entity<GetBudgetTransactionList>(e => e.HasNoKey());
             modelBuilder.Entity<GetSenderAccount>(e => e.HasNoKey());
             modelBuilder.Entity<GetReceiverAccount>(e => e.HasNoKey());
+            modelBuilder.Entity<GetWalletTransactionList>(e => e.HasNoKey());
 
             base.OnModelCreating(modelBuilder);
         }

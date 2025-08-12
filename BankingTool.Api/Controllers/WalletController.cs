@@ -44,7 +44,7 @@ namespace BankingTool.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<GetWalletTransactionListResponse>), 200)]
         [ProducesResponseType(typeof(ResponseDto<GetWalletTransactionListResponse>), 400)]
-        public async Task<IActionResult> GetBudgetTransactionList(GetWalletTransactionListRequestObject model)
+        public async Task<IActionResult> GetWalletTransactionList(GetWalletTransactionListRequestObject model)
         {
             return await HandleRequestAsync<GetWalletTransactionListRequestObject, GetWalletTransactionListResponse>(
                 model,
