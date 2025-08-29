@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { aW } from '@fullcalendar/core/internal-common';
 import { Observable, Observer } from 'rxjs';
 import { AppSettingsDto } from '../../dto/app-settings-dto';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
 import { EmitterService } from '../emitter.service';
+import { IntegrateService } from '../initailizerService/integrate.service';
 import { LocalStorageService } from '../local-storage.service';
 import { NotificationService } from '../notificationService/notification-service';
 import { AuthService } from '../service/auth.service';
@@ -16,7 +18,8 @@ export class HttpService {
 
   baseUrl = AppSettingsDto.baseUrl;
   constructor(private localStoreService: LocalStorageService, private emitService: EmitterService,
-    private notificationService: NotificationService, private authService: AuthService, private loaderService: LoaderService
+    private notificationService: NotificationService, private authService: AuthService,
+    private loaderService: LoaderService, private integrateService: IntegrateService
   ) { }
   requestObj = (method: string = 'GET', headerType: string = 'DEFAULT', body?: any) => {
     return {
@@ -133,7 +136,7 @@ export class HttpService {
     return base;
   }
 
-  handelResponse(response: any) {
+  async handelResponse(response: any) {
     if (response.status == 403) {
       return response.json();
     } else if (!response || response.status === 204) {
@@ -147,8 +150,19 @@ export class HttpService {
       this.loaderService.hide();
       this.notificationService.show("Internal server error " + response.status.toString(), 'error');
       throw response;
+    } else if (response.status >= 200 && response.status <= 210) {
+      // ✅ success case -> call IntegrateService
+      const result = await response.json();
+
+      // IntegrateService.getResponse() assumed returns Observable
+      return new Promise((resolve, reject) => {
+        this.integrateService.getResponse(result).subscribe({
+          next: (integratedRes) => resolve(integratedRes),
+          error: (err) => reject(err)
+        });
+      });
     } else {
-      return response.json()
+      return response.json();
     }
   }
 

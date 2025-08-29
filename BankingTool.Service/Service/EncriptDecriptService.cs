@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace BankingTool.Service
+namespace BankingTool.Service.Service
 {
     public class EncriptDecriptService : IEncriptDecriptService
     {
