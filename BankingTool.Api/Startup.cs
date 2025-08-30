@@ -1,6 +1,6 @@
 ﻿using Autofac;
+using BankingTool.Api.ApplicationSetUp;
 using BankingTool.Api.CustomeDI;
-using BankingTool.Api.Middleware;
 
 namespace BankingTool.Api
 {
@@ -20,7 +20,7 @@ namespace BankingTool.Api
         }
         public void Configure(WebApplication app, IWebHostEnvironment env, IHostApplicationLifetime hostApplicationLifetime, IHttpContextAccessor httpContextAccessor)
         {
-            app.AddMiddleware();
+            app.AddMiddleware(Configuration);
             app.AddDefaultMiddleware(env);
             ApplicationAppContext.Configure(httpContextAccessor, Configuration);
         }

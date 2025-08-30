@@ -17,6 +17,7 @@ import { LoaderService } from '../service/loader.service';
 export class HttpService {
 
   baseUrl = AppSettingsDto.baseUrl;
+  isEncryptionEnabled = AppSettingsDto.isEncryptionEnabled;
   constructor(private localStoreService: LocalStorageService, private emitService: EmitterService,
     private notificationService: NotificationService, private authService: AuthService,
     private loaderService: LoaderService, private integrateService: IntegrateService
@@ -151,18 +152,19 @@ export class HttpService {
       this.notificationService.show("Internal server error " + response.status.toString(), 'error');
       throw response;
     } else if (response.status >= 200 && response.status <= 210) {
-      // ✅ success case -> call IntegrateService
-      const result = await response.json();
-
-      // IntegrateService.getResponse() assumed returns Observable
-      return new Promise((resolve, reject) => {
-        this.integrateService.getResponse(result).subscribe({
-          next: (integratedRes) => resolve(integratedRes),
-          error: (err) => reject(err)
+      if (this.isEncryptionEnabled === 'true') {
+        const result = await response.json();
+        return new Promise((resolve, reject) => {
+          this.integrateService.getResponse(result).subscribe({
+            next: (integratedRes) => resolve(integratedRes),
+            error: (err) => reject(err)
+          });
         });
-      });
+      }
+      else {
+        return response.json();
+      }
     } else {
-      return response.json();
     }
   }
 

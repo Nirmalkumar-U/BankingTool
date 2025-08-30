@@ -2,43 +2,17 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Autofac.Core;
 using BankingTool.Model;
 using BankingTool.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BankingTool.Api.Middleware
+namespace BankingTool.Api.ApplicationSetUp
 {
-    public static class CustomMiddleware
+    public static class ServiceSetup
     {
-        public static IApplicationBuilder AddMiddleware(this WebApplication app)
-        {
-            app.UseMiddleware<CryptographyMiddleware>();
-            return app;
-        }
-        public static IApplicationBuilder AddDefaultMiddleware(this WebApplication app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.DefaultModelsExpandDepth(-1));
-            }
-            app.UseCors("AllowAllOrigins");
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-            return app;
-        }
-
         public static IServiceCollection AddDefaultService(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddControllers();

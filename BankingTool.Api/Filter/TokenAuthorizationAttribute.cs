@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using BankingTool.Repository;
-using BankingTool.Model;
-using Microsoft.AspNetCore.Http;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
+using BankingTool.Model;
+using BankingTool.Repository;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BankingTool.Api.Filter
 {
