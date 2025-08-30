@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { aW } from '@fullcalendar/core/internal-common';
 import { Observable, Observer } from 'rxjs';
 import { AppSettingsDto } from '../../dto/internal-dto/app-settings-dto';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
@@ -18,6 +16,7 @@ export class HttpService {
 
   baseUrl = AppSettingsDto.baseUrl;
   isEncryptionEnabled = AppSettingsDto.isEncryptionEnabled;
+  fieldsToEncrypt = AppSettingsDto.fieldsToEncrypt;
   constructor(private localStoreService: LocalStorageService, private emitService: EmitterService,
     private notificationService: NotificationService, private authService: AuthService,
     private loaderService: LoaderService, private integrateService: IntegrateService
@@ -154,7 +153,7 @@ export class HttpService {
     } else if (response.status >= 200 && response.status <= 210) {
       if (this.isEncryptionEnabled === 'true') {
         const result = await response.json();
-        if (this.hasAccountNumber(result)) {
+        if (this.hasEncryptField(result)) {
           return new Promise((resolve, reject) => {
             this.integrateService.getResponse(result).subscribe({
               next: (integratedRes) => resolve(integratedRes),
@@ -172,15 +171,16 @@ export class HttpService {
     } else {
     }
   }
-  private hasAccountNumber(obj: any): boolean {
+  private hasEncryptField(obj: any): boolean {
     if (!obj || typeof obj !== 'object') {
       return false;
     }
-    if ('accountNumber' in obj) {
+    const encryptFieldKeys = this.fieldsToEncrypt.split(',') ?? ['accountNumber'];
+    if (Object.keys(obj).some(key => encryptFieldKeys.some(field => key.toLowerCase() === field.toLowerCase()))) {
       return true;
     }
     return Object.values(obj).some(value =>
-      typeof value === 'object' && value !== null && this.hasAccountNumber(value)
+      typeof value === 'object' && value !== null && this.hasEncryptField(value)
     );
   }
   private refreshToken(): Promise<boolean> {

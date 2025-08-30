@@ -30,11 +30,12 @@ namespace BankingTool.Server.Controllers
 
         private void DecryptAccountNumbers(JsonNode? node)
         {
+            var fieldsToEncrypt = appSettings.FieldsToEncrypt?.Split(",") ?? ["AccountNumber"];
             if (node is JsonObject jsonObject)
             {
                 foreach (var property in jsonObject.ToArray())
                 {
-                    if (string.Equals(property.Key, "AccountNumber", StringComparison.OrdinalIgnoreCase) &&
+                    if (fieldsToEncrypt.Any(key => string.Equals(property.Key, key, StringComparison.OrdinalIgnoreCase)) &&
                         property.Value?.GetValueKind() == System.Text.Json.JsonValueKind.String)
                     {
                         var value = property.Value.GetValue<string>();

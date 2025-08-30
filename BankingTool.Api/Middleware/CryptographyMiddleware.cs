@@ -1,11 +1,14 @@
 ﻿using System.Text.Json.Nodes;
+using BankingTool.Model;
 using BankingTool.Service;
+using Microsoft.Extensions.Options;
 
 namespace BankingTool.Api.Middleware
 {
-    public class CryptographyMiddleware(RequestDelegate next, IEncriptDecriptService encryptionService)
+    public class CryptographyMiddleware(RequestDelegate next, IEncriptDecriptService encryptionService, IOptions<AppSettingsDto> appSetting)
     {
         private readonly RequestDelegate _next = next;
+        private readonly AppSettingsDto _appSetting = appSetting.Value;
         private readonly IEncriptDecriptService _encryptionService = encryptionService;
 
         public async Task InvokeAsync(HttpContext context)
@@ -25,7 +28,7 @@ namespace BankingTool.Api.Middleware
                 if (!string.IsNullOrEmpty(json))
                 {
                     var jsonNode = JsonNode.Parse(json);
-                    EncryptAccountNumbers(jsonNode);
+                    EncryptField(jsonNode);
 
                     memoryStream.SetLength(0);
                     await using var writer = new StreamWriter(memoryStream, leaveOpen: true);
@@ -40,13 +43,14 @@ namespace BankingTool.Api.Middleware
             context.Response.Body = originalBody;
         }
 
-        private void EncryptAccountNumbers(JsonNode? node)
+        private void EncryptField(JsonNode? node)
         {
+            var fieldsToEncrypt = _appSetting.FieldsToEncrypt.Split(",") ?? ["AccountNumber"];
             if (node is JsonObject jsonObject)
             {
                 foreach (var property in jsonObject.ToArray())
                 {
-                    if (string.Equals(property.Key, "AccountNumber", StringComparison.OrdinalIgnoreCase) &&
+                    if (fieldsToEncrypt.Any(key => string.Equals(property.Key, key, StringComparison.OrdinalIgnoreCase)) &&
                         property.Value?.GetValueKind() == System.Text.Json.JsonValueKind.String)
                     {
                         var value = property.Value.GetValue<string>();
@@ -55,7 +59,7 @@ namespace BankingTool.Api.Middleware
                     }
                     else
                     {
-                        EncryptAccountNumbers(property.Value);
+                        EncryptField(property.Value);
                     }
                 }
             }
@@ -63,7 +67,7 @@ namespace BankingTool.Api.Middleware
             {
                 foreach (var item in jsonArray)
                 {
-                    EncryptAccountNumbers(item);
+                    EncryptField(item);
                 }
             }
         }
