@@ -11,6 +11,9 @@ export class IntegrateService {
   getAppConfiguration(): Observable<any> {
     return this.http.get<any>('https://localhost:7113/AppSettings', { headers: this.getWebAppApiHeaders() });
   }
+  getResponse(data: any): Observable<any> {
+    return this.http.post<any>('https://localhost:7113/AppSettings', data, { headers: this.getWebAppApiHeaders() });
+  }
   getWebAppApiHeaders() {
     let headers = new HttpHeaders();
     headers = headers.append('skip', 'true');

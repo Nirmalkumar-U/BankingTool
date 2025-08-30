@@ -29,12 +29,12 @@ namespace BankingTool.Api.CustomeDI
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
             // 1. Scan for assemblies containing autofac modules in the bin folder
-            List<Assembly> assemblies = new();
-            assemblies.AddRange(
-                Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.dll", SearchOption.AllDirectories)
+            List<Assembly> assemblies =
+            [
+                .. Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.dll", SearchOption.AllDirectories)
                          .Where(filename => assemblyScanerPattern.Any(pattern => Regex.IsMatch(filename, pattern)))
                          .Select(Assembly.LoadFrom)
-                );
+            ];
 
             return assemblies;
         }

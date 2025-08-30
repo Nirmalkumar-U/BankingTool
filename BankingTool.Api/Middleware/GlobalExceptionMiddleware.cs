@@ -17,7 +17,7 @@ namespace BankingTool.Api.Middleware
                 await HandleException(context, ex);
             }
         }
-        private async Task HandleException(HttpContext context, Exception exception)
+        private static async Task HandleException(HttpContext context, Exception exception)
         {
             HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
             string message;

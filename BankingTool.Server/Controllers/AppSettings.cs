@@ -6,5 +6,6 @@ namespace AssetManagement.AngularWeb.Controllers
     {
         public String? BaseUrl { get; set; }
         public String? ApiKey { get; set; }
+        public String? IsEncryptionEnabled { get; set; }
     }
 }
