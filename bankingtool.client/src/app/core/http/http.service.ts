@@ -154,12 +154,17 @@ export class HttpService {
     } else if (response.status >= 200 && response.status <= 210) {
       if (this.isEncryptionEnabled === 'true') {
         const result = await response.json();
-        return new Promise((resolve, reject) => {
-          this.integrateService.getResponse(result).subscribe({
-            next: (integratedRes) => resolve(integratedRes),
-            error: (err) => reject(err)
+        if (this.hasAccountNumber(result)) {
+          return new Promise((resolve, reject) => {
+            this.integrateService.getResponse(result).subscribe({
+              next: (integratedRes) => resolve(integratedRes),
+              error: (err) => reject(err)
+            });
           });
-        });
+        }
+        else {
+          return result;
+        }
       }
       else {
         return response.json();
@@ -167,7 +172,17 @@ export class HttpService {
     } else {
     }
   }
-
+  private hasAccountNumber(obj: any): boolean {
+    if (!obj || typeof obj !== 'object') {
+      return false;
+    }
+    if ('accountNumber' in obj) {
+      return true;
+    }
+    return Object.values(obj).some(value =>
+      typeof value === 'object' && value !== null && this.hasAccountNumber(value)
+    );
+  }
   private refreshToken(): Promise<boolean> {
     let roleId = localStorage.getItem('RoleId');
     let emailId = localStorage.getItem('EmailId');
