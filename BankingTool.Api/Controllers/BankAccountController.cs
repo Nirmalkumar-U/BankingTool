@@ -160,8 +160,7 @@ namespace BankingTool.Api.Controllers
             return await HandleRequestAsync<int?, bool>(
                 null,
                 null,
-                _bankAccountService.GetSelfTransferInitialLoad,
-                true
+                _bankAccountService.GetSelfTransferInitialLoad
             );
         }
         [HttpPost]

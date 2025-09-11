@@ -239,7 +239,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId != dataContext.CustomerId && a.AccountStatus == AccountStatus.Active
+                          where a.CustomerId != dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
