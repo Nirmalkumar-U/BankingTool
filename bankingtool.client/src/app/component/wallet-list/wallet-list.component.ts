@@ -4,6 +4,7 @@ import { AppRoute } from '../../constant/constant';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { WalletService } from '../../core/service/wallet.service';
 import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { CreateChangeWalletStatusRequestObject } from '../../dto/request/wallet/change-wallet-status-request';
 import { GetWalletList, GetWalletListResponse } from '../../dto/response/get-wallet-list-response';
 
 @Component({
@@ -35,29 +36,29 @@ export class WalletListComponent {
     this.router.navigate([AppRoute.walletTransactionList(walletId)]);
   }
   changeStatus(walletId: number) {
-  //  if (budgetAccountId != null) {
-  //    let model = CreateChangeBudgetAccountStatusRequestObject(budgetAccountId);
-  //    this.budgetService.changeBudgetAccountStatus(model).subscribe((response: ResponseDto<boolean>) => {
-  //      if (response.status == true) {
-  //        const budget = this.budgetList.find(item => item.budgetAccountId === budgetAccountId);
-  //        if (budget) {
-  //          budget.budgetStatus = budget.budgetStatus === 'Active' ? 'InActive' : 'Active';
-  //        }
-  //        const inActiveBudget = this.inActiveBudgetList.find(item => item.budgetAccountId === budgetAccountId);
-  //        if (inActiveBudget) {
-  //          inActiveBudget.budgetStatus = inActiveBudget.budgetStatus === 'Active' ? 'InActive' : 'Active';
-  //        }
-  //        this.notificationService.show("Budget Account Status updated successfully.", 'success')
-  //      } else {
-  //        let messageList: string[] = [];
-  //        if (Array.isArray(response?.errors) && response?.errors)
-  //          messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
-  //        messageList.push("Budget Account Status updated failed.");
-  //        messageList.forEach((msg) => {
-  //          this.notificationService.show(msg, 'error');
-  //        });
-  //      }
-  //    });
-  //  }
+    if (walletId != null) {
+      let model = CreateChangeWalletStatusRequestObject(walletId);
+      this.walletService.changeWalletStatus(model).subscribe((response: ResponseDto<boolean>) => {
+        if (response.status == true) {
+          const wallet = this.walletList.find(item => item.walletId === walletId);
+          if (wallet) {
+            wallet.walletStatus = wallet.walletStatus === 'Active' ? 'InActive' : 'Active';
+          }
+          const inActiveWallet = this.inActiveWalletList.find(item => item.walletId === walletId);
+          if (inActiveWallet) {
+            inActiveWallet.walletStatus = inActiveWallet.walletStatus === 'Active' ? 'InActive' : 'Active';
+          }
+          this.notificationService.show("Wallet Status updated successfully.", 'success')
+        } else {
+          let messageList: string[] = [];
+          if (Array.isArray(response?.errors) && response?.errors)
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Wallet Status updated failed.");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
+          });
+        }
+      });
+    }
   }
 }

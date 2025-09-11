@@ -25,10 +25,8 @@ namespace BankingTool.Api.CustomeDI
         {
             string[] assemblyScanerPattern = new[] { @"BankingTool.Repository.*.dll", @"BankingTool.Service.*.dll" };
 
-            // Make sure process paths are sane...
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-            // 1. Scan for assemblies containing autofac modules in the bin folder
             List<Assembly> assemblies =
             [
                 .. Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.dll", SearchOption.AllDirectories)

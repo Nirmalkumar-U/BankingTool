@@ -374,6 +374,32 @@ namespace BankingTool.Api.Validators
             RuleBuilder<GetWalletTransactionListRequestObject>.For(x => x.Request.Wallet).Required(),
             RuleBuilder<GetWalletTransactionListRequestObject>.For(x => x.Request.Wallet.Id).Required()
         };
+        public static List<ValidationRule> CreateChangeWalletStatusRequestRules = new()
+        {
+            RuleBuilder<ChangeWalletStatusRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<ChangeWalletStatusRequestObject>.For(x => x.Request.Wallet).Required(),
+            RuleBuilder<ChangeWalletStatusRequestObject>.For(x => x.Request.Wallet.Id).Required()
+        };
+        public static List<ValidationRule> DepositWalletAmountRequestObjectRules = new()
+        {
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.Wallet).Required(),
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.WalletTransaction).Required(),
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.Wallet.Id).Required(),
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.WalletTransaction.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.WalletTransaction.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.WalletTransaction.TransactionDate).Required()
+        };
         #endregion Wallet
     }
 }

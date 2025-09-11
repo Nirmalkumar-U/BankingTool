@@ -1,4 +1,6 @@
-﻿using BankingTool.Model.Dto.ResponseDto;
+﻿using BankingTool.Model;
+using BankingTool.Model.Dto.InternalDto;
+using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +68,74 @@ namespace BankingTool.Repository.Repository
 
             return transactions;
         }
-
+        public async Task<bool> ChangeWalletStatus(int walletId)
+        {
+            var walletAccount = await dataContext.WalletAccount.Where(x => x.WalletAccountId == walletId).FirstOrDefaultAsync();
+            if (walletAccount != null)
+            {
+                walletAccount.WalletStatus = walletAccount.WalletStatus == WalletStatus.Active ? WalletStatus.InActive : WalletStatus.Active;
+                UpdateWalletAccount(walletAccount);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public async Task<WalletTransaction> GetLastWalletTransaction(int walletAccountId)
+        {
+            return await (from t in dataContext.WalletTransaction
+                          join td in dataContext.WalletTransactionDetail on t.WalletTransactionId equals td.WalletTransactionId
+                          where td.WalletAccountId == walletAccountId
+                          orderby t.TransactionTime descending
+                          select t).FirstOrDefaultAsync();
+        }
+        public async Task<WalletAccount> GetWalletAccount(int walletAccountId)
+        {
+            return await dataContext.WalletAccount.FirstOrDefaultAsync(x => x.WalletAccountId == walletAccountId);
+        }
+        public bool WalletDeposit(WalletAccount account, WalletTransaction transaction, WalletTransactionDetail transactionDetail,
+            bool isBudgetAccountAttached, List<BudgetTransactionDto> budgetTransactionDetail)
+        {
+            using var sqlTransaction = dataContext.Database.BeginTransaction();
+            try
+            {
+                UpdateWalletAccount(account);
+                var transactionId = InsertWalletTransaction(transaction);
+                transactionDetail.WalletTransactionId = transactionId.Value;
+                InsertWalletTransactionDetail(transactionDetail);
+                if (isBudgetAccountAttached)
+                {
+                    foreach (var budgetAccount in budgetTransactionDetail)
+                    {
+                        UpdateBudgetAccount(budgetAccount.BudgetAccount);
+                        var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
+                        budgetAccount.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                        var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetAccount.BudgetTransactionDetail);
+                    }
+                }
+                sqlTransaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                sqlTransaction.Rollback();
+                return false;
+            }
+        }
+        public async Task<List<DropDownDto>> GetFromWalletAccountListByCustomerId()
+        {
+            return await (from a in dataContext.WalletAccount
+                          join c in dataContext.Customer on a.CustomerId equals c.CustomerId
+                          join u in dataContext.Users on c.UserId equals u.UserId
+                          where a.CustomerId == dataContext.CustomerId && a.WalletStatus == WalletStatus.Active && a.IsDeleted == false
+                          select new DropDownDto
+                          {
+                              Key = a.WalletAccountId,
+                              Value = a.WalletName + " | " + a.WalletNumber
+                          }).ToListAsync();
+        }
         #region Private
         private int? InsertWalletAccount(WalletAccount model)
         {
@@ -78,7 +147,7 @@ namespace BankingTool.Repository.Repository
             var isInserted = Insert(model);
             return isInserted ? model.WalletAccountId : null;
         }
-        private void UpdateBudgetAccount(WalletAccount model)
+        private void UpdateWalletAccount(WalletAccount model)
         {
             model.ModifiedBy = dataContext.UserEmail;
             model.ModifiedDate = DateTime.Now;
@@ -98,6 +167,27 @@ namespace BankingTool.Repository.Repository
         {
             var isInserted = Insert(model);
             return isInserted ? model.WalletTransactionDetailId : null;
+        }
+        private void UpdateBudgetAccount(BudgetAccount model)
+        {
+            model.ModifiedBy = dataContext.UserEmail;
+            model.ModifiedDate = DateTime.Now;
+            Update(model);
+        }
+        private int? InsertBudgetTransaction(BudgetTransaction model)
+        {
+            model.CreatedBy = dataContext.UserEmail;
+            model.CreatedDate = DateTime.Now;
+            model.ModifiedBy = null;
+            model.ModifiedDate = null;
+            model.IsDeleted = false;
+            var isInserted = Insert(model);
+            return isInserted ? model.BudgetTransactionId : null;
+        }
+        private int? InsertBudgetTransactionDetail(BudgetTransactionDetail model)
+        {
+            var isInserted = Insert(model);
+            return isInserted ? model.BudgetTransactionDetailId : null;
         }
         #endregion Private
     }

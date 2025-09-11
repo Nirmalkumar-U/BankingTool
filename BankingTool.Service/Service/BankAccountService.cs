@@ -796,7 +796,7 @@ namespace BankingTool.Service.Service
                 int sumOfBudgetAccountAmount = budgetAccounts.Sum(x => x.Amount);
                 if (sumOfBudgetAccountAmount > amount)
                 {
-                    return [new ValidationResults { PropertyPath = "Request.BudgetAccount.Asmount", PropertyName = "Amount", ErrorMessage = "Sum of Budget Account Amount should be lesser equal to Transfer Amount." }];
+                    return [new ValidationResults { PropertyPath = "Request.BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Sum of Budget Account Amount should be lesser equal to Transfer Amount." }];
                 }
                 if (isInValid)
                 {

@@ -7,7 +7,7 @@ namespace BankingTool.Api
     public class Startup(IConfiguration configuration)
     {
         public IConfiguration Configuration { get; } = configuration;
-        public void ConfigureContainer(ContainerBuilder builder)
+        public void ConfigureDI(ContainerBuilder builder)
         {
             builder.RegisterModule(new BankingToolModule());
         }

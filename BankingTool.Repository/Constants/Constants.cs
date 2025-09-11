@@ -18,6 +18,11 @@
         public const string Active = "Active";
         public const string InActive = "InActive";
     }
+    public class WalletStatus
+    {
+        public const string Active = "Active";
+        public const string InActive = "InActive";
+    }
     public class CardType
     {
         public const string DebitCard = "DebitCard";

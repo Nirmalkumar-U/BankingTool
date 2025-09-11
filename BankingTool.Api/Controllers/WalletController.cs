@@ -1,10 +1,12 @@
 ﻿using BankingTool.Api.Filter;
 using BankingTool.Api.Validators;
 using BankingTool.Model;
+using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.RequestDto.Wallet;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Service.IService;
+using BankingTool.Service.Service;
 using LazyCache;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +15,10 @@ namespace BankingTool.Api.Controllers
     [ApiController]
     [TokenAuthorization]
     [Route("api/[controller]/[action]")]
-    public class WalletController(IWalletService budgetService, IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor)
+    public class WalletController(IWalletService walletService, IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor)
         : HandleRequest(validatorService, cacheProvider, httpContextAccessor)
     {
-        private readonly IWalletService _budgetService = budgetService;
+        private readonly IWalletService _walletService = walletService;
 
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
@@ -26,7 +28,7 @@ namespace BankingTool.Api.Controllers
             return await HandleRequestAsync<CreateWalletRequestObject, bool>(
                 model,
                 ValidationRules.CreateWalletAccountRequestRules,
-                () => _budgetService.CreateWalletAccount(model.Request.Wallet.WalletName, model.Request.Wallet.Amount)
+                () => _walletService.CreateWalletAccount(model.Request.Wallet.WalletName, model.Request.Wallet.Amount)
             );
         }
 
@@ -38,7 +40,7 @@ namespace BankingTool.Api.Controllers
             return await HandleRequestAsync<bool?, GetWalletListResponse>(
                 null,
                 null,
-                () => _budgetService.GetWalletList()
+                () => _walletService.GetWalletList()
             );
         }
         [HttpPost]
@@ -49,21 +51,45 @@ namespace BankingTool.Api.Controllers
             return await HandleRequestAsync<GetWalletTransactionListRequestObject, GetWalletTransactionListResponse>(
                 model,
                 ValidationRules.GetWalletTransactionListRequestRules,
-                () => _budgetService.GetWalletTransactionList(model.Request.Wallet.Id)
+                () => _walletService.GetWalletTransactionList(model.Request.Wallet.Id)
             );
         }
 
-        //[HttpPost]
-        //[ProducesResponseType(typeof(ResponseDto<bool>), 200)]
-        //[ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        //public async Task<IActionResult> ChangeBudgetAccountStatus(ChangeBudgetAccountStatusRequestObject model)
-        //{
-        //    return await HandleRequestAsync<ChangeBudgetAccountStatusRequestObject, bool>(
-        //        model,
-        //        ValidationRules.CreateChangeBudgetAccountStatusRequestRules,
-        //        () => _budgetService.ChangeBudgetAccountStatus(model.Request.BudgetAccount.Id)
-        //    );
-        //}
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> ChangeWalletStatus(ChangeWalletStatusRequestObject model)
+        {
+            return await HandleRequestAsync<ChangeWalletStatusRequestObject, bool>(
+                model,
+                ValidationRules.CreateChangeWalletStatusRequestRules,
+                () => _walletService.ChangeWalletStatus(model.Request.Wallet.Id)
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> DepositWalletAmount(DepositWalletAmountRequestObject model)
+        {
+            return await HandleRequestAsync<DepositWalletAmountRequestObject, bool>(
+                model,
+                ValidationRules.DepositWalletAmountRequestObjectRules,
+                () => _walletService.DepositWalletAmount(model.Request.Wallet.Id, model.Request.WalletTransaction.Amount,
+                model.Request.WalletTransaction.Description, model.Request.WalletTransaction.TransactionDate, model.Request.BudgetAccount)
+            );
+        }
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> GetWalletDepositInitialLoad()
+        {
+            return await HandleRequestAsync<int?, bool>(
+                null,
+                null,
+                _walletService.GetWalletDepositInitialLoad,
+                true
+            );
+        }
         //[HttpGet]
         //[ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         //[ProducesResponseType(typeof(ResponseDto<bool>), 400)]

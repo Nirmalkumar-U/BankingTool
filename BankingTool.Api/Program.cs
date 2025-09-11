@@ -18,7 +18,7 @@ public static class Program
         var configuration = builder.Configuration.GetConfiguration();
         var startup = new Startup(configuration);
         builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());//Custom DI
-        builder.Host.ConfigureContainer<ContainerBuilder>(startup.ConfigureContainer);
+        builder.Host.ConfigureContainer<ContainerBuilder>(startup.ConfigureDI);
         startup.ConfigureServices(builder.Services);
         return (startup, builder);
     }

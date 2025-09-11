@@ -1,5 +1,4 @@
-import { isNullOrEmpty } from "../../../core/commonFunction/common-function";
-import { RequestId, RequestNullableId } from "../request-id";
+import { RequestId } from "../request-id";
 
 export interface DepositAmountRequestObject {
   request: DepositAmountRequest;
