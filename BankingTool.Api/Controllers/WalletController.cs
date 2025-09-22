@@ -87,8 +87,18 @@ namespace BankingTool.Api.Controllers
             return await HandleRequestAsync<int?, bool>(
                 null,
                 null,
-                _walletService.GetWalletDepositInitialLoad,
-                true
+                _walletService.GetWalletDepositInitialLoad
+            );
+        }
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> GetWalletTransferInitialLoad()
+        {
+            return await HandleRequestAsync<int?, bool>(
+                null,
+                null,
+                _walletService.GetWalletTransferInitialLoad
             );
         }
     }

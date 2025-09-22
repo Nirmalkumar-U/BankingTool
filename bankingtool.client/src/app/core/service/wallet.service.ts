@@ -20,6 +20,9 @@ export class WalletService {
   getWalletDepositInitialLoad(): Observable<any> {
     return this.httpService.get('Wallet/GetWalletDepositInitialLoad');
   }
+  getWalletTransferInitialLoad(): Observable<any> {
+    return this.httpService.get('Wallet/GetWalletTransferInitialLoad');
+  }
   getWalletTransactionList(model: GetWalletTransactionListRequestObject): Observable<any> {
     return this.httpService.post('Wallet/GetWalletTransactionList', model);
   }

@@ -17,5 +17,6 @@ namespace BankingTool.Repository.IRepository
         Task<WalletAccount> GetWalletAccount(int walletAccountId);
         bool WalletDeposit(WalletTransactionDto walletDetails, List<BudgetTransactionDto> budgetTransactionDetail, AccountTransactionsDto accountDetails);
         Task<List<DropDownDto>> GetFromWalletAccountListByCustomerId();
+        Task<List<DropDownDto>> GetToWalletAccountListByCustomerId();
     }
 }

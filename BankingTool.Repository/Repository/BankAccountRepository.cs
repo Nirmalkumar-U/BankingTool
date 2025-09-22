@@ -203,7 +203,20 @@ namespace BankingTool.Repository.Repository
                               Value = cv.CodeValue1
                           }).ToListAsync();
         }
-
+        public async Task<List<DropDownDto>> GetAllAccountList()
+        {
+            return await (from a in dataContext.Account
+                          join c in dataContext.Customer on a.CustomerId equals c.CustomerId
+                          join u in dataContext.Users on c.UserId equals u.UserId
+                          join b in dataContext.Bank on a.BankId equals b.BankId
+                          join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
+                          where a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          select new DropDownDto
+                          {
+                              Key = a.AccountId,
+                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
+                          }).ToListAsync();
+        }
         public async Task<List<DropDownDto>> GetFromAccountListByCustomerId()
         {
             return await (from a in dataContext.Account
@@ -211,7 +224,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false
+                          where a.CustomerId == dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -225,7 +238,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == dataContext.CustomerId && a.AccountId != accountId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false
+                          where a.CustomerId == dataContext.CustomerId && a.AccountId != accountId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -239,7 +252,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId != dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false
+                          where a.CustomerId != dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,

@@ -37,18 +37,13 @@ namespace BankingTool.Repository.IRepository
         Task<List<GetReceiverAccount>> GetReceiverAccountDropdown(int accountId);
         Task<List<GetSenderAccount>> GetSenderAccountDropdown(int accountId);
         Task<Transaction> GetLastTransaction(int AccountId);
-
         bool CreateAccount(Account account, Transaction transaction, TransactionDetail transactionDetail, Card debitCard, Card creditCard, CreditScore cardScore, Customer customer,
             bool CustomerWantCreditCard, bool IsAnyAccountForThisCustomer, bool IsUpdatePrimaryAccount);
         bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
             TransactionDetail toTransactionDetail, List<BudgetTransactionDto> budgetTransactions, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount);
         bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail, bool isBudgetAccountAttached, List<BudgetTransactionDto> budgetTransactions);
         Task<List<DashBoardAccountList>> GetDashBoardInitialLoad();
-
-        void UpdateCustomer(Customer customer);
-        int? InsertTransaction(Transaction transaction);
         Task<Card> GetLastCard(string cardType);
-        int? InsertCard(Card card);
-        int? InsertCreditScore(CreditScore creditScore);
+        Task<List<DropDownDto>> GetAllAccountList();
     }
 }

@@ -138,7 +138,19 @@ namespace BankingTool.Repository.Repository
             return await (from a in dataContext.WalletAccount
                           join c in dataContext.Customer on a.CustomerId equals c.CustomerId
                           join u in dataContext.Users on c.UserId equals u.UserId
-                          where a.CustomerId == dataContext.CustomerId && a.WalletStatus == WalletStatus.Active && a.IsDeleted == false
+                          where a.CustomerId == dataContext.CustomerId && a.WalletStatus == WalletStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          select new DropDownDto
+                          {
+                              Key = a.WalletAccountId,
+                              Value = a.WalletName + " | " + a.WalletNumber
+                          }).ToListAsync();
+        }
+        public async Task<List<DropDownDto>> GetToWalletAccountListByCustomerId()
+        {
+            return await (from a in dataContext.WalletAccount
+                          join c in dataContext.Customer on a.CustomerId equals c.CustomerId
+                          join u in dataContext.Users on c.UserId equals u.UserId
+                          where a.CustomerId != dataContext.CustomerId && a.WalletStatus == WalletStatus.Active && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.WalletAccountId,

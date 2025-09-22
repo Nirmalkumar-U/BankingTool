@@ -181,6 +181,24 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
+        public async Task<ResponseDto<bool>> GetWalletTransferInitialLoad()
+        {
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                DropDownList = new List<DropDownListDto>
+                {
+                    new DropDownListDto{ Name = "FromWalletAccount", DropDown = await _walletRepository.GetFromWalletAccountListByCustomerId() },
+                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() },
+                    new DropDownListDto{ Name = "BudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() },
+                    new DropDownListDto{ Name = "Account", DropDown = await _bankAccountRepository.GetAllAccountList() }
+                },
+                StatuCode = 200,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
         #region Private
         private async Task<string> GetNewBudgetNumber()
         {

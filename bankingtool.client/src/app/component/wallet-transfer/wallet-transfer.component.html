@@ -1,1 +1,107 @@
-<p>wallet-transfer works!</p>
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>
+          Wallet Transfer <span style="float: inline-end;" class="">
+            To Account: <input class="form-check-input"
+                                 type="checkbox" checked
+                                 id="toggleSwitch"
+                                 [(ngModel)]="isToAccount"
+                                 (ngModelChange)="isToAccountChange()">
+          </span>
+        </h1>
+      </div>
+      <div class='card-body'>
+        <form class="row g-3 was-validated" novalidate [formGroup]="walletTransferForm" (ngSubmit)="walletTransfer()">
+          <div class="col-md-3">
+            <label class="form-label">Wallet Account</label>
+            <select class="form-select" formControlName="accountId" required>
+              <option value="">Select</option>
+              <option *ngFor="let fa of accountList" [ngValue]="fa.key">{{ fa.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Account...
+            </div>
+          </div>
+          <div class="col-md-1">
+            <label class="form-label">Balance</label>
+            <h6>{{balance}}</h6>
+          </div>
+          <div *ngIf="isToAccount" class="col-md-3">
+            <label class="form-label">Bank Account</label>
+            <select class="form-select" formControlName="bankAccountId" required>
+              <option value="">Select</option>
+              <option *ngFor="let fa of bankAccountList" [ngValue]="fa.key">{{ fa.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Bank Account...
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Transaction Date</label>
+            <input type="date" class="form-control" formControlName="transferDate" (blur)="setTransferDate($event)" />
+          </div>
+          <div class="col-md-2">
+            <label for="inputPassword4" class="form-label">Amount</label>
+            <input type="text" class="form-control" formControlName="amount" required>
+            <div class="invalid-feedback">
+              Please Enter amount...
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label for="inputPassword4" class="form-label">Description</label>
+            <input type="text" class="form-control" formControlName="description" required>
+            <div class="invalid-feedback">
+              Please Enter Description...
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Transaction Tag</label>
+            <select class="form-select" formControlName="bankAccountId" required>
+              <option value="">Select</option>
+              <option *ngFor="let fa of transactionTagList" [ngValue]="fa.key">{{ fa.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Transaction Tag...
+            </div>
+          </div>
+          <div class="col-12">
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Wallet Transfer</button>
+          </div>
+          <div class="col-md-12" *ngIf="budgetAccountList && budgetAccountList.length != 0">
+            <label class="form-label">Budget Allocation (Optional)</label>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Budget Account</th>
+                  <th>Budget Amount</th>
+                  <th style="width: 50px;">Action</th>
+                </tr>
+              </thead>
+              <tbody formArrayName="budgetAccount">
+                <tr *ngFor="let budget of budgetAccount.controls; let i = index" [formGroupName]="i">
+                  <td>
+                    <select class="form-select" formControlName="budgetAccountId" required>
+                      <option value="">Select</option>
+                      <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control" formControlName="budgetAmount" required />
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="removeBudgetAccount(i)">X</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="addBudgetAccount()">Add Row</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+

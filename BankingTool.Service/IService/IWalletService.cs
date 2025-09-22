@@ -13,5 +13,6 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> DepositWalletAmount(int walletId, int amount, string description, DateTime transactionDate, List<DepositWalletAmountRequestBudgetAccount> budgetAccounts,
             bool isFromAccount, int? accountId);
         Task<ResponseDto<bool>> GetWalletDepositInitialLoad();
+        Task<ResponseDto<bool>> GetWalletTransferInitialLoad();
     }
 }
