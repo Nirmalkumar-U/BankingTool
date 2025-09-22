@@ -75,7 +75,8 @@ namespace BankingTool.Api.Controllers
                 model,
                 ValidationRules.DepositWalletAmountRequestObjectRules,
                 () => _walletService.DepositWalletAmount(model.Request.Wallet.Id, model.Request.WalletTransaction.Amount,
-                model.Request.WalletTransaction.Description, model.Request.WalletTransaction.TransactionDate, model.Request.BudgetAccount)
+                model.Request.WalletTransaction.Description, model.Request.WalletTransaction.TransactionDate,
+                model.Request.BudgetAccount, model.Request.Account.IsFromAccount, model.Request.Account.Id)
             );
         }
         [HttpGet]
@@ -90,28 +91,5 @@ namespace BankingTool.Api.Controllers
                 true
             );
         }
-        //[HttpGet]
-        //[ProducesResponseType(typeof(ResponseDto<bool>), 200)]
-        //[ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        //public async Task<IActionResult> GetBudgetDropdownList()
-        //{
-        //    return await HandleRequestAsync<bool?, bool>(
-        //        null,
-        //        null,
-        //        () => _budgetService.GetBudgetDropdownList()
-        //    );
-        //}
-        //[HttpPost]
-        //[ProducesResponseType(typeof(ResponseDto<bool>), 200)]
-        //[ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        //public async Task<IActionResult> SaveBudgetTransaction(SaveBudgetTransactionRequestObject model)
-        //{
-        //    return await HandleRequestAsync<SaveBudgetTransactionRequestObject, bool>(
-        //        model,
-        //        ValidationRules.SaveBudgetTransactionRequestRules,
-        //        () => _budgetService.BudgetTransfer(model.Request.FromBudgetAccount.Id, model.Request.ToBudgetAccount, 
-        //        model.Request.FromBudgetAccount.Amount, model.Request.FromBudgetAccount.Description)
-        //    );
-        //}
     }
 }

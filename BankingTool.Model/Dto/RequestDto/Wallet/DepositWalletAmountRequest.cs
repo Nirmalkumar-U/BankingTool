@@ -11,6 +11,7 @@ namespace BankingTool.Model.Dto.RequestDto.Wallet
         public DepositWalletAmountRequestWallet Wallet { get; set; }
         public DepositWalletAmountRequestWalletTransaction WalletTransaction { get; set; }
         public List<DepositWalletAmountRequestBudgetAccount> BudgetAccount { get; set; }
+        public DepositWalletAmountRequestAccount Account { get; set; }
     }
     public class DepositWalletAmountRequestWallet : RequestId
     {
@@ -24,5 +25,9 @@ namespace BankingTool.Model.Dto.RequestDto.Wallet
     public class DepositWalletAmountRequestBudgetAccount : RequestId
     {
         public int Amount { get; set; }
+    }
+    public class DepositWalletAmountRequestAccount : RequestNullableId
+    {
+        public bool IsFromAccount { get; set; }
     }
 }

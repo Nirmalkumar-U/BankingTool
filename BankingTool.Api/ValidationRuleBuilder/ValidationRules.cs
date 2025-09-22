@@ -398,7 +398,8 @@ namespace BankingTool.Api.Validators
                     r.MinLength = 1;
                     r.MaxLength = 100;
                 }),
-            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.WalletTransaction.TransactionDate).Required()
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.WalletTransaction.TransactionDate).Required(),
+            RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.Account.IsFromAccount).Required(),
         };
         #endregion Wallet
     }

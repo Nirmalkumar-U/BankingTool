@@ -10,7 +10,8 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<GetWalletListResponse>> GetWalletList();
         Task<ResponseDto<GetWalletTransactionListResponse>> GetWalletTransactionList(int walletId);
         Task<ResponseDto<bool>> ChangeWalletStatus(int walletId);
-        Task<ResponseDto<bool>> DepositWalletAmount(int walletId, int amount, string description, DateTime transactionDate, List<DepositWalletAmountRequestBudgetAccount> budgetAccounts);
+        Task<ResponseDto<bool>> DepositWalletAmount(int walletId, int amount, string description, DateTime transactionDate, List<DepositWalletAmountRequestBudgetAccount> budgetAccounts,
+            bool isFromAccount, int? accountId);
         Task<ResponseDto<bool>> GetWalletDepositInitialLoad();
     }
 }

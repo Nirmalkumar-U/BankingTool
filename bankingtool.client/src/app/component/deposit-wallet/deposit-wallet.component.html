@@ -2,10 +2,28 @@
   <div class='container'>
     <div class='card'>
       <div class='card-header'>
-        <h1>Deposit Amount in Wallet</h1>
+        <h1>Deposit Amount in Wallet <span style="float: inline-end;" class=""> From Account: <input class="form-check-input"
+       type="checkbox"
+       id="toggleSwitch"
+       [(ngModel)]="isFromAccount"
+       (ngModelChange)="isFromAccountChange()"> </span></h1>
       </div>
       <div class='card-body'>
         <form class="row g-3 was-validated" novalidate [formGroup]="depositAmountForm" (ngSubmit)="depositAmount()">
+          <div *ngIf="isFromAccount" class="col-md-3">
+            <label class="form-label">Bank Account</label>
+            <select class="form-select" formControlName="bankAccountId" required>
+              <option value="">Select</option>
+              <option *ngFor="let fa of bankAccountList" [ngValue]="fa.key">{{ fa.value }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please Select Bank Account...
+            </div>
+          </div>
+          <div *ngIf="isFromAccount" class="col-md-1">
+            <label class="form-label">Balance</label>
+            <h6>{{balance}}</h6>
+          </div>
           <div class="col-md-3">
             <label class="form-label">Account</label>
             <select class="form-select" formControlName="accountId" required>

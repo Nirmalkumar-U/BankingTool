@@ -10,11 +10,13 @@ using BankingTool.Service.IService;
 
 namespace BankingTool.Service.Service
 {
-    public class WalletService(IWalletRespository walletRepository, IBudgetRepository budgetRepository, IBankAccountRepository bankAccountRepository) : IWalletService
+    public class WalletService(IWalletRepository walletRepository, IBudgetRepository budgetRepository,
+        IBankAccountRepository bankAccountRepository, ICommonService commonService) : IWalletService
     {
-        private readonly IWalletRespository _walletRepository = walletRepository;
+        private readonly IWalletRepository _walletRepository = walletRepository;
         private readonly IBudgetRepository _budgetRepository = budgetRepository;
-        private readonly IBankAccountRepository _bankAccountRepository= bankAccountRepository;
+        private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
+        private readonly ICommonService _commonService = commonService;
         public async Task<ResponseDto<bool>> CreateWalletAccount(string walletName, int amount)
         {
             ResponseDto<bool> response = new()
@@ -99,120 +101,66 @@ namespace BankingTool.Service.Service
                 StatuCode = 200
             };
         }
-        public async Task<ResponseDto<bool>> DepositWalletAmount(int walletId, int amount, string description, DateTime transactionDate, List<DepositWalletAmountRequestBudgetAccount> budgetAccounts)
+        public async Task<ResponseDto<bool>> DepositWalletAmount(int walletId, int amount, string description, DateTime transactionDate, List<DepositWalletAmountRequestBudgetAccount> budgetAccounts,
+            bool isFromAccount, int? accountId)
         {
             List<BudgetAccountDto> validateBudgetAccount = [.. budgetAccounts.Select(budgetAccounts => new BudgetAccountDto
             {
                 Id = budgetAccounts.Id,
                 Amount = budgetAccounts.Amount
             })];
-            var validationResult = ValidateBudgetAccount(validateBudgetAccount, amount);
-            if (validationResult != null)
+            var (budgetDetails, budgetValidationResult) = await _commonService.GetBudgetAccountDetailsToDebitOrCredit(false, accountId, amount, description, transactionDate, validateBudgetAccount, TransactionTag.Transfer, TransactionCatagory.Transfer);
+
+            if (budgetValidationResult != null && budgetValidationResult.Count != 0)
             {
                 return new ResponseDto<bool>
                 {
                     Response = false,
                     Status = false,
-                    ValidationErrors = validationResult,
+                    ValidationErrors = budgetValidationResult,
                     Errors = [],
                     StatuCode = 400
                 };
             }
 
-            var lastTransaction = await _walletRepository.GetLastWalletTransaction(walletId);
-            if (lastTransaction != null && lastTransaction?.TransactionTime.Date > transactionDate.Date)
+            var (walletDetails, walletValidationResult) = await _commonService.GetWalletDetailsToDebitOrCredit(false, walletId, amount, description, transactionDate, TransactionCatagory.Deposit, TransactionTag.Deposit);
+
+            if (walletValidationResult != null && walletValidationResult.Count != 0)
             {
                 return new ResponseDto<bool>
                 {
                     Response = false,
                     Status = false,
-                    ValidationErrors = [],
-                    Errors = [new Errors { PropertyName = "DepositAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
+                    ValidationErrors = walletValidationResult,
+                    Errors = [],
+                    StatuCode = 400
                 };
             }
-            if (lastTransaction != null && lastTransaction.TransactionTime.Date == transactionDate.Date)
-            {
-                transactionDate = lastTransaction.TransactionTime;
-                transactionDate = transactionDate.AddMinutes(5);
-            }
-            WalletAccount walletAccount = await _walletRepository.GetWalletAccount(walletId);
-            walletAccount.Balance = walletAccount.Balance + amount;
 
-            WalletTransaction transaction = new()
+            (AccountTransactionsDto accountDetails, List<ValidationResults> accountValidationResult) = (null, null);
+            if (isFromAccount)
             {
-                Amount = amount,
-                Description = description,
-                TransactionTime = transactionDate,
-                TransactionCategory = TransactionCatagory.Deposit,
-                TransactionTag = TransactionTag.Deposit
-            };
-            WalletTransactionDetail transactionDetails = new()
-            {
-                WalletAccountId = walletAccount.WalletAccountId,
-                TransactionType = TransactionType.Credit,
-                StageBalance = walletAccount.Balance,
-                TransactionRole = TransactionRole.Receiver,
-            };
-
-            List<BudgetTransactionDto> budgetAccountList = [];
-            bool isBudgetAccountAttached = false;
-            if (budgetAccounts != null && budgetAccounts.Count > 0)
-            {
-                isBudgetAccountAttached = true;
-                foreach (var bAccount in budgetAccounts)
+                (accountDetails, accountValidationResult) = await _commonService.GetAccountDetailsToDebitOrCredit(true, accountId, amount, description, transactionDate, TransactionCatagory.Transfer, TransactionTag.Transfer);
+                if (accountValidationResult != null && accountValidationResult.Count != 0)
                 {
-                    var lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(bAccount.Id);
-                    if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionDate.Date)
+                    return new ResponseDto<bool>
                     {
-                        return new ResponseDto<bool>
-                        {
-                            Response = false,
-                            Status = false,
-                            ValidationErrors = [],
-                            Errors = [new Errors { PropertyName = "DepositAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." }]
-                        };
-                    }
-                    var budgetTransactionDate = transactionDate;
-                    if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction.TransactionTime.Date == budgetTransactionDate.Date)
-                    {
-                        budgetTransactionDate = lastBudgetAccountTransaction.TransactionTime;
-                        budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
-                    }
-                    BudgetAccount budgetAccount = await _budgetRepository.GetBudgetAccountById(bAccount.Id);
-                    budgetAccount.Balance = budgetAccount.Balance + bAccount.Amount;
-                    BudgetTransaction budgetTransaction = new BudgetTransaction()
-                    {
-                        Amount = bAccount.Amount,
-                        Description = description,
-                        TransactionTime = budgetTransactionDate,
-                        TransactionCategory = TransactionCatagory.Deposit,
-                        TransactionTag = TransactionTag.Deposit
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = accountValidationResult,
+                        Errors = [],
+                        StatuCode = 400
                     };
-                    BudgetTransactionDetail budgetTransactionDetails = new BudgetTransactionDetail()
-                    {
-                        TransactionType = TransactionType.Credit,
-                        StageBalance = budgetAccount.Balance,
-                        TransactionRole = TransactionRole.Receiver,
-                        AccountId = 1,//TODO: Need to replace with actual value
-                        BudgetAccountId = budgetAccount.BudgetAccountId
-                    };
-                    BudgetTransactionDto budgetTransactions = new BudgetTransactionDto()
-                    {
-                        BudgetAccount = budgetAccount,
-                        BudgetTransaction = budgetTransaction,
-                        BudgetTransactionDetail = budgetTransactionDetails
-                    };
-                    budgetAccountList.Add(budgetTransactions);
                 }
             }
 
-            _walletRepository.WalletDeposit(walletAccount, transaction, transactionDetails, isBudgetAccountAttached, budgetAccountList);
+            var isDeposited = _walletRepository.WalletDeposit(walletDetails, budgetDetails,accountDetails);
             return new ResponseDto<bool>
             {
-                Response = true,
-                Status = true,
+                Response = isDeposited,
+                Status = isDeposited,
                 ValidationErrors = [],
-                Errors = []
+                Errors = isDeposited ? []: [new Errors() { PropertyName = "WalletDeposit", ErrorMessage = "Failed to Save Wallet Deposit Transaction." }]
             };
         }
         public async Task<ResponseDto<bool>> GetWalletDepositInitialLoad()
@@ -224,7 +172,8 @@ namespace BankingTool.Service.Service
                 {
                     new DropDownListDto{ Name = "FromWalletAccount", DropDown = await _walletRepository.GetFromWalletAccountListByCustomerId() },
                     new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() },
-                    new DropDownListDto{ Name = "BudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() }
+                    new DropDownListDto{ Name = "BudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() },
+                    new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() }
                 },
                 StatuCode = 200,
                 Status = true,
@@ -237,28 +186,6 @@ namespace BankingTool.Service.Service
         {
             var lastWalletAccount = await _walletRepository.GetLastWalletAccount();
             return ((lastWalletAccount != null && long.TryParse(lastWalletAccount.WalletNumber, out long lastNumber)) ? lastNumber + 1 : 50000000).ToString();
-        }
-        private static List<ValidationResults> ValidateBudgetAccount(List<BudgetAccountDto> budgetAccounts, int amount)
-        {
-            if (budgetAccounts != null && budgetAccounts.Count > 0)
-            {
-                bool isInValid = budgetAccounts.Any(x => x.Id == null);
-                bool isAmountInValid = budgetAccounts.Any(x => x?.Amount == null || x.Amount == 0);
-                int sumOfBudgetAccountAmount = budgetAccounts.Sum(x => x.Amount);
-                if (sumOfBudgetAccountAmount > amount)
-                {
-                    return [new ValidationResults { PropertyPath = "BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Sum of Budget Account Amount should be lesser equal to Transfer Amount." }];
-                }
-                if (isInValid)
-                {
-                    return [new ValidationResults { PropertyPath = "BudgetAccount.Id", PropertyName = "BudgetAccountId", ErrorMessage = "BudgetAccountId is required." }];
-                }
-                if (isAmountInValid)
-                {
-                    return [new ValidationResults { PropertyPath = "BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Amount is required." }];
-                }
-            }
-            return null;
         }
         #endregion Private
     }

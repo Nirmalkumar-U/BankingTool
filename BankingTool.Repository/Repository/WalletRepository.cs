@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankingTool.Repository.Repository
 {
-    public class WalletRespository(DataContext dataContext) : EntityRepository<WalletAccount>(dataContext), IWalletRespository
+    public class WalletRepository(DataContext dataContext) : EntityRepository<WalletAccount>(dataContext), IWalletRepository
     {
         public async Task<WalletAccount> GetLastWalletAccount()
         {
@@ -94,26 +94,35 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.WalletAccount.FirstOrDefaultAsync(x => x.WalletAccountId == walletAccountId);
         }
-        public bool WalletDeposit(WalletAccount account, WalletTransaction transaction, WalletTransactionDetail transactionDetail,
-            bool isBudgetAccountAttached, List<BudgetTransactionDto> budgetTransactionDetail)
+        public bool WalletDeposit(WalletTransactionDto walletDetails, List<BudgetTransactionDto> budgetTransactionDetail, AccountTransactionsDto accountDetails)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
             {
-                UpdateWalletAccount(account);
-                var transactionId = InsertWalletTransaction(transaction);
-                transactionDetail.WalletTransactionId = transactionId.Value;
-                InsertWalletTransactionDetail(transactionDetail);
-                if (isBudgetAccountAttached)
+                //Wallet
+                UpdateWalletAccount(walletDetails.WalletAccount);
+                var transactionId = InsertWalletTransaction(walletDetails.WalletTransaction);
+                walletDetails.WalletTransactionDetail.WalletTransactionId = transactionId.Value;
+                InsertWalletTransactionDetail(walletDetails.WalletTransactionDetail);
+
+                //Budget
+                foreach (var budgetAccount in budgetTransactionDetail)
                 {
-                    foreach (var budgetAccount in budgetTransactionDetail)
-                    {
-                        UpdateBudgetAccount(budgetAccount.BudgetAccount);
-                        var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
-                        budgetAccount.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
-                        var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetAccount.BudgetTransactionDetail);
-                    }
+                    UpdateBudgetAccount(budgetAccount.BudgetAccount);
+                    var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
+                    budgetAccount.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                    var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetAccount.BudgetTransactionDetail);
                 }
+
+                //Account
+                if(accountDetails != null)
+                {
+                    UpdateAccount(accountDetails.Account);
+                    var accountTransactionId = InsertTransaction(accountDetails.Transaction);
+                    accountDetails.TransactionDetail.TransactionId= accountTransactionId.Value;
+                    InsertTransactionDetail(accountDetails.TransactionDetail);
+                }
+
                 sqlTransaction.Commit();
                 return true;
             }
@@ -188,6 +197,26 @@ namespace BankingTool.Repository.Repository
         {
             var isInserted = Insert(model);
             return isInserted ? model.BudgetTransactionDetailId : null;
+        }
+        public void UpdateAccount(Account account)
+        {
+            account.ModifiedBy = dataContext.UserEmail;
+            account.ModifiedDate = DateTime.Now;
+            Update(account);
+        }
+        public int? InsertTransaction(Transaction transaction)
+        {
+            transaction.CreatedBy = dataContext.UserEmail;
+            transaction.CreatedDate = DateTime.Now;
+            transaction.ModifiedBy = null;
+            transaction.ModifiedDate = null;
+            transaction.IsDeleted = false;
+            var isInserted = Insert(transaction);
+            return isInserted ? transaction.TransactionId : null;
+        }
+        public void InsertTransactionDetail(TransactionDetail transactionDetail)
+        {
+            var isInserted = Insert(transactionDetail);
         }
         #endregion Private
     }

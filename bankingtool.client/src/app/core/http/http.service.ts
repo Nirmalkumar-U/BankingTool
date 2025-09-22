@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs';
 import { AppSettingsDto } from '../../dto/internal-dto/app-settings-dto';
 import { CreateTokenRequestObject } from '../../dto/request/user/create-token-request';
-import { EmitterService } from '../emitter.service';
 import { IntegrateService } from '../initailizerService/integrate.service';
 import { LocalStorageService } from '../local-storage.service';
 import { NotificationService } from '../notificationService/notification-service';
@@ -17,7 +16,7 @@ export class HttpService {
   baseUrl = AppSettingsDto.baseUrl;
   isEncryptionEnabled = AppSettingsDto.isEncryptionEnabled;
   fieldsToEncrypt = AppSettingsDto.fieldsToEncrypt;
-  constructor(private localStoreService: LocalStorageService, private emitService: EmitterService,
+  constructor(private localStoreService: LocalStorageService,
     private notificationService: NotificationService, private authService: AuthService,
     private loaderService: LoaderService, private integrateService: IntegrateService
   ) { }
@@ -168,7 +167,9 @@ export class HttpService {
       else {
         return response.json();
       }
-    } else {
+    }
+    else {
+      return response.json();
     }
   }
   private hasEncryptField(obj: any): boolean {

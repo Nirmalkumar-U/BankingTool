@@ -5,7 +5,7 @@ using BankingTool.Model.Model;
 
 namespace BankingTool.Repository.IRepository
 {
-    public interface IWalletRespository
+    public interface IWalletRepository
     {
         Task<WalletAccount> GetLastWalletAccount();
         Task<bool> CreateWalletAccount(WalletAccount walletAccount, WalletTransaction walletTransaction, WalletTransactionDetail walletTransactionDetails);
@@ -15,8 +15,7 @@ namespace BankingTool.Repository.IRepository
         Task<bool> ChangeWalletStatus(int walletId);
         Task<WalletTransaction> GetLastWalletTransaction(int walletAccountId);
         Task<WalletAccount> GetWalletAccount(int walletAccountId);
-        bool WalletDeposit(WalletAccount account, WalletTransaction transaction, WalletTransactionDetail transactionDetail,
-            bool isBudgetAccountAttached, List<BudgetTransactionDto> budgetTransactionDetail);
+        bool WalletDeposit(WalletTransactionDto walletDetails, List<BudgetTransactionDto> budgetTransactionDetail, AccountTransactionsDto accountDetails);
         Task<List<DropDownDto>> GetFromWalletAccountListByCustomerId();
     }
 }
