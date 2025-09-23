@@ -6,6 +6,9 @@ import { NotificationService } from '../../core/notificationService/notification
 import { WalletService } from '../../core/service/wallet.service';
 import { DropDownDto } from '../../dto/internal-dto/drop-down-dto';
 import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { GetAccountBalanceRequestObject } from '../../dto/request/bank-account/get-account-balance-request';
+import { GetWalletBalanceRequestObject } from '../../dto/request/wallet/get-wallet-balance-request';
+import { CreateWalletTransferRequestObject } from '../../dto/request/wallet/wallet-transfer-request';
 
 @Component({
   selector: 'app-wallet-transfer',
@@ -35,6 +38,7 @@ export class WalletTransferComponent {
       amount: ['', [Validators.required]],
       description: ['', [Validators.required]],
       transferDate: ['', [Validators.required]],
+      transactionTag: ['', [Validators.required]],
       budgetAccount: this.fb.array([])
     });
     this.walletTransferForm.patchValue({
@@ -57,6 +61,34 @@ export class WalletTransferComponent {
     this.budgetAccountList = initialData.dropDownList.find(x => x.name == "BudgetAccount")!.dropDown;
     this.transactionTagList = initialData.dropDownList.find(x => x.name == "TransactionTag")!.dropDown;
     this.updateBankAccountIdValidator();
+
+    this.walletTransferForm.get('accountId')?.valueChanges.subscribe(accountId => {
+      if (!isNullOrEmpty(accountId)) {
+        let model: GetWalletBalanceRequestObject = {
+          request: {
+            account: {
+              id: accountId
+            }
+          }
+        }
+        this.walletService.getWalletBalance(model).subscribe((response: ResponseDto<number>) => {
+          if (response.status == true) {
+            this.balance = response.response;
+          } else {
+            let messageList: string[] = [];
+            if (Array.isArray(response?.errors) && response?.errors)
+              messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+            messageList.push("Get Account Balance failed");
+            messageList.forEach((msg) => {
+              this.notificationService.show(msg, 'error')
+            });
+          }
+        });
+      } else {
+        this.balance = 0;
+      }
+    });
+
   }
   private updateBankAccountIdValidator() {
     const bankAccountIdControl = this.walletTransferForm.get('bankAccountId');
@@ -68,7 +100,31 @@ export class WalletTransferComponent {
     bankAccountIdControl?.updateValueAndValidity();
   }
   walletTransfer() {
-
+    this.messageList = [];
+    if (!this.walletTransferForm.invalid) {
+      let budgetAccounts: any[] = this.walletTransferForm.get('budgetAccount')?.value;
+      let validBudgetAccounts = budgetAccounts
+        .filter(x => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount))
+        .map((z: any) => ({ id: z.budgetAccountId, amount: z.budgetAmount }));
+      let model = CreateWalletTransferRequestObject(this.walletTransferForm.get('accountId')?.value,
+        this.walletTransferForm.get('amount')?.value, this.walletTransferForm.get('description')?.value,
+        this.walletTransferForm.get('transferDate')?.value, validBudgetAccounts, this.isToAccount == true ? this.walletTransferForm.get('bankAccountId')?.value : null,
+        this.walletTransferForm.get('transactionTag')?.value);
+      this.walletService.walletTransfer(model).subscribe((response: ResponseDto<boolean>) => {
+        if (response.status == true) {
+          this.isSubmitted = true;
+          this.notificationService.show("Amount transfered successfully.", 'success');
+        } else {
+          let messageList: string[] = [];
+          if (Array.isArray(response?.errors) && response?.errors)
+            messageList = [...response?.errors?.map(x => x.errorMessage), ...response?.validationErrors?.map(x => x.errorMessage)]
+          messageList.push("Transfer failed");
+          messageList.forEach((msg) => {
+            this.notificationService.show(msg, 'error');
+          });
+        }
+      });
+    }
   }
   get budgetAccount(): FormArray {
     return this.walletTransferForm.get('budgetAccount') as FormArray;

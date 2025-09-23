@@ -15,8 +15,9 @@ namespace BankingTool.Repository.IRepository
         Task<bool> ChangeWalletStatus(int walletId);
         Task<WalletTransaction> GetLastWalletTransaction(int walletAccountId);
         Task<WalletAccount> GetWalletAccount(int walletAccountId);
-        bool WalletDeposit(WalletTransactionDto walletDetails, List<BudgetTransactionDto> budgetTransactionDetail, AccountTransactionsDto accountDetails);
+        bool SaveTransactions(WalletTransactionDto walletDetails, List<BudgetTransactionDto> budgetTransactionDetail, AccountTransactionsDto accountDetails);
         Task<List<DropDownDto>> GetFromWalletAccountListByCustomerId();
         Task<List<DropDownDto>> GetToWalletAccountListByCustomerId();
+        Task<int> GetWalletBalance(int accountId);
     }
 }

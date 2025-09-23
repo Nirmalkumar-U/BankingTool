@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ChangeWalletStatusRequestObject } from '../../dto/request/wallet/change-wallet-status-request';
 import { CreateWalletRequestObject } from '../../dto/request/wallet/create-wallet-request';
+import { GetWalletBalanceRequestObject } from '../../dto/request/wallet/get-wallet-balance-request';
 import { GetWalletTransactionListRequestObject } from '../../dto/request/wallet/get-wallet-transaction-list-request';
+import { WalletTransferRequestObject } from '../../dto/request/wallet/wallet-transfer-request';
 import { HttpService } from '../http/http.service';
 
 @Injectable({
@@ -31,5 +33,11 @@ export class WalletService {
   }
   depositWalletAmount(model: ChangeWalletStatusRequestObject): Observable<any> {
     return this.httpService.post('Wallet/DepositWalletAmount', model);
+  }
+  walletTransfer(model: WalletTransferRequestObject): Observable<any> {
+    return this.httpService.post('Wallet/WalletTransfer', model);
+  }
+  getWalletBalance(model: GetWalletBalanceRequestObject): Observable<any> {
+    return this.httpService.post('Wallet/GetWalletBalance', model);
   }
 }

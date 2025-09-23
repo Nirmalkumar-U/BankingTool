@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, HostListener, OnInit } from "@angular/core";
 import { debounceTime, Subject } from "rxjs";
 import { NotificationService } from "../../core/notificationService/notification-service";
 import { NoteService } from "../../core/service/note.service";
@@ -34,6 +34,19 @@ export class NoteComponent implements OnInit {
       .pipe(debounceTime(this.debounceTimeMs))
       .subscribe(() => this.saveNote(false)); 
   }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscape(event: KeyboardEvent): void {
+    if (this.selectedNote) {
+      this.selectedNote = null;
+      this.newNoteMode = false;
+      return
+    }
+    if (this.isPopupOpen || this.selectedNote) {
+      this.isPopupOpen = false;
+    }
+  }
+
 
   togglePopup(): void {
     if (this.selectedNote) {
@@ -121,11 +134,9 @@ export class NoteComponent implements OnInit {
   }
   triggerAutoSave(): void {
     if (this.selectedNote) {
-      this.autoSave$.next(); // debounce logic will handle the actual save
+      this.autoSave$.next();
     }
   }
-
-
   closeEditor(): void {
     this.selectedNote = null;
     this.newNoteMode = false;
@@ -156,5 +167,4 @@ export class NoteComponent implements OnInit {
       }
     });
   }
-
 }

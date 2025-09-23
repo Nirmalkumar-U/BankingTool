@@ -5,6 +5,7 @@ using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
+using Microsoft.Identity.Client;
 
 namespace BankingTool.Service.Service
 {
@@ -137,6 +138,15 @@ namespace BankingTool.Service.Service
         public async Task<(WalletTransactionDto, List<ValidationResults>)> GetWalletDetailsToDebitOrCredit(bool isDebit, int walletId, int amount, string description, DateTime transactionDate,
             string transactionCatagory = "Transfer", string transactionTag = "Transfer")
         {
+            WalletAccount account = await _walletRepository.GetWalletAccount(walletId);
+            if (isDebit)
+            {
+                var validationResultBalance = ValidateBalance(account.Balance, amount);
+                if (validationResultBalance != null)
+                {
+                    return (null, validationResultBalance);
+                }
+            }
             var lastTransaction = await _walletRepository.GetLastWalletTransaction(walletId);
             if (lastTransaction != null && lastTransaction?.TransactionTime.Date > transactionDate.Date)
             {
@@ -148,7 +158,6 @@ namespace BankingTool.Service.Service
                 transactionDate = lastTransaction.TransactionTime;
                 transactionDate = transactionDate.AddMinutes(5);
             }
-            WalletAccount account = await _walletRepository.GetWalletAccount(walletId);
             if (isDebit)
             {
                 account.Balance -= amount;
@@ -208,7 +217,7 @@ namespace BankingTool.Service.Service
         {
             if (balance < amount)
             {
-                return [new ValidationResults { PropertyPath = "Request.Account.Amount", PropertyName = "Amount", ErrorMessage = "Amount should be lesser equal to Account Balance." }];
+                return [new ValidationResults { PropertyPath = "Request.Amount", PropertyName = "Amount", ErrorMessage = "Amount should be lesser equal to Account Balance." }];
             }
             return null;
         }

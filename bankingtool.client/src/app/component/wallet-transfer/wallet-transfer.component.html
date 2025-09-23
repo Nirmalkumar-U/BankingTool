@@ -58,9 +58,9 @@
           </div>
           <div class="col-md-3">
             <label class="form-label">Transaction Tag</label>
-            <select class="form-select" formControlName="bankAccountId" required>
+            <select class="form-select" formControlName="transactionTag" required>
               <option value="">Select</option>
-              <option *ngFor="let fa of transactionTagList" [ngValue]="fa.key">{{ fa.value }}</option>
+              <option *ngFor="let fa of transactionTagList" [ngValue]="fa.value">{{ fa.value }}</option>
             </select>
             <div class="invalid-feedback">
               Please Select Transaction Tag...
@@ -69,7 +69,7 @@
           <div class="col-12">
             <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Wallet Transfer</button>
           </div>
-          <div class="col-md-12" *ngIf="budgetAccountList && budgetAccountList.length != 0">
+          <div class="col-md-12" *ngIf="!isToAccount && budgetAccountList && budgetAccountList.length != 0">
             <label class="form-label">Budget Allocation (Optional)</label>
             <table class="table table-bordered">
               <thead>
@@ -103,5 +103,3 @@
     </div>
   </div>
 </div>
-
-

@@ -101,5 +101,29 @@ namespace BankingTool.Api.Controllers
                 _walletService.GetWalletTransferInitialLoad
             );
         }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> WalletTransfer(WalletTransferRequestObject model)
+        {
+            return await HandleRequestAsync<WalletTransferRequestObject, bool>(
+                model,
+                ValidationRules.WalletTransferRequestRules,
+                () => _walletService.WalletTransfer(model.Request.Wallet.Id, model.Request.Account.Id, model.Request.WalletTransaction.Amount,
+                model.Request.WalletTransaction.Description,model.Request.WalletTransaction.TransactionTag, model.Request.WalletTransaction.TransactionDate,
+                model.Request.BudgetAccount)
+            );
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<int>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<int>), 400)]
+        public async Task<IActionResult> GetWalletBalance(GetWalletBalanceRequestObject model)
+        {
+            return await HandleRequestAsync<GetWalletBalanceRequestObject, int>(
+                model,
+                ValidationRules.GetWalletBalanceRequestRules,
+                () => _walletService.GetWalletBalance(model.Request.Account.Id)
+            );
+        }
     }
 }

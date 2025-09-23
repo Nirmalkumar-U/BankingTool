@@ -154,13 +154,13 @@ namespace BankingTool.Service.Service
                 }
             }
 
-            var isDeposited = _walletRepository.WalletDeposit(walletDetails, budgetDetails,accountDetails);
+            var isDeposited = _walletRepository.SaveTransactions(walletDetails, budgetDetails, accountDetails);
             return new ResponseDto<bool>
             {
                 Response = isDeposited,
                 Status = isDeposited,
                 ValidationErrors = [],
-                Errors = isDeposited ? []: [new Errors() { PropertyName = "WalletDeposit", ErrorMessage = "Failed to Save Wallet Deposit Transaction." }]
+                Errors = isDeposited ? [] : [new Errors() { PropertyName = "WalletDeposit", ErrorMessage = "Failed to Save Wallet Deposit Transaction." }]
             };
         }
         public async Task<ResponseDto<bool>> GetWalletDepositInitialLoad()
@@ -194,6 +194,79 @@ namespace BankingTool.Service.Service
                     new DropDownListDto{ Name = "Account", DropDown = await _bankAccountRepository.GetAllAccountList() }
                 },
                 StatuCode = 200,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
+
+        public async Task<ResponseDto<bool>> WalletTransfer(int walletId, int? accountId, int amount, string description, string transactionTag,
+            DateTime transactionDate, List<WalletTransferRequestBudgetAccount> budgetAccounts)
+        {
+            (List<BudgetTransactionDto> budgetDetails, List<ValidationResults> budgetValidationResult) = ([], null);
+            (AccountTransactionsDto accountDetails, List<ValidationResults> accountValidationResult) = (null, null);
+            if (accountId == null)
+            {
+                List<BudgetAccountDto> validateBudgetAccount = [.. budgetAccounts.Select(budgetAccounts => new BudgetAccountDto
+                {
+                    Id = budgetAccounts.Id,
+                    Amount = budgetAccounts.Amount
+                })];
+                (budgetDetails, budgetValidationResult) = await _commonService.GetBudgetAccountDetailsToDebitOrCredit(true, null, amount, description, transactionDate, validateBudgetAccount, transactionTag, TransactionCatagory.Transfer);
+                if (budgetValidationResult != null && budgetValidationResult.Count != 0)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = budgetValidationResult,
+                        Errors = [],
+                        StatuCode = 400
+                    };
+                }
+            }
+            if(accountId != null)
+            {
+                (accountDetails, accountValidationResult) = await _commonService.GetAccountDetailsToDebitOrCredit(false, accountId, amount, description, transactionDate, TransactionCatagory.Transfer, transactionTag);
+                if (accountValidationResult != null && accountValidationResult.Count != 0)
+                {
+                    return new ResponseDto<bool>
+                    {
+                        Response = false,
+                        Status = false,
+                        ValidationErrors = accountValidationResult,
+                        Errors = [],
+                        StatuCode = 400
+                    };
+                }
+            }
+            var (walletDetails, walletValidationResult) = await _commonService.GetWalletDetailsToDebitOrCredit(true, walletId, amount, description, transactionDate, TransactionCatagory.Transfer, transactionTag);
+
+            if (walletValidationResult != null && walletValidationResult.Count != 0)
+            {
+                return new ResponseDto<bool>
+                {
+                    Response = false,
+                    Status = false,
+                    ValidationErrors = walletValidationResult,
+                    Errors = [],
+                    StatuCode = 400
+                };
+            }
+            var isTransfered = _walletRepository.SaveTransactions(walletDetails, budgetDetails, accountDetails);
+            return new ResponseDto<bool>
+            {
+                Response = isTransfered,
+                Status = isTransfered,
+                ValidationErrors = [],
+                Errors = isTransfered ? [] : [new Errors() { PropertyName = "WalletTransfer", ErrorMessage = "Failed to Save Wallet Transfer Transaction." }]
+            };
+        }
+        public async Task<ResponseDto<int>> GetWalletBalance(int accountId)
+        {
+            return new ResponseDto<int>
+            {
+                Response = await _walletRepository.GetWalletBalance(accountId),
                 Status = true,
                 ValidationErrors = [],
                 Errors = []

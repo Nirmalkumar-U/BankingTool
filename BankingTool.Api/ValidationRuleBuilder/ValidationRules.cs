@@ -401,6 +401,40 @@ namespace BankingTool.Api.Validators
             RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.WalletTransaction.TransactionDate).Required(),
             RuleBuilder<DepositWalletAmountRequestObject>.For(x => x.Request.Account.IsFromAccount).Required(),
         };
+        public static List<ValidationRule> WalletTransferRequestRules = new()
+        {
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request.Wallet).Required(),
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request.WalletTransaction).Required(),
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request.Wallet.Id).Required(),
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request.WalletTransaction.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request.WalletTransaction.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request.WalletTransaction.TransactionTag)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<WalletTransferRequestObject>.For(x => x.Request.WalletTransaction.TransactionDate).Required()
+        };
+
+        public static List<ValidationRule> GetWalletBalanceRequestRules = new()
+        {
+            RuleBuilder<GetWalletBalanceRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<GetWalletBalanceRequestObject>.For(x => x.Request.Account).Required(),
+            RuleBuilder<GetWalletBalanceRequestObject>.For(x => x.Request.Account.Id).Required()
+        };
         #endregion Wallet
     }
 }

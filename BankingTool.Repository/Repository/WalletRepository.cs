@@ -94,32 +94,38 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.WalletAccount.FirstOrDefaultAsync(x => x.WalletAccountId == walletAccountId);
         }
-        public bool WalletDeposit(WalletTransactionDto walletDetails, List<BudgetTransactionDto> budgetTransactionDetail, AccountTransactionsDto accountDetails)
+        public bool SaveTransactions(WalletTransactionDto walletDetails, List<BudgetTransactionDto> budgetTransactionDetail, AccountTransactionsDto accountDetails)
         {
             using var sqlTransaction = dataContext.Database.BeginTransaction();
             try
             {
                 //Wallet
-                UpdateWalletAccount(walletDetails.WalletAccount);
-                var transactionId = InsertWalletTransaction(walletDetails.WalletTransaction);
-                walletDetails.WalletTransactionDetail.WalletTransactionId = transactionId.Value;
-                InsertWalletTransactionDetail(walletDetails.WalletTransactionDetail);
+                if (walletDetails != null)
+                {
+                    UpdateWalletAccount(walletDetails.WalletAccount);
+                    var transactionId = InsertWalletTransaction(walletDetails.WalletTransaction);
+                    walletDetails.WalletTransactionDetail.WalletTransactionId = transactionId.Value;
+                    InsertWalletTransactionDetail(walletDetails.WalletTransactionDetail);
+                }
 
                 //Budget
-                foreach (var budgetAccount in budgetTransactionDetail)
+                if (budgetTransactionDetail != null && budgetTransactionDetail.Count != 0)
                 {
-                    UpdateBudgetAccount(budgetAccount.BudgetAccount);
-                    var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
-                    budgetAccount.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
-                    var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetAccount.BudgetTransactionDetail);
+                    foreach (var budgetAccount in budgetTransactionDetail)
+                    {
+                        UpdateBudgetAccount(budgetAccount.BudgetAccount);
+                        var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
+                        budgetAccount.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                        var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetAccount.BudgetTransactionDetail);
+                    }
                 }
 
                 //Account
-                if(accountDetails != null)
+                if (accountDetails != null)
                 {
                     UpdateAccount(accountDetails.Account);
                     var accountTransactionId = InsertTransaction(accountDetails.Transaction);
-                    accountDetails.TransactionDetail.TransactionId= accountTransactionId.Value;
+                    accountDetails.TransactionDetail.TransactionId = accountTransactionId.Value;
                     InsertTransactionDetail(accountDetails.TransactionDetail);
                 }
 
@@ -132,6 +138,12 @@ namespace BankingTool.Repository.Repository
                 sqlTransaction.Rollback();
                 return false;
             }
+        }
+        public async Task<int> GetWalletBalance(int accountId)
+        {
+            return await (from a in dataContext.WalletAccount
+                          where a.WalletAccountId == accountId && a.WalletStatus == WalletStatus.Active
+                          select a.Balance).FirstOrDefaultAsync();
         }
         public async Task<List<DropDownDto>> GetFromWalletAccountListByCustomerId()
         {
