@@ -360,7 +360,7 @@ namespace BankingTool.Repository.Repository
                 InsertTransactionDetail(transactionDetail);
                 if (isBudgetAccountAttached)
                 {
-                    foreach(var budgetAccount in budgetTransactionDetail)
+                    foreach (var budgetAccount in budgetTransactionDetail)
                     {
                         UpdateBudgetAccount(budgetAccount.BudgetAccount);
                         var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
@@ -417,7 +417,17 @@ namespace BankingTool.Repository.Repository
                     Balance = x.Balance,
                     AccountId = x.BudgetAccountId
                 }).ToListAsync();
-            return [.. accountDetailList, .. budgetAccountList];
+            var walletAccountList = await dataContext.WalletAccount
+                .Where(z => z.CustomerId == dataContext.CustomerId && z.WalletStatus == "Active")
+                .Select(x => new DashBoardAccountList
+                {
+                    BankName = x.WalletName,
+                    AccountNumber = x.WalletNumber,
+                    AccountType = "Wallet Account",
+                    Balance = x.Balance,
+                    AccountId = x.WalletAccountId
+                }).ToListAsync();
+            return [.. accountDetailList, .. budgetAccountList, .. walletAccountList];
         }
         #region Private
         public int? InsertAccount(Account account)

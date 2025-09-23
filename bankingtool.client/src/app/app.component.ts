@@ -90,7 +90,7 @@ export class AppComponent implements OnInit {
     let userName = this.localStorageService.getItem(ClaimKey.userName);
     this.logggedInUserName = userName ?? 'Logged In';
     this.indexedDbService.getAllData(Constant.actionTableName).then((data: GetActionsByUserIdDto[]) => {
-      const mainMenu = data.filter(x => !x.actionPath && x.actionType === 'Menu');
+      const mainMenu = data.filter(x => !x.actionPath && x.actionType === 'Menu').sort((a, b) => a.sequence! - b.sequence!);
       const subMenu = data.filter(x => x.actionPath);
 
       mainMenu.forEach((path: GetActionsByUserIdDto) => {
