@@ -4,6 +4,7 @@ using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
@@ -85,7 +86,7 @@ namespace BankingTool.Service.Service
             Account account = new()
             {
                 AccountNumber = await GetNewAccountNumber(),
-                AccountStatus = AccountStatus.Active,
+                AccountStatus = AccountStatusEnum.Active.EnumToString(),
                 CustomerId = model.Customer.Id,
                 AccountTypeId = model.Account.AccountTypeId,
                 Balance = Constants.AccountMininumBalanceForSavingsAccount,
@@ -97,13 +98,13 @@ namespace BankingTool.Service.Service
                 Amount = Constants.AccountMininumBalanceForSavingsAccount,
                 Description = "Initial Credit",
                 TransactionTime = new DateTime(2025, 5, 6),
-                TransactionCategory = TransactionCatagory.Deposit
+                TransactionCategory = TransactionCategoryEnum.Deposit.EnumToString(),
             };
             TransactionDetail transactionDetails = new()
             {
-                TransactionType = TransactionType.Credit,
+                TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                 StageBalance = Constants.AccountMininumBalanceForSavingsAccount,
-                TransactionRole = TransactionRole.Receiver,
+                TransactionRole = TransactionRoleEnum.Receiver.EnumToString(),
             };
 
             var (customer, isUpdatePrimaryAccount) = await UpdatePrimaryAccountNumber(model.Account.DoYouWantToChangeThisAccountToPrimaryAccount, account.AccountNumber, account.CustomerId);
@@ -111,7 +112,7 @@ namespace BankingTool.Service.Service
             Card debitCard = new()
             {
                 CardLimit = Constants.DefaultDebitCard,
-                CardType = CardType.DebitCard,
+                CardType = CardTypeEnum.DebitCard.EnumToString(),
                 ExpireDate = DateTime.Now.AddMonths(48),
                 CardNumber = await GetNewDebitCardNumber(),
                 CVV = await GetNewDebitCVVNumber(),
@@ -122,7 +123,7 @@ namespace BankingTool.Service.Service
                 creditCard = new()
                 {
                     CardLimit = Constants.DefaultDebitCard,
-                    CardType = CardType.CreditCard,
+                    CardType = CardTypeEnum.CreditCard.EnumToString(),
                     ExpireDate = DateTime.Now.AddMonths(48),
                     CardNumber = await GetNewCreditCardNumber(),
                     CVV = await GetNewCreditCVVNumber(),
@@ -142,7 +143,7 @@ namespace BankingTool.Service.Service
                     CreditScoreValue = CalculateCreditScore(0, 0, 0.0, 0, 0),
                     CustomerId = model.Customer.Id,
                     Description = null,
-                    Status = CreditScoreStatus.Active,
+                    Status = CreditScoreStatusEnum.Active.EnumToString(),
                 };
             }
 
@@ -303,7 +304,7 @@ namespace BankingTool.Service.Service
             };
         }
         public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate,
-            string transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccounts)
+            TransactionTagEnum transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccounts)
         {
             var account = await _bankAccountRepository.GetAccount(fromAccountId);
             var validateBalance = ValidateBalance(account.Balance, amount);
@@ -379,22 +380,22 @@ namespace BankingTool.Service.Service
                 TransactionTime = transactionDate,
                 Amount = amount,
                 Description = description,
-                TransactionCategory = TransactionCatagory.Transfer,
-                TransactionTag = transactionTag
+                TransactionCategory = TransactionCategoryEnum.Transfer.EnumToString(),
+                TransactionTag = transactionTag.EnumToString()
             };
             TransactionDetail fromTransactionDetail = new TransactionDetail
             {
                 AccountId = fromAccountId,
                 StageBalance = fromAccount.Balance,
-                TransactionType = TransactionType.Debit,
-                TransactionRole = TransactionRole.Sender
+                TransactionType = TransactionTypeEnum.Debit.EnumToString(),
+                TransactionRole = TransactionRoleEnum.Sender.EnumToString()
             };
             TransactionDetail toTransactionDetail = new TransactionDetail
             {
                 AccountId = toAccountId,
                 StageBalance = toAccount.Balance,
-                TransactionType = TransactionType.Credit,
-                TransactionRole = TransactionRole.Receiver
+                TransactionType = TransactionTypeEnum.Credit.EnumToString(),
+                TransactionRole = TransactionRoleEnum.Receiver.EnumToString()
             };
 
             List<BudgetTransactionDto> budgetAccountList = [];
@@ -426,14 +427,14 @@ namespace BankingTool.Service.Service
                         Amount = bAccount.Amount,
                         Description = description,
                         TransactionTime = budgetTransactionDate,
-                        TransactionCategory = TransactionCatagory.Transfer,
-                        TransactionTag = transactionTag
+                        TransactionCategory = TransactionCategoryEnum.Transfer.EnumToString(),
+                        TransactionTag = transactionTag.EnumToString()
                     };
                     var budgetTransactionDetails = new BudgetTransactionDetail()
                     {
-                        TransactionType = TransactionType.Debit,
+                        TransactionType = TransactionTypeEnum.Debit.EnumToString(),
                         StageBalance = budgetAccount.Balance,
-                        TransactionRole = TransactionRole.Sender,
+                        TransactionRole = TransactionRoleEnum.Sender.EnumToString(),
                         AccountId = fromAccountId,
                         BudgetAccountId = budgetAccount.BudgetAccountId
                     };
@@ -457,12 +458,12 @@ namespace BankingTool.Service.Service
                     Amount = amount,
                     Description = description,
                     TransactionDate = transactionDate,
-                    TransactionCatagory = TransactionCatagory.Transfer,
-                    TransactionTag = transactionTag,
-                    TransactionRole = TransactionRole.Receiver,
-                    TransactionType = TransactionType.Credit,
+                    TransactionCatagory = TransactionCategoryEnum.Transfer.EnumToString(),
+                    TransactionTag = transactionTag.EnumToString(),
+                    TransactionRole = TransactionRoleEnum.Receiver.EnumToString(),
+                    TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                     CustomerId = toAccount.CustomerId,
-                    NotificationStatus = NotificationStatus.Pending
+                    NotificationStatus = NotificationStatusEnum.Pending.EnumToString()
                 };
             }
 
@@ -472,7 +473,7 @@ namespace BankingTool.Service.Service
             {
                 Response = isSaved,
                 Status = isSaved,
-                Message = isSaved ? "Transfered Successfully." : "Transfer Failed.",
+                Message = isSaved ? "Transferred Successfully." : "Transfer Failed.",
                 ValidationErrors = [],
                 Errors = isSaved ? [] : [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transfer Failed" }]
             };
@@ -521,15 +522,15 @@ namespace BankingTool.Service.Service
                 Amount = amount,
                 Description = description,
                 TransactionTime = transactionDate,
-                TransactionCategory = TransactionCatagory.Deposit,
-                TransactionTag = TransactionTag.Deposit
+                TransactionCategory = TransactionCategoryEnum.Deposit.EnumToString(),
+                TransactionTag = TransactionTagEnum.Deposit.EnumToString()
             };
             TransactionDetail transactionDetails = new()
             {
                 AccountId = account.AccountId,
-                TransactionType = TransactionType.Credit,
+                TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                 StageBalance = account.Balance,
-                TransactionRole = TransactionRole.Receiver,
+                TransactionRole = TransactionRoleEnum.Receiver.EnumToString(),
             };
 
             List<BudgetTransactionDto> budgetAccountList = [];
@@ -563,14 +564,14 @@ namespace BankingTool.Service.Service
                         Amount = bAccount.Amount,
                         Description = description,
                         TransactionTime = budgetTransactionDate,
-                        TransactionCategory = TransactionCatagory.Deposit,
-                        TransactionTag = TransactionTag.Deposit
+                        TransactionCategory = TransactionCategoryEnum.Deposit.EnumToString(),
+                        TransactionTag = TransactionTagEnum.Deposit.EnumToString()
                     };
                     var budgetTransactionDetails = new BudgetTransactionDetail()
                     {
-                        TransactionType = TransactionType.Credit,
+                        TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                         StageBalance = budgetAccount.Balance,
-                        TransactionRole = TransactionRole.Receiver,
+                        TransactionRole = TransactionRoleEnum.Receiver.EnumToString(),
                         AccountId = account.AccountId,
                         BudgetAccountId = budgetAccount.BudgetAccountId
                     };
@@ -648,15 +649,15 @@ namespace BankingTool.Service.Service
                 Amount = amount,
                 Description = description,
                 TransactionTime = transactionDate,
-                TransactionCategory = TransactionCatagory.Withdraw,
-                TransactionTag = TransactionTag.Withdraw
+                TransactionCategory = TransactionCategoryEnum.Withdraw.EnumToString(),
+                TransactionTag = TransactionTagEnum.Withdraw.EnumToString()
             };
             TransactionDetail transactionDetails = new()
             {
                 AccountId = account.AccountId,
-                TransactionType = TransactionType.Debit,
+                TransactionType = TransactionTypeEnum.Debit.EnumToString(),
                 StageBalance = account.Balance,
-                TransactionRole = TransactionRole.Sender,
+                TransactionRole = TransactionRoleEnum.Sender.EnumToString(),
             };
 
             List<BudgetTransactionDto> budgetAccountList = [];
@@ -690,14 +691,14 @@ namespace BankingTool.Service.Service
                         Amount = bAccount.Amount,
                         Description = description,
                         TransactionTime = budgetTransactionDate,
-                        TransactionCategory = TransactionCatagory.Withdraw,
-                        TransactionTag = TransactionTag.Withdraw
+                        TransactionCategory = TransactionCategoryEnum.Withdraw.EnumToString(),
+                        TransactionTag = TransactionTagEnum.Withdraw.EnumToString()
                     };
                     BudgetTransactionDetail budgetTransactionDetails = new BudgetTransactionDetail()
                     {
-                        TransactionType = TransactionType.Debit,
+                        TransactionType = TransactionTypeEnum.Debit.EnumToString(),
                         StageBalance = budgetAccount.Balance,
-                        TransactionRole = TransactionRole.Sender,
+                        TransactionRole = TransactionRoleEnum.Sender.EnumToString(),
                         AccountId = account.AccountId,
                         BudgetAccountId = budgetAccount.BudgetAccountId
                     };
@@ -748,22 +749,22 @@ namespace BankingTool.Service.Service
         }
         private async Task<string> GetNewDebitCardNumber()
         {
-            var lastCard = await _bankAccountRepository.GetLastCard(CardType.DebitCard);
+            var lastCard = await _bankAccountRepository.GetLastCard(CardTypeEnum.DebitCard);
             return ((lastCard != null && long.TryParse(lastCard.CardNumber, out long lastNumber)) ? lastNumber + 1 : 8000000000000000).ToString();
         }
         private async Task<string> GetNewCreditCardNumber()
         {
-            var lastCard = await _bankAccountRepository.GetLastCard(CardType.CreditCard);
+            var lastCard = await _bankAccountRepository.GetLastCard(CardTypeEnum.CreditCard);
             return ((lastCard != null && long.TryParse(lastCard.CardNumber, out long lastNumber)) ? lastNumber + 1 : 7000000000000000).ToString();
         }
         private async Task<int> GetNewDebitCVVNumber()
         {
-            var lastCard = await _bankAccountRepository.GetLastCard(CardType.DebitCard);
+            var lastCard = await _bankAccountRepository.GetLastCard(CardTypeEnum.DebitCard);
             return (lastCard != null) ? lastCard.CVV + 1 : 100;
         }
         private async Task<int> GetNewCreditCVVNumber()
         {
-            var lastCard = await _bankAccountRepository.GetLastCard(CardType.CreditCard);
+            var lastCard = await _bankAccountRepository.GetLastCard(CardTypeEnum.CreditCard);
             return (lastCard != null) ? lastCard.CVV + 1 : 100;
         }
         private static int CalculateCreditScore(int onTimePayments, int totalPayments, double creditUtilization, int creditAge, int inquiries)

@@ -110,7 +110,7 @@ namespace BankingTool.Api.Controllers
                 model,
                 ValidationRules.WalletTransferRequestRules,
                 () => _walletService.WalletTransfer(model.Request.Wallet.Id, model.Request.Account.Id, model.Request.WalletTransaction.Amount,
-                model.Request.WalletTransaction.Description,model.Request.WalletTransaction.TransactionTag, model.Request.WalletTransaction.TransactionDate,
+                model.Request.WalletTransaction.Description, model.Request.WalletTransaction.TransactionTag, model.Request.WalletTransaction.TransactionDate,
                 model.Request.BudgetAccount)
             );
         }

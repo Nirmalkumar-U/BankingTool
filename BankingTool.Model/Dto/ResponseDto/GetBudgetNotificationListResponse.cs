@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model.Dto.ResponseDto
+﻿using BankingTool.Model.Enums;
+
+namespace BankingTool.Model.Dto.ResponseDto
 {
     public class GetBudgetNotificationListResponse
     {
@@ -12,7 +14,7 @@
         public string Description { get; set; }
         public int Amount { get; set; }
         public DateTime TransactionDate { get; set; }
-        public string NotificationStatus { get; set; }
+        public NotificationStatusEnum NotificationStatus { get; set; }
         public bool IsSelected { get; set; } = false;
     }
 }

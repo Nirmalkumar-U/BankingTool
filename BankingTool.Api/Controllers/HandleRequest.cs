@@ -2,6 +2,7 @@
 using System.Text.Json;
 using BankingTool.Model;
 using BankingTool.Model.Dto.BaseDto;
+using BankingTool.Model.ErrorCodes;
 using BankingTool.Repository;
 using BankingTool.Service.IService;
 using LazyCache;
@@ -51,7 +52,7 @@ namespace BankingTool.Api.Controllers
                 if (!isValid)
                 {
                     result.StatuCode = 400;
-                    result.Message = ErrorMessage.ValidationFailed;
+                    result.Message = ResponseCode.ServerError_ValidationFailed.GetMessageDetails();
                     return BadRequest(result);
                 }
             }
@@ -95,7 +96,7 @@ namespace BankingTool.Api.Controllers
             if (result.Errors.Count > 0)
             {
                 result.Errors = [.. (errors ?? []), .. (result.Errors ?? [])];
-                result.Message = ErrorMessage.BadRequest;
+                result.Message = ResponseCode.ServerError_BadRequest.GetMessageDetails();
                 result.StatuCode = 400;
                 return BadRequest(result);
             }
@@ -103,27 +104,27 @@ namespace BankingTool.Api.Controllers
 
             if (result.StatuCode == 500 || errors.Any())
             {
-                result.Message = result.Message ?? ErrorMessage.InternalServerError;
+                result.Message = result.Message ?? ResponseCode.ServerError_InternalServerError.GetMessageDetails();
                 return StatusCode(500, result);
             }
             else if (result.StatuCode == 404)
             {
-                result.Message = result.Message ?? ErrorMessage.NotFound;
+                result.Message = result.Message ?? ResponseCode.ServerError_NotFound.GetMessageDetails();
                 return NotFound(result);
             }
             else if (result.StatuCode == 400)
             {
-                result.Message = result.Message ?? ErrorMessage.BadRequest;
+                result.Message = result.Message ?? ResponseCode.ServerError_BadRequest.GetMessageDetails();
                 return BadRequest(result);
             }
             else if (result.StatuCode == 200)
             {
-                result.Message = result.Message ?? ErrorMessage.Success;
+                result.Message = result.Message ?? ResponseCode.ServerSuccess_Success.GetMessageDetails();
                 return Ok(result);
             }
             else if (result.StatuCode == 201)
             {
-                result.Message = result.Message ?? ErrorMessage.Created;
+                result.Message = result.Message ?? ResponseCode.ServerSuccess_Created.GetMessageDetails();
                 return CreatedAtAction(serviceMethod.Method.Name, result);
             }
             else if (result.StatuCode == 204)
@@ -132,12 +133,12 @@ namespace BankingTool.Api.Controllers
             }
             else if (result.StatuCode == 207)
             {
-                result.Message = result.Message ?? ErrorMessage.MultiStatus;
+                result.Message = result.Message ?? ResponseCode.ServerSuccess_MultiStatus.GetMessageDetails();
                 return StatusCode(207, result); ;
             }
             else
             {
-                result.Message = result.Message ?? ErrorMessage.Success;
+                result.Message = result.Message ?? ResponseCode.ServerSuccess_Success.GetMessageDetails();
                 return Ok(result);
             }
         }

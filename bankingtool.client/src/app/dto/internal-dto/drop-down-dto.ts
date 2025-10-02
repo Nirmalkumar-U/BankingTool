@@ -2,6 +2,7 @@ export interface DropDownDto {
   key: number;
   value: string;
   isSelected: boolean;
+  codeValue1: string | null;
 }
 
 export interface DropDownListDto {

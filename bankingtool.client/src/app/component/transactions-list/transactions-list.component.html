@@ -88,7 +88,7 @@
               <label class="form-label">Tag</label>
               <select class="form-select" formControlName="transactionTag">
                 <option value="">Select</option>
-                <option *ngFor="let bank of transactionTagList" [ngValue]="bank.value">{{ bank.value }}</option>
+                <option *ngFor="let bank of transactionTagList" [ngValue]="bank.codeValue1">{{ bank.value }}</option>
               </select>
             </div>
             <div class="col-md-3">

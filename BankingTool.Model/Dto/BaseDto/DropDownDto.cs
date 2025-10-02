@@ -5,6 +5,7 @@
         public int? Key { get; set; }
         public string Value { get; set; }
         public bool IsSelected { get; set; } = false;
+        public string CodeValue1 { get; set; }
     }
 
     public class DropDownListDto

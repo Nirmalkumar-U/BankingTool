@@ -3,6 +3,7 @@ using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +58,7 @@ namespace BankingTool.Repository.Repository
         public async Task<List<DropDownDto>> GetBudgetAccountDropdown()
         {
             var budgetAccount = await dataContext.BudgetAccount
-                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetStatus == "Active" && x.IsDeleted == false)
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetStatus == BudgetAccountStatusEnum.Active.EnumToString() && x.IsDeleted == false)
                 .Select(x => new DropDownDto
                 {
                     Key = x.BudgetAccountId,
@@ -70,7 +71,7 @@ namespace BankingTool.Repository.Repository
         public async Task<List<DropDownDto>> GetBudgetAccountDropdownExceptBudgetAccountId(int budgetAccountId)
         {
             var budgetAccount = await dataContext.BudgetAccount
-                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetAccountId != budgetAccountId && x.BudgetStatus == "Active" && x.IsDeleted == false)
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.BudgetAccountId != budgetAccountId && x.BudgetStatus == BudgetAccountStatusEnum.Active.EnumToString() && x.IsDeleted == false)
                 .Select(x => new DropDownDto
                 {
                     Key = x.BudgetAccountId,
@@ -82,7 +83,7 @@ namespace BankingTool.Repository.Repository
         public async Task<int> GetBudgetAccountBalance(int budgetAccountId)
         {
             var budgetAccount = await dataContext.BudgetAccount
-                .FirstOrDefaultAsync(x => x.CustomerId == dataContext.CustomerId && x.BudgetAccountId == budgetAccountId && x.BudgetStatus == "Active" && x.IsDeleted == false);
+                .FirstOrDefaultAsync(x => x.CustomerId == dataContext.CustomerId && x.BudgetAccountId == budgetAccountId && x.BudgetStatus == BudgetAccountStatusEnum.Active.EnumToString() && x.IsDeleted == false);
             return budgetAccount.Balance;
         }
         public async Task<List<GetBudgetList>> GetBudgetList()
@@ -95,7 +96,7 @@ namespace BankingTool.Repository.Repository
                     BudgetName = x.BudgetName,
                     BudgetNumber = x.BudgetNumber,
                     Balance = x.Balance,
-                    BudgetStatus = x.BudgetStatus
+                    BudgetStatus = x.BudgetStatus.BudgetAccountStatusStringToEnum()
                 }).ToListAsync();
             return budgetAccountList;
         }
@@ -149,7 +150,7 @@ namespace BankingTool.Repository.Repository
                             budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
                         }
                         var budgetAccount = await GetBudgetAccountById(item.Id);
-                        budgetAccount.Balance = budgetNotification.TransactionRole == TransactionRole.Receiver ? budgetAccount.Balance + item.Amount : budgetAccount.Balance - item.Amount;
+                        budgetAccount.Balance = budgetNotification.TransactionRole == TransactionRoleEnum.Receiver.EnumToString() ? budgetAccount.Balance + item.Amount : budgetAccount.Balance - item.Amount;
                         var budgetTransaction = new BudgetTransaction()
                         {
                             Amount = item.Amount,
@@ -194,7 +195,7 @@ namespace BankingTool.Repository.Repository
                         BudgetTransactionDetail budgetTransactionDetail = new BudgetTransactionDetail
                         {
                             TransactionType = budgetNotification.TransactionType,
-                            StageBalance = budgetNotification.TransactionRole == TransactionRole.Receiver ? lastTransactionStageBalance + item.Amount : lastTransactionStageBalance - item.Amount,
+                            StageBalance = budgetNotification.TransactionRole == TransactionRoleEnum.Receiver.EnumToString() ? lastTransactionStageBalance + item.Amount : lastTransactionStageBalance - item.Amount,
                             TransactionRole = budgetNotification.TransactionRole,
                             AccountId = budgetNotification.AccountId,
                             BudgetTransactionId = budgetTransactionId.Value,
@@ -206,7 +207,7 @@ namespace BankingTool.Repository.Repository
                         foreach (var budget in budgetTransactionAboveTransferedTime)
                         {
                             var updateBudgetTransactionDetail = budget.BudgetTransactionDetail.FirstOrDefault();
-                            updateBudgetTransactionDetail.StageBalance = updateBudgetTransactionDetail.TransactionRole == TransactionRole.Receiver ?
+                            updateBudgetTransactionDetail.StageBalance = updateBudgetTransactionDetail.TransactionRole == TransactionRoleEnum.Receiver.EnumToString() ?
                                 currentStageBalance + budget.Amount : currentStageBalance - budget.Amount;
                             Update(updateBudgetTransactionDetail);
                             currentStageBalance = updateBudgetTransactionDetail.StageBalance;
@@ -216,7 +217,7 @@ namespace BankingTool.Repository.Repository
                         UpdateBudgetAccount(budgetAccount);
                     }
                 }
-                budgetNotification.NotificationStatus = NotificationStatus.Accepted;
+                budgetNotification.NotificationStatus = NotificationStatusEnum.Accepted.EnumToString();
                 UpdateBudgetNotification(budgetNotification);
                 sqlTransaction.Commit();
                 return true;
@@ -231,7 +232,7 @@ namespace BankingTool.Repository.Repository
         public async Task<bool> RejectBudgetTransaction(int BudgetNotificationId)
         {
             var budgetNotification = await dataContext.BudgetNotification.FirstOrDefaultAsync(x => x.BudgetNotificationId == BudgetNotificationId);
-            budgetNotification.NotificationStatus = NotificationStatus.Rejected;
+            budgetNotification.NotificationStatus = NotificationStatusEnum.Rejected.EnumToString();
             UpdateBudgetNotification(budgetNotification);
             return true;
         }
@@ -242,7 +243,7 @@ namespace BankingTool.Repository.Repository
         public async Task<List<GetBudgetNotificationList>> GetBudgetNotificationList()
         {
             return await dataContext.BudgetNotification
-                .Where(x => x.CustomerId == dataContext.CustomerId && x.NotificationStatus == NotificationStatus.Pending)
+                .Where(x => x.CustomerId == dataContext.CustomerId && x.NotificationStatus == NotificationStatusEnum.Pending.EnumToString())
                 .Select(z => new GetBudgetNotificationList
                 {
                     BudgetNotificationId = z.BudgetNotificationId,
@@ -251,7 +252,7 @@ namespace BankingTool.Repository.Repository
                     Description = z.Description,
                     Amount = z.Amount,
                     TransactionDate = z.TransactionDate,
-                    NotificationStatus = z.NotificationStatus,
+                    NotificationStatus = z.NotificationStatus.NotificationStatusStringToEnum(),
                     IsSelected = false
                 }).ToListAsync();
         }
@@ -260,7 +261,7 @@ namespace BankingTool.Repository.Repository
             var budgetAccount = await dataContext.BudgetAccount.Where(x => x.BudgetAccountId == budgetAccountId).FirstOrDefaultAsync();
             if (budgetAccount != null)
             {
-                budgetAccount.BudgetStatus = budgetAccount.BudgetStatus == BudgetAccountStatus.Active ? BudgetAccountStatus.InActive : BudgetAccountStatus.Active;
+                budgetAccount.BudgetStatus = budgetAccount.BudgetStatus == BudgetAccountStatusEnum.Active.EnumToString() ? BudgetAccountStatusEnum.InActive.EnumToString() : BudgetAccountStatusEnum.Active.EnumToString();
                 UpdateBudgetAccount(budgetAccount);
                 return true;
             }

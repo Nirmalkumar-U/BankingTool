@@ -32,9 +32,9 @@ export const createTransactionListRequestObject = (accountId: number, receiverAc
         senderAccountId: isNullOrEmpty(senderAccountId) ? null : senderAccountId
       },
       transaction: {
-        transactionCategory: transactionCategory,
+        transactionCategory: isNullOrEmpty(transactionCategory) ? null : transactionCategory,
         transactionFromDate: transactionFromDate,
-        transactionTag: transactionTag,
+        transactionTag: isNullOrEmpty(transactionTag) ? null : transactionTag,
         transactionToDate: transactionToDate
       }
     }

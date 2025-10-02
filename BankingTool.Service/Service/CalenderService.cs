@@ -31,7 +31,7 @@ namespace BankingTool.Service.Service
                 StartDateTime = model.StartDateTime,
                 EndDateTime = model.EndDateTime,
                 Duration = model.Duration,
-                EventType = CalenderEventTypeEnum.MapCalendarEventTypeEnumToString(model.EventType),
+                EventType = model.EventType.CalendarEventTypeEnumToString(),
                 IsAllDay = model.IsAllDay,
                 IsPublic = true,
                 Recurrence = model.Recurrence,

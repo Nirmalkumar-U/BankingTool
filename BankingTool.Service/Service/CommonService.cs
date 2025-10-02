@@ -1,11 +1,10 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.InternalDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
-using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
-using Microsoft.Identity.Client;
 
 namespace BankingTool.Service.Service
 {
@@ -15,7 +14,7 @@ namespace BankingTool.Service.Service
         private readonly IBudgetRepository _budgetRepository = budgetRepository;
         private readonly IWalletRepository _walletRepository = walletRepository;
         public async Task<(AccountTransactionsDto, List<ValidationResults>)> GetAccountDetailsToDebitOrCredit(bool isDebit, int? accountId, int amount, string description, DateTime transactionDate,
-            string transactionTag = "Transfer", string transactionCatagory = "Transfer")
+            TransactionTagEnum transactionTag = TransactionTagEnum.Transfer, TransactionCategoryEnum transactionCatagory = TransactionCategoryEnum.Transfer)
         {
             if (accountId == null)
             {
@@ -55,15 +54,15 @@ namespace BankingTool.Service.Service
                 Amount = amount,
                 Description = description,
                 TransactionTime = transactionDate,
-                TransactionCategory = transactionCatagory,
-                TransactionTag = transactionTag
+                TransactionCategory = transactionCatagory.EnumToString(),
+                TransactionTag = transactionTag.EnumToString()
             };
             TransactionDetail transactionDetails = new()
             {
                 AccountId = account.AccountId,
-                TransactionType = isDebit ? TransactionType.Debit : TransactionType.Credit,
+                TransactionType = isDebit ? TransactionTypeEnum.Debit.EnumToString() : TransactionTypeEnum.Credit.EnumToString(),
                 StageBalance = account.Balance,
-                TransactionRole = isDebit ? TransactionRole.Sender : TransactionRole.Receiver,
+                TransactionRole = isDebit ? TransactionRoleEnum.Sender.EnumToString() : TransactionRoleEnum.Receiver.EnumToString(),
             };
             var result = new AccountTransactionsDto
             {
@@ -74,7 +73,7 @@ namespace BankingTool.Service.Service
             return (result, null);
         }
         public async Task<(List<BudgetTransactionDto>, List<ValidationResults>)> GetBudgetAccountDetailsToDebitOrCredit(bool isDebit, int? accountId, int amount, string description,
-            DateTime transactionDate, List<BudgetAccountDto> budgetAccounts, string transactionTag = "Transfer", string transactionCatagory = "Transfer")
+            DateTime transactionDate, List<BudgetAccountDto> budgetAccounts, TransactionTagEnum transactionTag = TransactionTagEnum.Transfer, TransactionCategoryEnum transactionCatagory = TransactionCategoryEnum.Transfer)
         {
             Account account = accountId == null ? null : await _bankAccountRepository.GetAccount(accountId.Value);
             var validationResult = ValidateBudgetAccount(budgetAccounts, amount);
@@ -112,14 +111,14 @@ namespace BankingTool.Service.Service
                         Amount = bAccount.Amount,
                         Description = description,
                         TransactionTime = budgetTransactionDate,
-                        TransactionCategory = transactionCatagory,
-                        TransactionTag = transactionTag
+                        TransactionCategory = transactionCatagory.EnumToString(),
+                        TransactionTag = transactionTag.EnumToString()
                     };
                     BudgetTransactionDetail budgetTransactionDetails = new BudgetTransactionDetail()
                     {
-                        TransactionType = isDebit ? TransactionType.Debit : TransactionType.Credit,
+                        TransactionType = isDebit ? TransactionTypeEnum.Debit.EnumToString() : TransactionTypeEnum.Credit.EnumToString(),
                         StageBalance = budgetAccount.Balance,
-                        TransactionRole = isDebit ? TransactionRole.Sender : TransactionRole.Receiver,
+                        TransactionRole = isDebit ? TransactionRoleEnum.Sender.EnumToString() : TransactionRoleEnum.Receiver.EnumToString(),
                         AccountId = accountId == null ? 1 : account.AccountId,
                         BudgetAccountId = budgetAccount.BudgetAccountId
                     };
@@ -136,7 +135,7 @@ namespace BankingTool.Service.Service
             return (budgetAccountList, null);
         }
         public async Task<(WalletTransactionDto, List<ValidationResults>)> GetWalletDetailsToDebitOrCredit(bool isDebit, int walletId, int amount, string description, DateTime transactionDate,
-            string transactionCatagory = "Transfer", string transactionTag = "Transfer")
+            TransactionCategoryEnum transactionCatagory = TransactionCategoryEnum.Transfer, TransactionTagEnum transactionTag = TransactionTagEnum.Transfer)
         {
             WalletAccount account = await _walletRepository.GetWalletAccount(walletId);
             if (isDebit)
@@ -172,15 +171,15 @@ namespace BankingTool.Service.Service
                 Amount = amount,
                 Description = description,
                 TransactionTime = transactionDate,
-                TransactionCategory = transactionCatagory,
-                TransactionTag = transactionTag
+                TransactionCategory = transactionCatagory.EnumToString(),
+                TransactionTag = transactionTag.EnumToString()
             };
             WalletTransactionDetail transactionDetails = new()
             {
                 WalletAccountId = account.WalletAccountId,
-                TransactionType = isDebit ? TransactionType.Debit : TransactionType.Credit,
+                TransactionType = isDebit ? TransactionTypeEnum.Debit.EnumToString() : TransactionTypeEnum.Credit.EnumToString(),
                 StageBalance = account.Balance,
-                TransactionRole = isDebit ? TransactionRole.Sender : TransactionRole.Receiver,
+                TransactionRole = isDebit ? TransactionRoleEnum.Sender.EnumToString() : TransactionRoleEnum.Receiver.EnumToString(),
             };
             var result = new WalletTransactionDto
             {

@@ -60,7 +60,7 @@
             <label class="form-label">Transaction Tag</label>
             <select class="form-select" formControlName="transactionTag" required>
               <option value="">Select</option>
-              <option *ngFor="let fa of transactionTagList" [ngValue]="fa.value">{{ fa.value }}</option>
+              <option *ngFor="let fa of transactionTagList" [ngValue]="fa.codeValue1">{{ fa.value }}</option>
             </select>
             <div class="invalid-feedback">
               Please Select Transaction Tag...

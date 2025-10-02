@@ -3,6 +3,7 @@ using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Dto.SPDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
 
 namespace BankingTool.Repository.IRepository
@@ -18,8 +19,8 @@ namespace BankingTool.Repository.IRepository
         Task<Customer> GetCustomerByCustomerId(int customerId);
         Task<List<DropDownDto>> GetBankDetailsDropDownWithoutCustomerAndAccountType(int customerId, int accountTypeId);
         Task<bool> IsCustomerHasCreditCardInThatBank(int customerId, int bankId);
-        Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, string TransactionTag,
-            DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, string TransactionCategory);
+        Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, TransactionTagEnum? TransactionTag,
+            DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, TransactionCategoryEnum? TransactionCategory);
         Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName);
         Task<List<GetTransactionsListResponseCardInfo>> GetCardInfoByAccountId(int accountId, string name, string bankName);
         Task<(int, string, string, string)> GetAccountIdByBankIdAndAccountTypeAndCustomerId(int bankId, int accountTypeId, int customerId);
@@ -43,7 +44,7 @@ namespace BankingTool.Repository.IRepository
             TransactionDetail toTransactionDetail, List<BudgetTransactionDto> budgetTransactions, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount);
         bool CashTransfer(Account account, Transaction transaction, TransactionDetail transactionDetail, bool isBudgetAccountAttached, List<BudgetTransactionDto> budgetTransactions);
         Task<List<DashBoardAccountList>> GetDashBoardInitialLoad();
-        Task<Card> GetLastCard(string cardType);
+        Task<Card> GetLastCard(CardTypeEnum cardType);
         Task<List<DropDownDto>> GetAllAccountList();
     }
 }

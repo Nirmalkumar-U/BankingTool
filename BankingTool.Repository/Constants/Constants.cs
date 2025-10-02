@@ -1,4 +1,4 @@
-﻿    namespace BankingTool.Repository
+﻿namespace BankingTool.Repository
 {
     public class Constants
     {
@@ -6,81 +6,7 @@
         public const int DefaultDebitCard = 50000;
         public const int AccountMininumBalanceForSavingsAccount = 0;
     }
-    public class AccountStatus
-    {
-        public const string Active = "Active";
-        public const string InActive = "InActive";
-        public const string Deactivated = "Deactivated";
-        public const string NotInUse = "NotInUse";
-    }
-    public class BudgetAccountStatus
-    {
-        public const string Active = "Active";
-        public const string InActive = "InActive";
-    }
-    public class WalletStatus
-    {
-        public const string Active = "Active";
-        public const string InActive = "InActive";
-    }
-    public class CardType
-    {
-        public const string DebitCard = "DebitCard";
-        public const string CreditCard = "CreditCard";
-    }
-    public class CreditScoreStatus
-    {
-        public const string Active = "Active";
-        public const string InActive = "InActive";
-        public const string Default = "Default";
-    }
-    public class TransactionType
-    {
-        public const string Debit = "Debit";
-        public const string Credit = "Credit";
-    }
-    public class NotificationStatus
-    {
-        public const string Pending = "Pending";
-        public const string Accepted = "Accepted";
-        public const string Rejected = "Rejected";
-    }
-    public class TransactionRole
-    {
-        public const string Sender = "Sender";
-        public const string Receiver = "Receiver";
-    }
-    public class TransactionCatagory
-    {
-        public const string Cash = "Cash";
-        public const string Transfer = "Transfer";
-        public const string Cheque = "Cheque";
-        public const string Deposit = "Deposit";
-        public const string Withdraw = "Withdraw";
-    }
-    public class TransactionTag
-    {
-        public const string Transfer = "Transfer";
-        public const string Cheque = "Cheque";
-        public const string Deposit = "Deposit";
-        public const string Withdraw = "Withdraw";
-        public const string Entertainment = "Entertainment";
-        public const string NoTag = "No Tag";
-        public const string Groceries = "Groceries";
-        public const string Miscellaneous = "Miscellaneous";
-        public const string SelfTransfer = "Self Transfer";
-        public const string Food = "Food";
-        public const string Fuel = "Fuel";
-        public const string BillPayment = "Bill Payment";
-        public const string Shopping = "Shopping";
-        public const string Rent = "Rent";
-        public const string Travel = "Travel";
-        public const string Health = "Health";
-        public const string Insurance = "Insurance";
-        public const string Investment = "Investment";
-        public const string Salary = "Salary";
-        public const string Savings = "Savings";
-    }
+
     public class CodeValueTypeCode
     {
         public const int AccountType = 100;
@@ -100,16 +26,5 @@
         public const string StaffId = nameof(StaffId);
         public const string CustomerId = nameof(CustomerId);
         public const string ExpiresAt = nameof(ExpiresAt);
-    }
-    public static class ErrorMessage
-    {
-        public const string LoginFailed = "Login Failed.";
-        public const string InternalServerError = "Internal Server Error.";
-        public const string BadRequest = "Bad Request.";
-        public const string Success = "Success.";
-        public const string Created = "Created.";
-        public const string MultiStatus = "Multi Status.";
-        public const string NotFound = "Not Found.";
-        public const string ValidationFailed = "Validation Failed.";
     }
 }

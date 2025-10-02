@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model.Dto.ResponseDto
+﻿using BankingTool.Model.Enums;
+
+namespace BankingTool.Model.Dto.ResponseDto
 {
     public class GetBudgetListResponse
     {
@@ -10,7 +12,7 @@
         public string BudgetName { get; set; }
         public string BudgetNumber { get; set; }
         public int Balance { get; set; }
-        public string BudgetStatus { get; set; }
+        public BudgetAccountStatusEnum BudgetStatus { get; set; }
 
     }
 }

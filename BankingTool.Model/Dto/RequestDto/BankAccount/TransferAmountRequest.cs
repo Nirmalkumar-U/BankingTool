@@ -1,4 +1,5 @@
 ﻿using BankingTool.Model.Dto.RequestDtos;
+using BankingTool.Model.Enums;
 
 namespace BankingTool.Model.Dto.RequestDto.BankAccount
 {
@@ -22,7 +23,7 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
         public int Amount { get; set; }
         public string Description { get; set; }
         public DateTime TransactionDate { get; set; }
-        public string TransactionTag { get; set; }
+        public TransactionTagEnum TransactionTag { get; set; }
     }
     public class TransferAmountRequestBudgetAccount : RequestId
     {

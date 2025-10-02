@@ -3,6 +3,7 @@ using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Dto.SPDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ namespace BankingTool.Repository.Repository
         }
         public async Task<List<DropDownDto>> GetAccountTypeDropDown()
         {
-            return await dataContext.CodeValue.Where(x => x.TypeCode == Constants.AccountType && x.InUse).OrderBy(s => s.Sequence)
+            return await dataContext.CodeValue.Where(x => x.TypeCode == CodeValueTypeCode.AccountType && x.InUse).OrderBy(s => s.Sequence)
                 .Select(z => new DropDownDto
                 {
                     Key = z.CodeValueId,
@@ -44,7 +45,7 @@ namespace BankingTool.Repository.Repository
         {
             return await (from a in dataContext.Account.AsNoTracking()
                           join c in dataContext.Card.AsNoTracking() on a.AccountId equals c.AccountId
-                          where a.CustomerId == customerId && a.BankId == bankId && c.CardType == CardType.CreditCard && a.IsDeleted == false
+                          where a.CustomerId == customerId && a.BankId == bankId && c.CardType == CardTypeEnum.CreditCard.EnumToString() && a.IsDeleted == false
                           select c).AnyAsync();
         }
         public async Task<List<DropDownDto>> GetAllActiveCustomerDropDown()
@@ -64,10 +65,10 @@ namespace BankingTool.Repository.Repository
                 return await dataContext.Account.OrderByDescending(a => a.AccountId).FirstOrDefaultAsync();
             return null;
         }
-        public async Task<Card> GetLastCard(string cardType)
+        public async Task<Card> GetLastCard(CardTypeEnum cardType)
         {
             if (dataContext.Card.Any())
-                return await dataContext.Card.Where(x => x.CardType == cardType).OrderByDescending(z => z.CardId).FirstOrDefaultAsync();
+                return await dataContext.Card.Where(x => x.CardType == cardType.EnumToString()).OrderByDescending(z => z.CardId).FirstOrDefaultAsync();
             return null;
         }
         public async Task<bool> IsAnyAccountForThisCustomer(int customerId)
@@ -78,19 +79,19 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.Customer.FirstOrDefaultAsync(x => x.CustomerId == customerId);
         }
-        public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, string TransactionTag,
-            DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, string TransactionCategory)
+        public async Task<List<GetTransactionsListResponseTransactionList>> GetTransactionByAccountId(int accountId, TransactionTagEnum? TransactionTag,
+            DateTime? TransactionFromDate, DateTime? TransactionToDate, int? SenderAccountId, int? ReceiverAccountId, TransactionCategoryEnum? TransactionCategory)
         {
             var sql = "EXEC GetAccountTransactions @AccountId, @TransactionTag, @TransactionFromDate, @TransactionToDate, @SenderAccountId, @ReceiverAccountId, @TransactionCategory";
             var parameters = new[]
                             {
                                 new Microsoft.Data.SqlClient.SqlParameter("@AccountId", accountId.ToString()),
-                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionTag", TransactionTag ?? ""),
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionTag", TransactionTag?.EnumToString() ?? ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@TransactionFromDate", TransactionFromDate != null ? TransactionFromDate.Value.Date : ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@TransactionToDate", TransactionToDate != null ? TransactionToDate.Value.Date : ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@SenderAccountId", SenderAccountId != null ? SenderAccountId.ToString() : ""),
                                 new Microsoft.Data.SqlClient.SqlParameter("@ReceiverAccountId",ReceiverAccountId != null ? ReceiverAccountId.ToString() : ""),
-                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionCategory",TransactionCategory ?? "")
+                                new Microsoft.Data.SqlClient.SqlParameter("@TransactionCategory",TransactionCategory?.EnumToString() ?? "")
                             };
 
             var transactions = await dataContext.Set<GetTransactionsListResponseTransactionList>()
@@ -142,7 +143,8 @@ namespace BankingTool.Repository.Repository
                 .Select(z => new DropDownDto
                 {
                     Key = z.CodeValueId,
-                    Value = z.CodeValue1
+                    Value = z.CodeValue1,
+                    CodeValue1 = z.CodeValue1.Replace(" ", "")
                 }).ToListAsync();
         }
         public async Task<GetTransactionsListResponseAccountInfo> GetAccountInfo(int accountId, string accountType, string name, string bankName)
@@ -162,8 +164,8 @@ namespace BankingTool.Repository.Repository
             return await dataContext.Card.Where(x => x.AccountId == accountId).Select(z => new GetTransactionsListResponseCardInfo
             {
                 BankName = bankName,
-                BalanceLimit = z.CardType == CardType.CreditCard ? z.CardLimit : null,
-                CardType = z.CardType,
+                BalanceLimit = z.CardType == CardTypeEnum.CreditCard.EnumToString() ? z.CardLimit : null,
+                CardType = z.CardType.CardTypeStringToEnum(),
                 CardNumber = z.CardNumber,
                 CVV = z.CVV,
                 ExpirationDate = z.ExpireDate,
@@ -210,7 +212,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          where a.AccountStatus == AccountStatusEnum.Active.EnumToString() && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -224,7 +226,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          where a.CustomerId == dataContext.CustomerId && a.AccountStatus == AccountStatusEnum.Active.EnumToString() && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -238,7 +240,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId == dataContext.CustomerId && a.AccountId != accountId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          where a.CustomerId == dataContext.CustomerId && a.AccountId != accountId && a.AccountStatus == AccountStatusEnum.Active.EnumToString() && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -252,7 +254,7 @@ namespace BankingTool.Repository.Repository
                           join u in dataContext.Users on c.UserId equals u.UserId
                           join b in dataContext.Bank on a.BankId equals b.BankId
                           join cv in dataContext.CodeValue on a.AccountTypeId equals cv.CodeValueId
-                          where a.CustomerId != dataContext.CustomerId && a.AccountStatus == AccountStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          where a.CustomerId != dataContext.CustomerId && a.AccountStatus == AccountStatusEnum.Active.EnumToString() && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.AccountId,
@@ -263,7 +265,7 @@ namespace BankingTool.Repository.Repository
         public async Task<int> GetAccountBalance(int accountId)
         {
             return await (from a in dataContext.Account
-                          where a.AccountId == accountId && a.AccountStatus == AccountStatus.Active
+                          where a.AccountId == accountId && a.AccountStatus == AccountStatusEnum.Active.EnumToString()
                           select a.Balance).FirstOrDefaultAsync();
         }
         public async Task<CreditScore> GetCreditScoreOfCustomer(int customerId)

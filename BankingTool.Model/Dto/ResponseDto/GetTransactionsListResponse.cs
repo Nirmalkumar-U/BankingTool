@@ -1,4 +1,6 @@
-﻿namespace BankingTool.Model.Dto.Response
+﻿using BankingTool.Model.Enums;
+
+namespace BankingTool.Model.Dto.Response
 {
     public class GetTransactionsListResponse
     {
@@ -30,7 +32,7 @@
     }
     public class GetTransactionsListResponseCardInfo
     {
-        public string CardType { get; set; }
+        public CardTypeEnum CardType { get; set; }
         public string CardNumber { get; set; }
         public string BankName { get; set; }
         public string HolderName { get; set; }

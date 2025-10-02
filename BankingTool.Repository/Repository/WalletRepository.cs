@@ -1,6 +1,7 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.ResponseDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ namespace BankingTool.Repository.Repository
                     WalletName = x.WalletName,
                     WalletNumber = x.WalletNumber,
                     Balance = x.Balance,
-                    WalletStatus = x.WalletStatus
+                    WalletStatus = x.WalletStatus.WalletStatusStringToEnum()
                 }).ToListAsync();
         }
         public async Task<WalletAccount> GetWalletById(int walletId)
@@ -73,7 +74,7 @@ namespace BankingTool.Repository.Repository
             var walletAccount = await dataContext.WalletAccount.Where(x => x.WalletAccountId == walletId).FirstOrDefaultAsync();
             if (walletAccount != null)
             {
-                walletAccount.WalletStatus = walletAccount.WalletStatus == WalletStatus.Active ? WalletStatus.InActive : WalletStatus.Active;
+                walletAccount.WalletStatus = walletAccount.WalletStatus == WalletStatusEnum.Active.EnumToString() ? WalletStatusEnum.InActive.EnumToString() : WalletStatusEnum.Active.EnumToString();
                 UpdateWalletAccount(walletAccount);
                 return true;
             }
@@ -142,7 +143,7 @@ namespace BankingTool.Repository.Repository
         public async Task<int> GetWalletBalance(int accountId)
         {
             return await (from a in dataContext.WalletAccount
-                          where a.WalletAccountId == accountId && a.WalletStatus == WalletStatus.Active
+                          where a.WalletAccountId == accountId && a.WalletStatus == WalletStatusEnum.Active.EnumToString()
                           select a.Balance).FirstOrDefaultAsync();
         }
         public async Task<List<DropDownDto>> GetFromWalletAccountListByCustomerId()
@@ -150,7 +151,7 @@ namespace BankingTool.Repository.Repository
             return await (from a in dataContext.WalletAccount
                           join c in dataContext.Customer on a.CustomerId equals c.CustomerId
                           join u in dataContext.Users on c.UserId equals u.UserId
-                          where a.CustomerId == dataContext.CustomerId && a.WalletStatus == WalletStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          where a.CustomerId == dataContext.CustomerId && a.WalletStatus == WalletStatusEnum.Active.EnumToString() && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.WalletAccountId,
@@ -162,7 +163,7 @@ namespace BankingTool.Repository.Repository
             return await (from a in dataContext.WalletAccount
                           join c in dataContext.Customer on a.CustomerId equals c.CustomerId
                           join u in dataContext.Users on c.UserId equals u.UserId
-                          where a.CustomerId != dataContext.CustomerId && a.WalletStatus == WalletStatus.Active && a.IsDeleted == false && u.IsDeleted == false
+                          where a.CustomerId != dataContext.CustomerId && a.WalletStatus == WalletStatusEnum.Active.EnumToString() && a.IsDeleted == false && u.IsDeleted == false
                           select new DropDownDto
                           {
                               Key = a.WalletAccountId,

@@ -18,7 +18,7 @@ namespace BankingTool.Repository.Repository
                     UserId = x.UserId,
                     Title = x.Title,
                     Description = x.Description,
-                    EventType = CalenderEventTypeEnum.MapCalendarEventTypeStringToEnum(x.EventType),
+                    EventType = x.EventType.StringToEnum(),
                     StartDateTime = x.StartDateTime,
                     EndDateTime = x.EndDateTime,
                     IsAllDay = x.IsAllDay,

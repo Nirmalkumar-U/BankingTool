@@ -10,7 +10,7 @@ namespace BankingTool.Model.Dto.InternalDto
         public string Description { get; set; }
         public DateTime StartDateTime { get; set; }
         public DateTime? EndDateTime { get; set; }
-        public CalendarEventType EventType { get; set; }
+        public CalendarEventTypeEnum EventType { get; set; }
         public string Recurrence { get; set; }
         public string Duration { get; set; }
         public bool IsAllDay { get; set; }

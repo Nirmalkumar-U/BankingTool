@@ -3,6 +3,7 @@ using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.Wallet;
 using BankingTool.Model.Dto.ResponseDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
@@ -30,21 +31,21 @@ namespace BankingTool.Service.Service
                 WalletName = walletName,
                 WalletNumber = await GetNewBudgetNumber(),
                 Balance = amount,
-                WalletStatus = "Active"
+                WalletStatus = WalletStatusEnum.Active.EnumToString()
             };
             WalletTransaction walletTransaction = new()
             {
                 Amount = amount,
                 Description = "Initial Credit",
                 TransactionTime = new DateTime(2025, 5, 6),
-                TransactionCategory = TransactionCatagory.Deposit,
-                TransactionTag = TransactionTag.Deposit
+                TransactionCategory = TransactionCategoryEnum.Deposit.EnumToString(),
+                TransactionTag = TransactionTagEnum.Deposit.EnumToString()
             };
             WalletTransactionDetail walletTransactionDetails = new()
             {
-                TransactionType = TransactionType.Credit,
+                TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                 StageBalance = amount,
-                TransactionRole = TransactionRole.Receiver
+                TransactionRole = TransactionRoleEnum.Receiver.EnumToString()
             };
 
             var createdBudgerAccount = await _walletRepository.CreateWalletAccount(walletAccount, walletTransaction, walletTransactionDetails);
@@ -82,7 +83,7 @@ namespace BankingTool.Service.Service
                 {
                     WalletName = wallet.WalletName,
                     WalletNumber = wallet.WalletNumber,
-                    WalletStatus = wallet.WalletStatus,
+                    WalletStatus = wallet.WalletStatus.WalletStatusStringToEnum(),
                     Balance = wallet.Balance,
                     WalletTransactionList = await _walletRepository.GetWalletTransactionList(walletId)
                 },
@@ -109,7 +110,7 @@ namespace BankingTool.Service.Service
                 Id = budgetAccounts.Id,
                 Amount = budgetAccounts.Amount
             })];
-            var (budgetDetails, budgetValidationResult) = await _commonService.GetBudgetAccountDetailsToDebitOrCredit(false, accountId, amount, description, transactionDate, validateBudgetAccount, TransactionTag.Transfer, TransactionCatagory.Transfer);
+            var (budgetDetails, budgetValidationResult) = await _commonService.GetBudgetAccountDetailsToDebitOrCredit(false, accountId, amount, description, transactionDate, validateBudgetAccount, TransactionTagEnum.Transfer, TransactionCategoryEnum.Transfer);
 
             if (budgetValidationResult != null && budgetValidationResult.Count != 0)
             {
@@ -123,7 +124,7 @@ namespace BankingTool.Service.Service
                 };
             }
 
-            var (walletDetails, walletValidationResult) = await _commonService.GetWalletDetailsToDebitOrCredit(false, walletId, amount, description, transactionDate, TransactionCatagory.Deposit, TransactionTag.Deposit);
+            var (walletDetails, walletValidationResult) = await _commonService.GetWalletDetailsToDebitOrCredit(false, walletId, amount, description, transactionDate, TransactionCategoryEnum.Deposit, TransactionTagEnum.Deposit);
 
             if (walletValidationResult != null && walletValidationResult.Count != 0)
             {
@@ -140,7 +141,7 @@ namespace BankingTool.Service.Service
             (AccountTransactionsDto accountDetails, List<ValidationResults> accountValidationResult) = (null, null);
             if (isFromAccount)
             {
-                (accountDetails, accountValidationResult) = await _commonService.GetAccountDetailsToDebitOrCredit(true, accountId, amount, description, transactionDate, TransactionCatagory.Transfer, TransactionTag.Transfer);
+                (accountDetails, accountValidationResult) = await _commonService.GetAccountDetailsToDebitOrCredit(true, accountId, amount, description, transactionDate, TransactionTagEnum.Transfer, TransactionCategoryEnum.Transfer);
                 if (accountValidationResult != null && accountValidationResult.Count != 0)
                 {
                     return new ResponseDto<bool>
@@ -200,7 +201,7 @@ namespace BankingTool.Service.Service
             };
         }
 
-        public async Task<ResponseDto<bool>> WalletTransfer(int walletId, int? accountId, int amount, string description, string transactionTag,
+        public async Task<ResponseDto<bool>> WalletTransfer(int walletId, int? accountId, int amount, string description, TransactionTagEnum transactionTag,
             DateTime transactionDate, List<WalletTransferRequestBudgetAccount> budgetAccounts)
         {
             (List<BudgetTransactionDto> budgetDetails, List<ValidationResults> budgetValidationResult) = ([], null);
@@ -212,7 +213,7 @@ namespace BankingTool.Service.Service
                     Id = budgetAccounts.Id,
                     Amount = budgetAccounts.Amount
                 })];
-                (budgetDetails, budgetValidationResult) = await _commonService.GetBudgetAccountDetailsToDebitOrCredit(true, null, amount, description, transactionDate, validateBudgetAccount, transactionTag, TransactionCatagory.Transfer);
+                (budgetDetails, budgetValidationResult) = await _commonService.GetBudgetAccountDetailsToDebitOrCredit(true, null, amount, description, transactionDate, validateBudgetAccount, transactionTag, TransactionCategoryEnum.Transfer);
                 if (budgetValidationResult != null && budgetValidationResult.Count != 0)
                 {
                     return new ResponseDto<bool>
@@ -227,7 +228,7 @@ namespace BankingTool.Service.Service
             }
             if(accountId != null)
             {
-                (accountDetails, accountValidationResult) = await _commonService.GetAccountDetailsToDebitOrCredit(false, accountId, amount, description, transactionDate, TransactionCatagory.Transfer, transactionTag);
+                (accountDetails, accountValidationResult) = await _commonService.GetAccountDetailsToDebitOrCredit(false, accountId, amount, description, transactionDate, transactionTag, TransactionCategoryEnum.Transfer);
                 if (accountValidationResult != null && accountValidationResult.Count != 0)
                 {
                     return new ResponseDto<bool>
@@ -240,7 +241,7 @@ namespace BankingTool.Service.Service
                     };
                 }
             }
-            var (walletDetails, walletValidationResult) = await _commonService.GetWalletDetailsToDebitOrCredit(true, walletId, amount, description, transactionDate, TransactionCatagory.Transfer, transactionTag);
+            var (walletDetails, walletValidationResult) = await _commonService.GetWalletDetailsToDebitOrCredit(true, walletId, amount, description, transactionDate, TransactionCategoryEnum.Transfer, transactionTag);
 
             if (walletValidationResult != null && walletValidationResult.Count != 0)
             {

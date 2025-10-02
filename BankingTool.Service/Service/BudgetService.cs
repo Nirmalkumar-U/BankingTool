@@ -3,6 +3,7 @@ using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.ResponseDto;
+using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
 using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
@@ -26,21 +27,21 @@ namespace BankingTool.Service.Service
                 BudgetName = budgetName,
                 BudgetNumber = await GetNewBudgetNumber(),
                 Balance = amount,
-                BudgetStatus = "Active"
+                BudgetStatus = BudgetAccountStatusEnum.Active.EnumToString(),
             };
             BudgetTransaction budgetTransaction = new()
             {
                 Amount = amount,
                 Description = "Initial Credit",
                 TransactionTime = new DateTime(2025, 5, 6),
-                TransactionCategory = TransactionCatagory.Deposit,
-                TransactionTag = TransactionTag.Deposit
+                TransactionCategory = TransactionCategoryEnum.Deposit.EnumToString(),
+                TransactionTag = TransactionTagEnum.Deposit.EnumToString()
             };
             BudgetTransactionDetail budgetTransactionDetails = new()
             {
-                TransactionType = TransactionType.Credit,
+                TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                 StageBalance = amount,
-                TransactionRole = TransactionRole.Receiver,
+                TransactionRole = TransactionRoleEnum.Receiver.EnumToString(),
                 AccountId = await _budgetRepository.GetPrimaryAccountIdOfCustomer()
             };
 
@@ -146,7 +147,7 @@ namespace BankingTool.Service.Service
                 {
                     BudgetName = budgetAccount.BudgetName,
                     BudgetNumber = budgetAccount.BudgetNumber,
-                    BudgetStatus = budgetAccount.BudgetStatus,
+                    BudgetStatus = budgetAccount.BudgetStatus.BudgetAccountStatusStringToEnum(),
                     Balance = budgetAccount.Balance,
                     BudgetTransactionList = await _budgetRepository.GetBudgetTransactionList(budgetAccountId)
                 },
@@ -157,7 +158,7 @@ namespace BankingTool.Service.Service
         public async Task<ResponseDto<GetBudgetNotificationListResponse>> GetBudgetNotificationList()
         {
             var budgetList = await _budgetRepository.GetBudgetList();
-            var budgetDropdownList = budgetList.Where(z => z.BudgetStatus == BudgetAccountStatus.Active).Select(x => new DropDownDto
+            var budgetDropdownList = budgetList.Where(z => z.BudgetStatus == BudgetAccountStatusEnum.Active).Select(x => new DropDownDto
             {
                 Key = x.BudgetAccountId,
                 Value = x.BudgetName,
@@ -250,14 +251,14 @@ namespace BankingTool.Service.Service
                 Amount = amount,
                 Description = description,
                 TransactionTime = transactionTime,
-                TransactionCategory = TransactionCatagory.Transfer,
-                TransactionTag = TransactionTag.Transfer
+                TransactionCategory = TransactionCategoryEnum.Transfer.EnumToString(),
+                TransactionTag = TransactionTagEnum.Transfer.EnumToString()
             };
             BudgetTransactionDetail senderBudgetTransactionDetails = new()
             {
-                TransactionType = TransactionType.Debit,
+                TransactionType = TransactionTypeEnum.Debit.EnumToString(),
                 StageBalance = fromBudgetAccount.Balance,
-                TransactionRole = TransactionRole.Sender,
+                TransactionRole = TransactionRoleEnum.Sender.EnumToString(),
                 AccountId = 1,
                 BudgetAccountId = fromAccountId
             };
@@ -291,14 +292,14 @@ namespace BankingTool.Service.Service
                     Amount = toAccount.Amount,
                     Description = description,
                     TransactionTime = budgetTransactionDate,
-                    TransactionCategory = TransactionCatagory.Transfer,
-                    TransactionTag = TransactionTag.Transfer
+                    TransactionCategory = TransactionCategoryEnum.Transfer.EnumToString(),
+                    TransactionTag = TransactionTagEnum.Transfer.EnumToString()
                 };
                 BudgetTransactionDetail receiverBudgetTransactionDetails = new()
                 {
-                    TransactionType = TransactionType.Credit,
+                    TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                     StageBalance = toBudgerAccount.Balance,
-                    TransactionRole = TransactionRole.Receiver,
+                    TransactionRole = TransactionRoleEnum.Receiver.EnumToString(),
                     AccountId = 1,
                     BudgetAccountId = toAccount.Id
                 };

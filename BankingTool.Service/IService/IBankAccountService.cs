@@ -2,6 +2,7 @@
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
+using BankingTool.Model.Enums;
 
 namespace BankingTool.Service.IService
 {
@@ -16,7 +17,7 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId);
         Task<ResponseDto<bool>> GetTransferAmountInitialLoad();
         Task<ResponseDto<int>> GetAccountBalance(int accountId);
-        Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, string transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccount);
+        Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate, TransactionTagEnum transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccount);
         Task<ResponseDto<bool>> GetSelfTransferInitialLoad();
         Task<ResponseDto<bool>> GetToAccountListExcludedByAccountId(int accountId);
         Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, List<DepositAmountRequestBudgetAccount> budgetAccount);

@@ -1,10 +1,12 @@
-﻿namespace BankingTool.Model.Dto.ResponseDto
+﻿using BankingTool.Model.Enums;
+
+namespace BankingTool.Model.Dto.ResponseDto
 {
     public class GetWalletTransactionListResponse
     {
         public string WalletName { get; set; }
         public string WalletNumber { get; set; }
-        public string WalletStatus { get; set; }
+        public WalletStatusEnum WalletStatus { get; set; }
         public int Balance { get; set; }
         public List<GetWalletTransactionList> WalletTransactionList { get; set; }
     }
