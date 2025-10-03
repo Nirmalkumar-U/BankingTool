@@ -16,6 +16,8 @@ export class HomeComponent {
   totalBalance: number = 0;
   totalAccounts: number = 0;
   totalSavingsAccounts: number = 0;
+  showBalances: boolean = false;
+
   constructor(private readonly activatedRoute: ActivatedRoute, private fb: FormBuilder, private readonly router: Router, private notificationService: NotificationService) {
   }
   ngOnInit() {
@@ -43,5 +45,8 @@ export class HomeComponent {
 
     if (accountType == 'Budget Account')
       this.router.navigate([AppRoute.budgetTransactionList(accountId)]);
+  }
+  toggleBalances() {
+    this.showBalances = !this.showBalances; 
   }
 }
