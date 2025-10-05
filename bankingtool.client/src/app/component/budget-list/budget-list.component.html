@@ -19,7 +19,7 @@
             <tr *ngFor="let trans of budgetList">
               <td> <a style="cursor: pointer;" class="text-secondary" (click)="getBudgetTransactionList(trans.budgetAccountId)">{{ trans.budgetName }}</a></td>
               <td>{{ trans.budgetNumber }}</td>
-              <td>{{ trans.balance }}</td>
+              <td>{{ trans.balance | number:'1.2-2':'en-US' }}</td>
               <td>
                 <button class="btn btn-primary" *ngIf="trans.budgetStatus == 'InActive'" (click)="changeStatus(trans.budgetAccountId)">Active</button>
                 <button class="btn btn-danger" *ngIf="trans.budgetStatus == 'Active'" (click)="changeStatus(trans.budgetAccountId)">InActive</button>
@@ -50,7 +50,7 @@
             <tr *ngFor="let trans of inActiveBudgetList">
               <td> <a style="cursor: pointer;" class="text-secondary" (click)="getBudgetTransactionList(trans.budgetAccountId)">{{ trans.budgetName }}</a></td>
               <td>{{ trans.budgetNumber }}</td>
-              <td>{{ trans.balance }}</td>
+              <td>{{ trans.balance | number:'1.2-2':'en-US' }}</td>
               <td>
                 <button class="btn btn-primary" *ngIf="trans.budgetStatus == 'InActive'" (click)="changeStatus(trans.budgetAccountId)">Active</button>
                 <button class="btn btn-danger" *ngIf="trans.budgetStatus == 'Active'" (click)="changeStatus(trans.budgetAccountId)">InActive</button>
