@@ -1,4 +1,4 @@
-import { formatDate } from '@angular/common';
+import { formatCurrency, formatDate } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 export interface TableColumn {
@@ -100,6 +100,9 @@ export class DataTableComponent {
   formatCell(value: any, col: TableColumn): any {
     if (col.format === 'date' && value) {
       return formatDate(value, col.dateFormat || 'dd/MM/yyyy', 'en-US');
+    }
+    if (col.format === 'currency' && value) {
+      return formatCurrency(value, 'en-US', '', 'symbol', '1.2-2');
     }
     return value;
   }

@@ -17,11 +17,11 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
     }
     public class CashWithdrawRequestBudgetAccount : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
     public class CashWithdrawRequestTransaction
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public string Description { get; set; }
         public DateTime TransactionDate { get; set; }
     }

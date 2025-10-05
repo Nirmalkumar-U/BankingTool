@@ -11,6 +11,6 @@
     public class CreateBudgetAccountRequestBudgetAccount
     {
         public string BudgetName { get; set; }
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

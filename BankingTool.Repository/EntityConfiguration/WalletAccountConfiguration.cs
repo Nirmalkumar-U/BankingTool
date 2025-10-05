@@ -37,7 +37,9 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // Balance
             builder.Property(b => b.Balance)
-                   .IsRequired();
+                   .IsRequired()
+               .HasColumnType("decimal(18,2)")
+               .HasPrecision(18, 2);
 
             builder.Property(b => b.WalletStatus)
                    .IsRequired()

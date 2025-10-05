@@ -109,11 +109,11 @@ namespace BankingTool.Api.Controllers
             );
         }
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<int>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<int>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<decimal>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<decimal>), 400)]
         public async Task<IActionResult> GetToBudgetDropdownListAndBalanceOfBudgetAccount(GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject model)
         {
-            return await HandleRequestAsync<GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject, int>(
+            return await HandleRequestAsync<GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestObject, decimal>(
                 model,
                 ValidationRules.GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestRules,
                 () => _budgetService.GetToBudgetDropdownListAndBalanceOfBudgetAccount(model.Request.BudgetAccount.Id)

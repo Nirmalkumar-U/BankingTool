@@ -128,11 +128,11 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<int>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<int>), 400)]
+        [ProducesResponseType(typeof(ResponseDto<decimal>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<decimal>), 400)]
         public async Task<IActionResult> GetAccountBalance(GetAccountBalanceRequestObject model)
         {
-            return await HandleRequestAsync<GetAccountBalanceRequestObject, int>(
+            return await HandleRequestAsync<GetAccountBalanceRequestObject, decimal>(
                 model,
                 ValidationRules.GetAccountBalanceRequestRules,
                 () => _bankAccountService.GetAccountBalance(model.Request.Account.Id)

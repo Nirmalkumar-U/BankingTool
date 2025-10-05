@@ -24,7 +24,9 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // Amount
             builder.Property(bt => bt.Amount)
-                   .IsRequired();
+                   .IsRequired()
+               .HasColumnType("decimal(18,2)")
+               .HasPrecision(18, 2);
 
             // Description
             builder.Property(bt => bt.Description)

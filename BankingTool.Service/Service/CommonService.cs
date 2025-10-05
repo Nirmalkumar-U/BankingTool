@@ -13,7 +13,7 @@ namespace BankingTool.Service.Service
         private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
         private readonly IBudgetRepository _budgetRepository = budgetRepository;
         private readonly IWalletRepository _walletRepository = walletRepository;
-        public async Task<(AccountTransactionsDto, List<ValidationResults>)> GetAccountDetailsToDebitOrCredit(bool isDebit, int? accountId, int amount, string description, DateTime transactionDate,
+        public async Task<(AccountTransactionsDto, List<ValidationResults>)> GetAccountDetailsToDebitOrCredit(bool isDebit, int? accountId, decimal amount, string description, DateTime transactionDate,
             TransactionTagEnum transactionTag = TransactionTagEnum.Transfer, TransactionCategoryEnum transactionCatagory = TransactionCategoryEnum.Transfer)
         {
             if (accountId == null)
@@ -72,7 +72,7 @@ namespace BankingTool.Service.Service
             };
             return (result, null);
         }
-        public async Task<(List<BudgetTransactionDto>, List<ValidationResults>)> GetBudgetAccountDetailsToDebitOrCredit(bool isDebit, int? accountId, int amount, string description,
+        public async Task<(List<BudgetTransactionDto>, List<ValidationResults>)> GetBudgetAccountDetailsToDebitOrCredit(bool isDebit, int? accountId, decimal amount, string description,
             DateTime transactionDate, List<BudgetAccountDto> budgetAccounts, TransactionTagEnum transactionTag = TransactionTagEnum.Transfer, TransactionCategoryEnum transactionCatagory = TransactionCategoryEnum.Transfer)
         {
             Account account = accountId == null ? null : await _bankAccountRepository.GetAccount(accountId.Value);
@@ -134,7 +134,7 @@ namespace BankingTool.Service.Service
             }
             return (budgetAccountList, null);
         }
-        public async Task<(WalletTransactionDto, List<ValidationResults>)> GetWalletDetailsToDebitOrCredit(bool isDebit, int walletId, int amount, string description, DateTime transactionDate,
+        public async Task<(WalletTransactionDto, List<ValidationResults>)> GetWalletDetailsToDebitOrCredit(bool isDebit, int walletId, decimal amount, string description, DateTime transactionDate,
             TransactionCategoryEnum transactionCatagory = TransactionCategoryEnum.Transfer, TransactionTagEnum transactionTag = TransactionTagEnum.Transfer)
         {
             WalletAccount account = await _walletRepository.GetWalletAccount(walletId);
@@ -190,13 +190,13 @@ namespace BankingTool.Service.Service
             return (result, null);
         }
         #region Private Method
-        private static List<ValidationResults> ValidateBudgetAccount(List<BudgetAccountDto> budgetAccounts, int amount)
+        private static List<ValidationResults> ValidateBudgetAccount(List<BudgetAccountDto> budgetAccounts, decimal amount)
         {
             if (budgetAccounts != null && budgetAccounts.Count > 0)
             {
                 bool isInValid = budgetAccounts.Any(x => x.Id == null);
                 bool isAmountInValid = budgetAccounts.Any(x => x?.Amount == null || x.Amount == 0);
-                int sumOfBudgetAccountAmount = budgetAccounts.Sum(x => x.Amount);
+                decimal sumOfBudgetAccountAmount = budgetAccounts.Sum(x => x.Amount);
                 if (sumOfBudgetAccountAmount > amount)
                 {
                     return [new ValidationResults { PropertyPath = "Request.BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Sum of Budget Account Amount should be lesser equal to Transfer Amount." }];
@@ -212,7 +212,7 @@ namespace BankingTool.Service.Service
             }
             return null;
         }
-        private static List<ValidationResults> ValidateBalance(int balance, int amount)
+        private static List<ValidationResults> ValidateBalance(decimal balance, decimal amount)
         {
             if (balance < amount)
             {

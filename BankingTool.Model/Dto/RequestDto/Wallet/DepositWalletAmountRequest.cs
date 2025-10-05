@@ -18,13 +18,13 @@ namespace BankingTool.Model.Dto.RequestDto.Wallet
     }
     public class DepositWalletAmountRequestWalletTransaction
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public string Description { get; set; }
         public DateTime TransactionDate { get; set; }
     }
     public class DepositWalletAmountRequestBudgetAccount : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
     public class DepositWalletAmountRequestAccount : RequestNullableId
     {

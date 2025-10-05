@@ -20,13 +20,13 @@ namespace BankingTool.Model.Dto.RequestDto.BankAccount
     }
     public class TransferAmountRequestTransaction
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public string Description { get; set; }
         public DateTime TransactionDate { get; set; }
         public TransactionTagEnum TransactionTag { get; set; }
     }
     public class TransferAmountRequestBudgetAccount : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

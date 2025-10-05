@@ -13,11 +13,11 @@ namespace BankingTool.Model.Dto.RequestDto.Budget
     }
     public class SaveBudgetTransactionRequestFromBudgetAccount : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public string Description { get; set; }
     }
     public class SaveBudgetTransactionRequestToBudgetAccount : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

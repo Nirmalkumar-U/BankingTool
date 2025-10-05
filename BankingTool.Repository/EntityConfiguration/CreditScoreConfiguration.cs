@@ -30,7 +30,9 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // CreditScoreValue
             builder.Property(cs => cs.CreditScoreValue)
-                   .IsRequired(false);
+                   .IsRequired(false)
+               .HasColumnType("decimal(18,2)")
+               .HasPrecision(18, 2);
 
             // Status
             builder.Property(cs => cs.Status)

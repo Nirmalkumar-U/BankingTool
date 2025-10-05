@@ -1,7 +1,6 @@
 ﻿using BankingTool.Model;
 using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.Budget;
-using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
@@ -80,7 +79,7 @@ namespace BankingTool.Repository.Repository
                 }).ToListAsync();
             return budgetAccount;
         }
-        public async Task<int> GetBudgetAccountBalance(int budgetAccountId)
+        public async Task<decimal> GetBudgetAccountBalance(int budgetAccountId)
         {
             var budgetAccount = await dataContext.BudgetAccount
                 .FirstOrDefaultAsync(x => x.CustomerId == dataContext.CustomerId && x.BudgetAccountId == budgetAccountId && x.BudgetStatus == BudgetAccountStatusEnum.Active.EnumToString() && x.IsDeleted == false);
@@ -202,7 +201,7 @@ namespace BankingTool.Repository.Repository
                             BudgetAccountId = item.Id
                         };
                         var budgetTransactionDetailId = InsertBudgetTransactionDetail(budgetTransactionDetail);
-                        int currentStageBalance = budgetTransactionDetail.StageBalance;
+                        decimal currentStageBalance = budgetTransactionDetail.StageBalance;
 
                         foreach (var budget in budgetTransactionAboveTransferedTime)
                         {

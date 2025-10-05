@@ -22,7 +22,7 @@ namespace BankingTool.Repository.IRepository
         Task<bool> RejectBudgetTransaction(int BudgetNotificationId);
         Task<bool> ChangeBudgetAccountStatus(int budgetAccountId);
         Task<BudgetNotification> GetBudgetNotification(int BudgetNotificationId);
-        Task<int> GetBudgetAccountBalance(int budgetAccountId);
+        Task<decimal> GetBudgetAccountBalance(int budgetAccountId);
         Task<List<DropDownDto>> GetBudgetAccountDropdownExceptBudgetAccountId(int budgetAccountId);
         Task<bool> SaveBudgetTransfer(BudgetAccount fromBudgetAccount, BudgetTransaction budgetTransaction,
            BudgetTransactionDetail fromBudgetTransactionDetail, List<BudgetTransactionDto> budgetAccountList);

@@ -293,9 +293,9 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<int>> GetAccountBalance(int accountId)
+        public async Task<ResponseDto<decimal>> GetAccountBalance(int accountId)
         {
-            return new ResponseDto<int>
+            return new ResponseDto<decimal>
             {
                 Response = await _bankAccountRepository.GetAccountBalance(accountId),
                 Status = true,
@@ -303,7 +303,7 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, int amount, string description, DateTime transactionDate,
+        public async Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, decimal amount, string description, DateTime transactionDate,
             TransactionTagEnum transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccounts)
         {
             var account = await _bankAccountRepository.GetAccount(fromAccountId);
@@ -478,7 +478,7 @@ namespace BankingTool.Service.Service
                 Errors = isSaved ? [] : [new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transfer Failed" }]
             };
         }
-        public async Task<ResponseDto<bool>> DepositAmount(int accountId, int amount, string description, DateTime transactionDate, List<DepositAmountRequestBudgetAccount> budgetAccounts)
+        public async Task<ResponseDto<bool>> DepositAmount(int accountId, decimal amount, string description, DateTime transactionDate, List<DepositAmountRequestBudgetAccount> budgetAccounts)
         {
             List<BudgetAccountDto> validateBudgetAccount = [.. budgetAccounts.Select(budgetAccounts => new BudgetAccountDto
             {
@@ -594,7 +594,7 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
-        public async Task<ResponseDto<bool>> CashWithdraw(int accountId, int amount, string description, DateTime transactionDate, List<CashWithdrawRequestBudgetAccount> budgetAccounts)
+        public async Task<ResponseDto<bool>> CashWithdraw(int accountId, decimal amount, string description, DateTime transactionDate, List<CashWithdrawRequestBudgetAccount> budgetAccounts)
         {
             Account account = await _bankAccountRepository.GetAccount(accountId);
             var validationResultBalance = ValidateBalance(account.Balance, amount);
@@ -788,13 +788,13 @@ namespace BankingTool.Service.Service
             // Ensure score stays within valid range (300 - 850)
             return Math.Clamp(score, 300, 850);
         }
-        private static List<ValidationResults> ValidateBudgetAccount(List<BudgetAccountDto> budgetAccounts, int amount)
+        private static List<ValidationResults> ValidateBudgetAccount(List<BudgetAccountDto> budgetAccounts, decimal amount)
         {
             if (budgetAccounts != null && budgetAccounts.Count > 0)
             {
                 bool isInValid = budgetAccounts.Any(x => x.Id == null);
                 bool isAmountInValid = budgetAccounts.Any(x => x?.Amount == null || x.Amount == 0);
-                int sumOfBudgetAccountAmount = budgetAccounts.Sum(x => x.Amount);
+                decimal sumOfBudgetAccountAmount = budgetAccounts.Sum(x => x.Amount);
                 if (sumOfBudgetAccountAmount > amount)
                 {
                     return [new ValidationResults { PropertyPath = "Request.BudgetAccount.Amount", PropertyName = "Amount", ErrorMessage = "Sum of Budget Account Amount should be lesser equal to Transfer Amount." }];
@@ -810,7 +810,7 @@ namespace BankingTool.Service.Service
             }
             return null;
         }
-        private static List<ValidationResults> ValidateBalance(int balance, int amount)
+        private static List<ValidationResults> ValidateBalance(decimal balance, decimal amount)
         {
             if (balance < amount)
             {

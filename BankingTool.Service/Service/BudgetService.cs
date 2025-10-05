@@ -5,7 +5,6 @@ using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
-using BankingTool.Repository;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
 
@@ -14,7 +13,7 @@ namespace BankingTool.Service.Service
     public class BudgetService(IBudgetRepository budgetRepository) : IBudgetService
     {
         private readonly IBudgetRepository _budgetRepository = budgetRepository;
-        public async Task<ResponseDto<bool>> CreateBudgetAccount(string budgetName, int amount)
+        public async Task<ResponseDto<bool>> CreateBudgetAccount(string budgetName, decimal amount)
         {
             ResponseDto<bool> response = new()
             {
@@ -71,7 +70,7 @@ namespace BankingTool.Service.Service
                 };
             }
             var budgetNotification = await _budgetRepository.GetBudgetNotification(BudgetNotificationId);
-            int sumOfBudgetAmount = BudgetAccount.Sum(x => x.Amount);
+            decimal sumOfBudgetAmount = BudgetAccount.Sum(x => x.Amount);
             if (budgetNotification.Amount < sumOfBudgetAmount)
             {
                 return new ResponseDto<bool>
@@ -189,9 +188,9 @@ namespace BankingTool.Service.Service
                 DropDownList = [new DropDownListDto { Name = "FromBudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() }]
             };
         }
-        public async Task<ResponseDto<int>> GetToBudgetDropdownListAndBalanceOfBudgetAccount(int bugetAccountId)
+        public async Task<ResponseDto<decimal>> GetToBudgetDropdownListAndBalanceOfBudgetAccount(int bugetAccountId)
         {
-            return new ResponseDto<int>()
+            return new ResponseDto<decimal>()
             {
                 Errors = [],
                 ValidationErrors = [],
@@ -201,7 +200,7 @@ namespace BankingTool.Service.Service
                 DropDownList = [new DropDownListDto { Name = "ToBudgetAccountId", DropDown = await _budgetRepository.GetBudgetAccountDropdownExceptBudgetAccountId(bugetAccountId) }]
             };
         }
-        public async Task<ResponseDto<bool>> BudgetTransfer(int fromAccountId, List<SaveBudgetTransactionRequestToBudgetAccount> toAccounts, int amount, string description)
+        public async Task<ResponseDto<bool>> BudgetTransfer(int fromAccountId, List<SaveBudgetTransactionRequestToBudgetAccount> toAccounts, decimal amount, string description)
         {
             var fromBudgetAccount = await _budgetRepository.GetBudgetAccountById(fromAccountId);
             var sumOfToAccountAmount = toAccounts.Sum(x => x.Amount);
@@ -328,7 +327,7 @@ namespace BankingTool.Service.Service
             var lastBudgetAccount = await _budgetRepository.GetLastBudgetAccount();
             return ((lastBudgetAccount != null && long.TryParse(lastBudgetAccount.BudgetNumber, out long lastNumber)) ? lastNumber + 1 : 60000000).ToString();
         }
-        private static List<ValidationResults> ValidateBalance(int balance, int amount)
+        private static List<ValidationResults> ValidateBalance(decimal balance, decimal amount)
         {
             if (balance < amount)
             {

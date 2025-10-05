@@ -13,7 +13,7 @@ namespace BankingTool.Model.Dto.RequestDto.Budget
     }
     public class AcceptBudgetTransactionRequestBudgetAcccount : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
     public class AcceptBudgetTransactionRequestBudgetNotification : RequestId
     {

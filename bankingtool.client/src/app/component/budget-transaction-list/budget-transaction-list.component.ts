@@ -18,9 +18,9 @@ export class BudgetTransactionListComponent {
     { field: 'transactionTag', header: 'Tag', sortable: true, width: '8%' },
     { field: 'transactionDate', header: 'Date', sortable: true, width: '11%', format: 'date', dateFormat: 'dd-MM-yyyy' },
     { field: 'description', header: 'Description', width: '18%' },
-    { field: 'receiverAmount', header: 'Credit', sortable: true, width: '8%' },
-    { field: 'senderAmount', header: 'Debit', sortable: true, width: '8%' },
-    { field: 'stageBalance', header: 'Stage Balance', sortable: true, width: '12%' }
+    { field: 'receiverAmount', header: 'Credit', format: 'currency', sortable: true, width: '8%' },
+    { field: 'senderAmount', header: 'Debit', format: 'currency', sortable: true, width: '8%' },
+    { field: 'stageBalance', header: 'Stage Balance', format: 'currency', sortable: true, width: '12%' }
   ];
 
   accountInfo: GetBudgetTransactionListResponse | null = null;

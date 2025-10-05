@@ -28,7 +28,7 @@ namespace BankingTool.Repository.IRepository
         Task<List<DropDownDto>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int BankId);
         Task<List<DropDownDto>> GetFromAccountListByCustomerId();
         Task<List<DropDownDto>> GetToAccountListOnWithoutCustomerId();
-        Task<int> GetAccountBalance(int accountId);
+        Task<decimal> GetAccountBalance(int accountId);
         Task<Account> GetAccount(int AccountId);
         Task<Transaction> GetTransaction(int TransactionId);
         Task<List<DropDownDto>> GetToAccountListExcludedByAccountId(int accountId);

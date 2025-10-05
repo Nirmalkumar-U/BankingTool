@@ -18,7 +18,7 @@ namespace BankingTool.Service.Service
         private readonly IBudgetRepository _budgetRepository = budgetRepository;
         private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
         private readonly ICommonService _commonService = commonService;
-        public async Task<ResponseDto<bool>> CreateWalletAccount(string walletName, int amount)
+        public async Task<ResponseDto<bool>> CreateWalletAccount(string walletName, decimal amount)
         {
             ResponseDto<bool> response = new()
             {
@@ -102,7 +102,7 @@ namespace BankingTool.Service.Service
                 StatuCode = 200
             };
         }
-        public async Task<ResponseDto<bool>> DepositWalletAmount(int walletId, int amount, string description, DateTime transactionDate, List<DepositWalletAmountRequestBudgetAccount> budgetAccounts,
+        public async Task<ResponseDto<bool>> DepositWalletAmount(int walletId, decimal amount, string description, DateTime transactionDate, List<DepositWalletAmountRequestBudgetAccount> budgetAccounts,
             bool isFromAccount, int? accountId)
         {
             List<BudgetAccountDto> validateBudgetAccount = [.. budgetAccounts.Select(budgetAccounts => new BudgetAccountDto
@@ -201,7 +201,7 @@ namespace BankingTool.Service.Service
             };
         }
 
-        public async Task<ResponseDto<bool>> WalletTransfer(int walletId, int? accountId, int amount, string description, TransactionTagEnum transactionTag,
+        public async Task<ResponseDto<bool>> WalletTransfer(int walletId, int? accountId, decimal amount, string description, TransactionTagEnum transactionTag,
             DateTime transactionDate, List<WalletTransferRequestBudgetAccount> budgetAccounts)
         {
             (List<BudgetTransactionDto> budgetDetails, List<ValidationResults> budgetValidationResult) = ([], null);
@@ -263,9 +263,9 @@ namespace BankingTool.Service.Service
                 Errors = isTransfered ? [] : [new Errors() { PropertyName = "WalletTransfer", ErrorMessage = "Failed to Save Wallet Transfer Transaction." }]
             };
         }
-        public async Task<ResponseDto<int>> GetWalletBalance(int accountId)
+        public async Task<ResponseDto<decimal>> GetWalletBalance(int accountId)
         {
-            return new ResponseDto<int>
+            return new ResponseDto<decimal>
             {
                 Response = await _walletRepository.GetWalletBalance(accountId),
                 Status = true,

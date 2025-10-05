@@ -46,7 +46,9 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // Amount
             builder.Property(bn => bn.Amount)
-                   .IsRequired();
+                   .IsRequired()
+               .HasColumnType("decimal(18,2)")
+               .HasPrecision(18, 2);
 
             // Dates
             builder.Property(bn => bn.TransactionDate)

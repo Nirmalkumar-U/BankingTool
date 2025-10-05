@@ -140,7 +140,7 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
-        public async Task<int> GetWalletBalance(int accountId)
+        public async Task<decimal> GetWalletBalance(int accountId)
         {
             return await (from a in dataContext.WalletAccount
                           where a.WalletAccountId == accountId && a.WalletStatus == WalletStatusEnum.Active.EnumToString()

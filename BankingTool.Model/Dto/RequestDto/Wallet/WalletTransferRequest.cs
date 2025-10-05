@@ -19,14 +19,14 @@ namespace BankingTool.Model.Dto.RequestDto.Wallet
     }
     public class WalletTransferRequestWalletTransaction
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public string Description { get; set; }
         public TransactionTagEnum TransactionTag { get; set; }
         public DateTime TransactionDate { get; set; }
     }
     public class WalletTransferRequestBudgetAccount : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
     public class WalletTransferRequestAccount : RequestNullableId
     {

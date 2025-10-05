@@ -4,6 +4,6 @@ namespace BankingTool.Model.Dto.InternalDto
 {
     public class BudgetAccountDto : RequestId
     {
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace BankingTool.Model.Dto.ResponseDto
         public int WalletId { get; set; }
         public string WalletName { get; set; }
         public string WalletNumber { get; set; }
-        public int Balance { get; set; }
+        public decimal Balance { get; set; }
         public WalletStatusEnum WalletStatus { get; set; }
 
     }

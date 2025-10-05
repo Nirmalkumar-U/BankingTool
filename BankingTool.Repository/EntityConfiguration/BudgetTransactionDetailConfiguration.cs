@@ -59,7 +59,9 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // StageBalance
             builder.Property(btd => btd.StageBalance)
-                   .IsRequired();
+                   .IsRequired()
+               .HasColumnType("decimal(18,2)")
+               .HasPrecision(18, 2);
         }
     }
 }

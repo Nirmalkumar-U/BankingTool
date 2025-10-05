@@ -27,7 +27,9 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // Amount: Required
             builder.Property(t => t.Amount)
-                   .IsRequired();
+                   .IsRequired()
+               .HasColumnType("decimal(18,2)")
+               .HasPrecision(18, 2);
 
             // TransactionTime: Required, Default handled at DB level
             builder.Property(t => t.TransactionTime)

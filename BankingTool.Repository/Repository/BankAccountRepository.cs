@@ -261,8 +261,7 @@ namespace BankingTool.Repository.Repository
                               Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(a.AccountNumber.Length - 4) + "/" + cv.CodeValue1
                           }).ToListAsync();
         }
-
-        public async Task<int> GetAccountBalance(int accountId)
+        public async Task<decimal> GetAccountBalance(int accountId)
         {
             return await (from a in dataContext.Account
                           where a.AccountId == accountId && a.AccountStatus == AccountStatusEnum.Active.EnumToString()
@@ -314,7 +313,6 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
-
         public bool TransferAmount(Account fromAccount, Account toAccount, Transaction transaction, TransactionDetail fromTransactionDetail,
             TransactionDetail toTransactionDetail, List<BudgetTransactionDto> budgetTransactions, BudgetNotification budgetNotification, bool isCustomerAsBudgetAccount)
         {

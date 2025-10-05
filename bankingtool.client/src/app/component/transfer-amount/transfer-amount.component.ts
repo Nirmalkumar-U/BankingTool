@@ -33,7 +33,7 @@ export class TransferAmountComponent {
       toAccountId: ['', [Validators.required]],
       fromAccountId: ['', [Validators.required]],
       transferDate: ['', [Validators.required]],
-      amount: ['', [Validators.required]],
+      amount: ['', [Validators.required, Validators.min(0), Validators.pattern(/^\d+(\.\d{1,2})?$|^$/)]],
       description: ['', [Validators.required]],
       transactionTag: ['', [Validators.required]],
       budgetAccount: this.fb.array([])
@@ -151,7 +151,7 @@ export class TransferAmountComponent {
     this.budgetAccount.push(
       this.fb.group({
         budgetAccountId: ['', Validators.required],
-        budgetAmount: ['', Validators.required]
+        budgetAmount: ['', [Validators.required, Validators.min(0), Validators.pattern(/^\d+(\.\d{1,2})?$|^$/)]]
       })
     );
   }

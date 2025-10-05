@@ -12,7 +12,7 @@
               <option value="">Select</option>
               <option *ngFor="let fa of fromList" [ngValue]="fa.key">{{ fa.value }}</option>
             </select>
-            <div class="invalid-feedback">
+            <div *ngIf="transferAmountForm.get('fromAccountId')?.invalid && transferAmountForm.get('fromAccountId')?.touched" class="invalid-feedback">
               Please Select Account...
             </div>
           </div>
@@ -22,22 +22,22 @@
               <option value="">Select</option>
               <option *ngFor="let ta of toList" [ngValue]="ta.key">{{ ta.value }}</option>
             </select>
-            <div class="invalid-feedback">
+            <div *ngIf="transferAmountForm.get('toAccountId')?.invalid && transferAmountForm.get('toAccountId')?.touched" class="invalid-feedback">
               Please Select Account...
             </div>
           </div>
           <div class="col-md-1">
             <label class="form-label">Balance</label>
-            <h6>{{balance}}</h6>
+            <h6>{{ balance | currency:'':'':'1.2-2' }}</h6>
           </div>
           <div class="col-md-3">
             <label class="form-label">Transaction Date</label>
             <input type="date" class="form-control" formControlName="transferDate" (blur)="setTransferDate($event)" />
           </div>
           <div class="col-md-3">
-            <label for="inputPassword4" class="form-label">Amount</label>
-            <input type="text" class="form-control" formControlName="amount" required>
-            <div class="invalid-feedback">
+            <label for="amount" class="form-label">Amount</label>
+            <input type="number" class="form-control" formControlName="amount" step="0.01" min="0" required>
+            <div *ngIf="transferAmountForm.get('amount')?.invalid && transferAmountForm.get('amount')?.touched" class="invalid-feedback">
               Please Enter amount...
             </div>
           </div>
@@ -47,19 +47,19 @@
               <option value="">Select</option>
               <option *ngFor="let bank of transactionTagList" [ngValue]="bank.codeValue1">{{ bank.value }}</option>
             </select>
-            <div class="invalid-feedback">
+            <div *ngIf="transferAmountForm.get('transactionTag')?.invalid && transferAmountForm.get('transactionTag')?.touched" class="invalid-feedback">
               Please Select tag...
             </div>
           </div>
           <div class="col-md-3">
-            <label for="inputPassword4" class="form-label">Description</label>
+            <label for="description" class="form-label">Description</label>
             <input type="text" class="form-control" formControlName="description" required>
-            <div class="invalid-feedback">
+            <div *ngIf="transferAmountForm.get('description')?.invalid && transferAmountForm.get('description')?.touched" class="invalid-feedback">
               Please Enter Description...
             </div>
           </div>
           <div class="col-12">
-            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Transfer Account</button>
+            <button type="submit" [disabled]="transferAmountForm.invalid || isSubmitted" class="btn btn-primary">Transfer Account</button>
           </div>
           <div class="col-md-12" *ngIf="budgetAccountList && budgetAccountList.length != 0">
             <label class="form-label">Budget Allocation (Optional)</label>
@@ -78,9 +78,15 @@
                       <option value="">Select</option>
                       <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
                     </select>
+                    <div *ngIf="budget.get('budgetAccountId')?.invalid && budget.get('budgetAccountId')?.touched" class="invalid-feedback">
+                      Please Select Budget Account...
+                    </div>
                   </td>
                   <td>
-                    <input type="number" class="form-control" formControlName="budgetAmount" required />
+                    <input type="number" class="form-control" formControlName="budgetAmount" step="0.01" min="0" required />
+                    <div *ngIf="budget.get('budgetAmount')?.invalid && budget.get('budgetAmount')?.touched" class="invalid-feedback">
+                      Please Enter Budget Amount...
+                    </div>
                   </td>
                   <td>
                     <button type="button" class="btn btn-danger btn-sm" (click)="removeBudgetAccount(i)">X</button>

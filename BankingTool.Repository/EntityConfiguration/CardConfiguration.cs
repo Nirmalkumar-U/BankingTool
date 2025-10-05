@@ -38,7 +38,9 @@ namespace BankingTool.Repository.EntityConfiguration
 
             // CardLimit: Required
             builder.Property(c => c.CardLimit)
-                   .IsRequired();
+                   .IsRequired()
+               .HasColumnType("decimal(18,2)")
+               .HasPrecision(18, 2);
 
             // ExpireDate: Required
             builder.Property(c => c.ExpireDate)

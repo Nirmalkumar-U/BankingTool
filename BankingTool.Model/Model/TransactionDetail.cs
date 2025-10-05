@@ -7,7 +7,7 @@
         public string TransactionRole { get; set; }
         public string TransactionType { get; set; }
         public int AccountId { get; set; }
-        public int StageBalance { get; set; }
+        public decimal StageBalance { get; set; }
 
 
         // Optional Navigation Properties

@@ -29,9 +29,9 @@ export class TransactionsListComponent {
     { field: 'transactionTag', header: 'Tag', sortable: true, width: '8%' },
     { field: 'transactionDate', header: 'Date', sortable: true, width: '11%', format: 'date', dateFormat: 'dd/MM/yyyy' },
     { field: 'description', header: 'Description', width: '18%' },
-    { field: 'creditAmount', header: 'Credit', sortable: true, width: '8%' },
-    { field: 'debitAmount', header: 'Debit', sortable: true, width: '8%' },
-    { field: 'stageBalance', header: 'Stage Balance', sortable: true, width: '12%' }
+    { field: 'creditAmount', header: 'Credit', format: 'currency', sortable: true, width: '8%' },
+    { field: 'debitAmount', header: 'Debit', format: 'currency', sortable: true, width: '8%' },
+    { field: 'stageBalance', header: 'Stage Balance', format: 'currency', sortable: true, width: '12%' }
   ];
 
   transactionForm: FormGroup;
