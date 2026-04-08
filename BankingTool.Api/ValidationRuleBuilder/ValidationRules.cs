@@ -1,6 +1,7 @@
 ﻿using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.RequestDto.Budget;
+using BankingTool.Model.Dto.RequestDto.BulkTransaction;
 using BankingTool.Model.Dto.RequestDto.Calender;
 using BankingTool.Model.Dto.RequestDto.Note;
 using BankingTool.Model.Dto.RequestDto.User;
@@ -436,5 +437,25 @@ namespace BankingTool.Api.Validators
             RuleBuilder<GetWalletBalanceRequestObject>.For(x => x.Request.Account.Id).Required()
         };
         #endregion Wallet
+        #region BulkTransaction
+        //Add validation rules for BulkTransactionRequestObject and its nested properties as needed
+        public static List<ValidationRule> BulkTransactionRequestRules = new()
+        {
+            RuleBuilder<BulkTransactionRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.For(x => x.Request).WithCollectionRules(r => {
+                r.CollectionMinCount = 1;
+            }),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.BudgetAccount).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.TransactionCategory).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.FromAccountId).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.ToAccountId).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionDate).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionTag).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Amount).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Description).Required(),
+        };
+        #endregion BulkTransaction
     }
 }
