@@ -445,16 +445,16 @@ namespace BankingTool.Api.Validators
             RuleBuilder<BulkTransactionRequestObject>.For(x => x.Request).WithCollectionRules(r => {
                 r.CollectionMinCount = 1;
             }),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.BudgetAccount).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.TransactionCategory).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.FromAccountId).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.ToAccountId).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionDate).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionTag).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Amount).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Description).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.BudgetAccount).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.TransactionCategory).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.FromAccountId).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.ToAccountId).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionDate).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionTag).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Amount).Required(),
+            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Description).Required(),
         };
         #endregion BulkTransaction
     }

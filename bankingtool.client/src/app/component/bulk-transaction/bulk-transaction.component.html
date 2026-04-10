@@ -1,0 +1,160 @@
+<div class='dashboard-content'>
+  <div class='container'>
+    <div class='card'>
+      <div class='card-header'>
+        <h1>Bulk Transaction</h1>
+      </div>
+      <div class='card-body'>
+        <form class="was-validated" novalidate [formGroup]="bulkTransactionForm" (ngSubmit)="submitTransactions()">
+          <!-- Transactions Table -->
+          <div class="col-md-12">
+            <label class="form-label">Transactions</label>
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th style="width: 120px;">Category</th>
+                    <th style="width: 150px;">From Account</th>
+                    <th style="width: 150px;">To Account</th>
+                    <th style="width: 100px;">Amount</th>
+                    <th style="width: 150px;">Description</th>
+                    <th style="width: 130px;">Date</th>
+                    <th style="width: 120px;">Tag</th>
+                    <th style="width: 50px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="transactions">
+                  <tr *ngFor="let transaction of transactions.controls; let i = index" [formGroupName]="i">
+                    <td>
+                      <select class="form-select" formControlName="transactionCategory" required
+                              aria-label="Select transaction category">
+                        <option value="">Select</option>
+                        <option *ngFor="let account of transactionCatagoryList" [ngValue]="account.value">{{ account.value }}</option>
+                        
+                      </select>
+                      <div class="invalid-feedback" *ngIf="transaction.get('transactionCategory')?.invalid">
+                        Required
+                      </div>
+                    </td>
+                    <td>
+                      <select class="form-select" formControlName="fromAccountId"
+                        aria-label="Select from account">
+                        <option value="">Select</option>
+                        <option *ngFor="let account of fromList" [ngValue]="account.key">{{ account.value }}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="transaction.get('fromAccountId')?.invalid">
+                        Required
+                      </div>
+                    </td>
+                    <td>
+                      <select class="form-select" formControlName="toAccountId"
+                        aria-label="Select to account">
+                        <option value="">Select</option>
+                        <option *ngFor="let account of toList" [ngValue]="account.key">{{ account.value }}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="transaction.get('toAccountId')?.invalid">
+                        Required
+                      </div>
+                    </td>
+                    <td>
+                      <input type="number" class="form-control" formControlName="amount" placeholder="0.00"
+                        min="0.01" step="0.01" required aria-label="Transaction amount">
+                      <div class="invalid-feedback" *ngIf="transaction.get('amount')?.invalid">
+                        Required & > 0
+                      </div>
+                    </td>
+                    <td>
+                      <input type="text" class="form-control" formControlName="description" required
+                        aria-label="Transaction description">
+                      <div class="invalid-feedback" *ngIf="transaction.get('description')?.invalid">
+                        Required
+                      </div>
+                    </td>
+                    <td>
+                      <input type="date" class="form-control" formControlName="transactionDate" required
+                        aria-label="Transaction date">
+                      <div class="invalid-feedback" *ngIf="transaction.get('transactionDate')?.invalid">
+                        Required
+                      </div>
+                    </td>
+                    <td>
+                      <select class="form-select" formControlName="transactionTag" required
+                              aria-label="Select transaction tag">
+                        <option value="">Select</option>
+                        <option *ngFor="let account of transactionTagList" [ngValue]="account.key">{{ account.value }}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="transaction.get('transactionTag')?.invalid">
+                        Required
+                      </div>
+                    </td>
+                    <td>
+                      <button *ngIf="transactions.length > 1" type="button" class="btn btn-danger btn-sm"
+                        (click)="removeTransaction(i)" aria-label="Remove transaction">X</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm mb-3" (click)="addTransaction()"
+              aria-label="Add new transaction">+ Add Transaction</button>
+          </div>
+
+          <!-- Budget Entries for each Transaction -->
+          <div class="col-md-12" *ngFor="let transaction of transactions.controls; let i = index">
+            <label class="form-label">Budget Entries for Transaction {{ i + 1 }}</label>
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm">
+                <thead>
+                  <tr>
+                    <th>Budget Account</th>
+                    <th style="width: 150px;">Budget Amount</th>
+                    <th style="width: 50px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let entry of getBudgetEntries(i).controls; let j = index" [formGroup]="$any(entry)">
+                    <td>
+                      <select class="form-select" formControlName="budgetAccountId" required
+                        aria-label="Select budget account">
+                        <option value="">Select</option>
+                        <option *ngFor="let budget of budgetAccountsList" [ngValue]="budget.key">{{ budget.value }}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAccountId')?.invalid">
+                        Required
+                      </div>
+                    </td>
+                    <td>
+                      <input type="number" class="form-control" formControlName="budgetAmount" placeholder="0.00"
+                        min="0.01" step="0.01" required aria-label="Budget amount">
+                      <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAmount')?.invalid">
+                        Required & > 0
+                      </div>
+                    </td>
+                    <td>
+                      <button *ngIf="j > 0" type="button" class="btn btn-danger btn-sm"
+                        (click)="removeBudgetEntry(i, j)" aria-label="Remove budget entry">X</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm mb-4"
+              (click)="addBudgetEntry(i)" aria-label="Add budget entry">+ Add Budget Entry</button>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="col-12">
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary"
+              [disabled]="!isFormValid() || isLoading">
+              <span *ngIf="!isLoading">Submit Transactions</span>
+              <span *ngIf="isLoading">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Submitting...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

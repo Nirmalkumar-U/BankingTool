@@ -6,5 +6,6 @@ namespace BankingTool.Service.IService
     public interface IBulkTransactionService
     {
         Task<ResponseDto<bool>> BulkTransaction(BulkTransactionRequestObject model);
+        Task<ResponseDto<bool>> GetBulkTransactionInitialLoad();
     }
 }

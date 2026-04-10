@@ -285,7 +285,7 @@ namespace BankingTool.Service.Service
                     validationResults.AddRange(validationResult);
                 }
                 //Validate Transaction Date should be greater than last transaction date
-                var lastTransaction = await _bankAccountRepository.GetLastTransaction(toAccountId.Value);
+                var lastTransaction = await _bankAccountRepository.GetLastTransaction(fromAccountId.Value);
                 if (lastTransaction != null && lastTransaction?.TransactionTime.Date > transactionDate.Date)
                 {
                     errors.Add(new Errors { PropertyName = "TransferAmount", ErrorMessage = "Transaction Date should be greater then last transaction date." });
@@ -314,7 +314,7 @@ namespace BankingTool.Service.Service
                     transactionDate = transactionDate.AddMinutes(5);
                 }
                 //Get Account details and prepare transaction, transaction details and budget transaction details to save into database
-                Account account = await _bankAccountRepository.GetAccount(toAccountId.Value);
+                Account account = await _bankAccountRepository.GetAccount(fromAccountId.Value);
                 account.Balance = transactionCategoryEnum == TransactionCategoryEnum.Deposit ? account.Balance + amount : account.Balance - amount;
 
                 Transaction transaction = new()
@@ -374,8 +374,8 @@ namespace BankingTool.Service.Service
                 }
                 return (new BulkTransactionDto
                 {
-                    FromAccount = null,
-                    ToAccount = account,
+                    FromAccount = account,
+                    ToAccount = null,
                     Transaction = transaction,
                     FromTransactionDetail = null,
                     ToTransactionDetail = transactionDetails,
@@ -390,6 +390,27 @@ namespace BankingTool.Service.Service
             }
         }
 
+        public async Task<ResponseDto<bool>> GetBulkTransactionInitialLoad()
+        {
+            //GetAllTransactionCategory
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                DropDownList = new List<DropDownListDto>
+                {
+                    new DropDownListDto{ Name = "FromAccount", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() },
+                    new DropDownListDto{ Name = "ToAccount", DropDown = await _bankAccountRepository.GetToAccountListOnWithoutCustomerId() },
+                    new DropDownListDto{ Name = "TransactionTag", DropDown = await _bankAccountRepository.GetAllTransactionTag() },
+                    new DropDownListDto{ Name = "BudgetAccount", DropDown = await _budgetRepository.GetBudgetAccountDropdown() },
+                    new DropDownListDto{ Name = "TransactionCategory", DropDown = await _bankAccountRepository.GetAllTransactionCategory() }
+                },
+                StatuCode = 200,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
+        #region Private
         private static List<ValidationResults> ValidateBudgetAccount(List<BudgetAccountDto> budgetAccounts, decimal amount)
         {
             if (budgetAccounts != null && budgetAccounts.Count > 0)
@@ -481,5 +502,6 @@ namespace BankingTool.Service.Service
             var isInserted = Insert(model);
             return isInserted ? model.BudgetNotificationId : null;
         }
+        #endregion Private
     }
 }

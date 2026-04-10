@@ -230,7 +230,7 @@ namespace BankingTool.Repository.Repository
                           select new DropDownDto
                           {
                               Key = a.AccountId,
-                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
+                              Value = b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
                           }).ToListAsync();
         }
         public async Task<List<DropDownDto>> GetToAccountListExcludedByAccountId(int accountId)
@@ -244,7 +244,7 @@ namespace BankingTool.Repository.Repository
                           select new DropDownDto
                           {
                               Key = a.AccountId,
-                              Value = u.FirstName + "/" + b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
+                              Value = b.BankAbbrivation + "/" + a.AccountNumber.Substring(0, 4) + "/" + cv.CodeValue1
                           }).ToListAsync();
         }
         public async Task<List<DropDownDto>> GetToAccountListOnWithoutCustomerId()

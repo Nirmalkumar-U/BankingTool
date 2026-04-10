@@ -27,5 +27,17 @@ namespace BankingTool.Api.Controllers
                 () => _bulkTransactionService.BulkTransaction(model)
             );
         }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public Task<IActionResult> GetBulkTransactionInitialLoad()
+        {
+            return HandleRequestAsync<BulkTransactionRequestObject, bool>(
+                null,
+                null,
+                () => _bulkTransactionService.GetBulkTransactionInitialLoad()
+            );
+        }
     }
 }

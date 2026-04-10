@@ -363,3 +363,16 @@ MigrationBackup/
 FodyWeavers.xsd
 *.pack
 /bankingtool.client/.angular/cache/15.2.11
+/bankingtool.client/dist/bankingtool.client/3rdpartylicenses.txt
+*.woff2
+*.woff
+*.eot
+*.ttf
+/bankingtool.client/dist/bankingtool.client/main.997ae3ede73cdeaa.js
+/bankingtool.client/dist/bankingtool.client/992.dadd1653d1491935.js
+/bankingtool.client/dist/bankingtool.client/fontawesome-webfont.da909aa098b0ee2d.svg
+/bankingtool.client/dist/bankingtool.client/scripts.c89ec616c38b1a8a.js
+/bankingtool.client/dist/bankingtool.client/runtime.9cc8bb2af55f8b7f.js
+/bankingtool.client/dist/bankingtool.client/styles.df0b942256dec6fc.css
+/bankingtool.client/dist/bankingtool.client/3rdpartylicenses.txt
+/bankingtool.client/dist/bankingtool.client/3rdpartylicenses.txt

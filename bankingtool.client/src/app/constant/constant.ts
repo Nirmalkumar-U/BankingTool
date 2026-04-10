@@ -55,6 +55,9 @@ export class AppPaths {
   public static walletList: string = 'walletList';
   public static walletTransfer: string = 'walletTransfer';
   public static walletDeposit: string = 'depositWallet';
+
+  //Bulk Transaction
+  public static bulkTransaction: string = 'bulkTransaction';
 }
 
 export class AppRoute {
@@ -100,6 +103,9 @@ export class AppRoute {
   public static walletList: string = '/walletList';
   public static walletTransfer: string = '/walletTransfer';
   public static walletDeposit: string = '/depositWallet';
+
+  //Bulk Transaction
+  public static bulkTransaction: string = '/bulkTransaction';
 }
 export class PageTitle {
   public static home: string = 'Home';
@@ -144,6 +150,9 @@ export class PageTitle {
   public static walletList: string = 'Wallet List';
   public static walletTransfer: string = 'Wallet Transfer';
   public static walletDeposit: string = 'Wallet Deposit';
+
+  //Bulk Transaction
+  public static bulkTransaction: string = 'Bulk Transaction';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';

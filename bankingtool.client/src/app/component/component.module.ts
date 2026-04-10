@@ -51,6 +51,8 @@ import { WalletListResolver } from '../core/resolver/wallet-list.resolver';
 import { WalletTransactionListResolver } from '../core/resolver/wallet-transaction-list.resolver';
 import { WalletDepositResolver } from '../core/resolver/wallet-deposit.resolver';
 import { WalletTransferResolver } from '../core/resolver/wallet-transfer.resolver';
+import { BulkTransactionComponent } from './bulk-transaction/bulk-transaction.component';
+import { BulkTransactionResolver } from '../core/resolver/bulk-transaction.resolver';
 
 const routes: Routes = [
   {
@@ -204,6 +206,12 @@ const routes: Routes = [
     title: PageTitle.walletTransactionList,
     component: WalletTransactionListComponent,
     resolve: { DataResolver: WalletTransactionListResolver }
+  },
+  {
+    path: AppPaths.bulkTransaction,
+    title: PageTitle.bulkTransaction,
+    component: BulkTransactionComponent,
+    resolve: { DataResolver: BulkTransactionResolver }
   }
 ];
 @NgModule({
@@ -233,7 +241,8 @@ const routes: Routes = [
     WalletListComponent,
     WalletTransferComponent,
     DepositWalletComponent,
-    WalletTransactionListComponent
+    WalletTransactionListComponent,
+    BulkTransactionComponent
   ],
   imports: [
     RouterModule.forChild(routes),
