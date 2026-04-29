@@ -4,6 +4,7 @@
     {
         public List<DashBoardAccountList> DashBoardAccountList { get; set; }
         public decimal TotalBalance { get; set; }
+        public decimal TotalBudgetBalance { get; set; }
     }
     public class DashBoardAccountList
     {

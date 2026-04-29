@@ -14,6 +14,7 @@ import { DashBoardAccountList, GetDashBoardInitialLoadResponse } from '../../dto
 export class HomeComponent {
   accountList: DashBoardAccountList[] = [];
   totalBalance: number = 0;
+  totalBudgetBalance: number = 0;
   totalAccounts: number = 0;
   totalSavingsAccounts: number = 0;
   showBalances: boolean = false;
@@ -33,6 +34,7 @@ export class HomeComponent {
     }
     this.accountList = initialData.response.dashBoardAccountList;
     this.totalBalance = initialData.response.totalBalance;
+    this.totalBudgetBalance = initialData.response.totalBudgetBalance;
     this.totalAccounts = this.accountList.length;
     this.totalSavingsAccounts = this.accountList.filter(account => account.accountType.toLowerCase() === 'saving account').length;
   }

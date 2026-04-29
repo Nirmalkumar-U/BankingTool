@@ -1,6 +1,7 @@
 export interface GetDashBoardInitialLoadResponse {
   dashBoardAccountList: DashBoardAccountList[];
   totalBalance: number;
+  totalBudgetBalance: number;
 }
 
 export interface DashBoardAccountList {

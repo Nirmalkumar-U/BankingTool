@@ -21,11 +21,12 @@ namespace BankingTool.Service.Service
         {
             var accountList = await _bankAccountRepository.GetDashBoardInitialLoad();
             var totalBalance = accountList.Where(z => z.AccountType == "Saving Account").Sum(x => x.Balance);
+            var totalBudgetBalance = accountList.Where(z => z.AccountType == "Budget Account").Sum(x => x.Balance);
             return new ResponseDto<GetDashBoardInitialLoadResponse>
             {
                 DropDownList = [],
                 Errors = [],
-                Response = new GetDashBoardInitialLoadResponse { TotalBalance = totalBalance, DashBoardAccountList = accountList },
+                Response = new GetDashBoardInitialLoadResponse { TotalBalance = totalBalance, DashBoardAccountList = accountList, TotalBudgetBalance = totalBudgetBalance },
                 StatuCode = 200,
                 ValidationErrors = [],
                 Status = true
