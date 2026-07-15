@@ -36,6 +36,7 @@
                  (ngModelChange)="triggerAutoSave()" />
 
           <textarea class="form-control" rows="6"
+                    style="min-height: calc(1.5em + 30.75rem + calc(var(--bs-border-width) * 2));"
                     placeholder="Write your note here..."
                     [(ngModel)]="selectedNote.content"
                     name="content"

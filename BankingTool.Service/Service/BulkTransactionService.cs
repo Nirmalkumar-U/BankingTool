@@ -346,7 +346,7 @@ namespace BankingTool.Service.Service
                             budgetTransactionDate = budgetTransactionDate.AddMinutes(5);
                         }
                         var budgetAccount = await _budgetRepository.GetBudgetAccountById(bAccount.Id);
-                        budgetAccount.Balance = budgetAccount.Balance + bAccount.Amount;
+                        budgetAccount.Balance = transactionCategoryEnum == TransactionCategoryEnum.Deposit ? budgetAccount.Balance + bAccount.Amount : budgetAccount.Balance - bAccount.Amount;
                         var budgetTransaction = new BudgetTransaction()
                         {
                             Amount = bAccount.Amount,
