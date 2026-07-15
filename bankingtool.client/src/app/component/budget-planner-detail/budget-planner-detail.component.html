@@ -1,0 +1,95 @@
+<div class="budget-detail-container">
+  <div class="page-header">
+    <h1>Budget Planner Details</h1>
+    <button class="btn-close" (click)="goBack()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && budgetPlannerDetail" class="detail-content">
+    <!-- Plan Information Card -->
+    <div class="info-card">
+      <div class="card-header">
+        <h2>{{ budgetPlannerDetail.PlanName }}</h2>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-small" (click)="editBudgetPlanner()">
+            <i class="fa fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-danger btn-small" (click)="deleteBudgetPlanner()">
+            <i class="fa fa-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="description">
+          <strong>Description:</strong>
+          <p>{{ budgetPlannerDetail.Description }}</p>
+        </div>
+
+        <!-- Budget Summary -->
+        <div class="budget-summary">
+          <div class="summary-card">
+            <h3>Total Budget</h3>
+            <p class="amount">{{ budgetPlannerDetail.TotalBudget | currency }}</p>
+          </div>
+          <div class="summary-card">
+            <h3>Total Allocated</h3>
+            <p class="amount">{{ getTotalAllocated() | currency }}</p>
+          </div>
+          <div class="summary-card" [class.warning]="getRemainingBudget() < 0">
+            <h3>Remaining</h3>
+            <p class="amount">{{ getRemainingBudget() | currency }}</p>
+          </div>
+          <div class="summary-card">
+            <h3>Allocation %</h3>
+            <p class="amount">{{ getPercentageAllocated() | number: '1.0-0' }}%</p>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+          <label>Budget Allocation Progress</label>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getPercentageAllocated()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Items -->
+    <div class="items-card">
+      <h2>Budget Items ({{ budgetPlannerDetail.BudgetItems.length }})</h2>
+
+      <div *ngIf="budgetPlannerDetail.BudgetItems.length === 0" class="empty-state">
+        <p>No budget items available</p>
+      </div>
+
+      <div *ngIf="budgetPlannerDetail.BudgetItems.length > 0" class="items-table">
+        <div class="table-header">
+          <div class="col-name">Item Name</div>
+          <div class="col-amount">Amount</div>
+          <div class="col-percentage">% of Total</div>
+        </div>
+
+        <div *ngFor="let item of budgetPlannerDetail.BudgetItems" class="table-row">
+          <div class="col-name">{{ item.BudgetName }}</div>
+          <div class="col-amount">{{ item.AllocatedAmount | currency }}</div>
+          <div class="col-percentage">
+            <div class="progress-mini">
+              <div class="progress-fill" [style.width.%]="(item.AllocatedAmount / budgetPlannerDetail.TotalBudget) * 100"></div>
+            </div>
+            <span>{{ (item.AllocatedAmount / budgetPlannerDetail.TotalBudget) * 100 | number: '1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="action-footer">
+      <button class="btn btn-secondary" (click)="goBack()">
+        <i class="fa fa-arrow-left"></i> Back to List
+      </button>
+    </div>
+  </div>
+</div>

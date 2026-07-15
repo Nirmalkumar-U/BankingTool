@@ -37,6 +37,10 @@ export class AppPaths {
   public static budgetTransactionList: string = 'budgetTransactionList/:id';
   public static budgetList: string = 'budgetList';
   public static budgetTransfer: string = 'budgetTransfer';
+  public static budgetPlannerList: string = 'budgetPlannerList';
+  public static createBudgetPlanner: string = 'budgetPlanner/create';
+  public static editBudgetPlanner: string = 'budgetPlanner/edit/:id';
+  public static budgetPlannerDetail: string = 'budgetPlanner/detail/:id';
 
   //Notification
   public static budgetNotification: string = 'budgetNotification';
@@ -85,6 +89,10 @@ export class AppRoute {
   public static budgetList: string = '/budgetList';
   public static budgetTransfer: string = '/budgetTransfer';
   public static budgetTransactionList = (id: number): string => { return `/budgetTransactionList/${id}`; }
+  public static budgetPlannerList: string = '/budgetPlannerList';
+  public static createBudgetPlanner = (): string => { return '/budgetPlanner/create'; }
+  public static editBudgetPlanner = (id: number): string => { return `/budgetPlanner/edit/${id}`; }
+  public static budgetPlannerDetail = (id: number): string => { return `/budgetPlanner/detail/${id}`; }
 
   //Notification
   public static budgetNotification: string = '/budgetNotification';
@@ -132,6 +140,9 @@ export class PageTitle {
   public static budgetTransactionList: string = 'Budget Transaction List';
   public static budgetList: string = 'Budget List';
   public static budgetTransfer: string = 'Budget Transfer';
+  public static budgetPlannerList: string = 'Budget Planner List';
+  public static budgetPlannerForm: string = 'Budget Planner';
+  public static budgetPlannerDetail: string = 'Budget Planner Detail';
 
   // Notification
   public static budgetNotification: string = 'Budget Notification';

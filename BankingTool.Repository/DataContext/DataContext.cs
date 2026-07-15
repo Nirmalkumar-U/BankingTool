@@ -60,6 +60,8 @@ namespace BankingTool.Repository
         public DbSet<WalletAccount> WalletAccount { get; set; }
         public DbSet<WalletTransaction> WalletTransaction { get; set; }
         public DbSet<WalletTransactionDetail> WalletTransactionDetail { get; set; }
+        public DbSet<BudgetPlanner> BudgetPlanner { get; set; }
+        public DbSet<BudgetItem> BudgetItem { get; set; }
 
         // SP
         public DbSet<GetActionsByUserIdDto> GetActionsByUserIdDto { get; set; }
@@ -96,6 +98,8 @@ namespace BankingTool.Repository
             modelBuilder.ApplyConfiguration(new WalletAccountConfiguration());
             modelBuilder.ApplyConfiguration(new WalletTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new WalletTransactionDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetPlannerConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetItemConfiguration());
 
             //SPs
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());

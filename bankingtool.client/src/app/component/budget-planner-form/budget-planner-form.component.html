@@ -1,0 +1,161 @@
+<div class="budget-planner-form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Edit Budget Planner' : 'Create New Budget Planner' }}</h1>
+    <button class="btn-close" (click)="goBack()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="budgetPlannerForm" *ngIf="!isLoading" class="budget-form">
+    <!-- Plan Information Section -->
+    <div class="form-section">
+      <h2>Plan Information</h2>
+
+      <div class="form-group">
+        <label for="planName">Plan Name *</label>
+        <input
+          type="text"
+          id="planName"
+          formControlName="planName"
+          class="form-control"
+          placeholder="Enter plan name"
+          [class.is-invalid]="planNameControl?.invalid && planNameControl?.touched"
+        />
+        <div *ngIf="planNameControl?.invalid && planNameControl?.touched" class="error-message">
+          <span *ngIf="planNameControl?.errors?.['required']">Plan name is required</span>
+          <span *ngIf="planNameControl?.errors?.['minlength']">Plan name must be at least 3 characters</span>
+          <span *ngIf="planNameControl?.errors?.['maxlength']">Plan name cannot exceed 100 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-control"
+          rows="3"
+          placeholder="Enter plan description"
+          [class.is-invalid]="descriptionControl?.invalid && descriptionControl?.touched"
+        ></textarea>
+        <div *ngIf="descriptionControl?.invalid && descriptionControl?.touched" class="error-message">
+          <span *ngIf="descriptionControl?.errors?.['required']">Description is required</span>
+          <span *ngIf="descriptionControl?.errors?.['minlength']">Description must be at least 10 characters</span>
+          <span *ngIf="descriptionControl?.errors?.['maxlength']">Description cannot exceed 500 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="totalBudget">Total Budget *</label>
+        <input
+          type="number"
+          id="totalBudget"
+          formControlName="totalBudget"
+          class="form-control"
+          placeholder="Enter total budget amount"
+          (change)="onTotalBudgetChange()"
+          [class.is-invalid]="totalBudgetControl?.invalid && totalBudgetControl?.touched"
+        />
+        <div *ngIf="totalBudgetControl?.invalid && totalBudgetControl?.touched" class="error-message">
+          <span *ngIf="totalBudgetControl?.errors?.['required']">Total budget is required</span>
+          <span *ngIf="totalBudgetControl?.errors?.['min']">Total budget must be greater than 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Items Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2>Budget Items</h2>
+        <button type="button" class="btn btn-secondary btn-small" (click)="addBudgetItem()">
+          <i class="fa fa-plus"></i> Add Item
+        </button>
+      </div>
+
+      <div class="budget-items-summary">
+        <div class="summary-item">
+          <span>Total Budget:</span>
+          <span class="amount">{{ totalBudgetControl?.value | currency }}</span>
+        </div>
+        <div class="summary-item">
+          <span>Total Allocated:</span>
+          <span class="amount">{{ getTotalAllocated() | currency }}</span>
+        </div>
+        <div class="summary-item" [class.warning]="getRemainingBudget() < 0">
+          <span>Remaining:</span>
+          <span class="amount">{{ getRemainingBudget() | currency }}</span>
+        </div>
+      </div>
+
+      <div class="budget-items-container">
+        <div *ngIf="budgetItems.length === 0" class="empty-items">
+          <p>No budget items added yet.</p>
+        </div>
+
+        <div *ngFor="let item of budgetItems.controls; let i = index" class="budget-item-row">
+          <div [formGroup]="getBudgetItemGroup(i)" class="item-form-group">
+            <div class="form-group">
+              <label [for]="'itemName_' + i">Item Name *</label>
+              <input
+                type="text"
+                [id]="'itemName_' + i"
+                formControlName="budgetName"
+                class="form-control"
+                placeholder="e.g., Groceries, Utilities"
+                [class.is-invalid]="budgetItems.at(i).get('budgetName')?.invalid && budgetItems.at(i).get('budgetName')?.touched"
+              />
+              <div *ngIf="budgetItems.at(i).get('budgetName')?.invalid && budgetItems.at(i).get('budgetName')?.touched" class="error-message">
+                <span *ngIf="budgetItems.at(i).get('budgetName')?.errors?.['required']">Item name is required</span>
+                <span *ngIf="budgetItems.at(i).get('budgetName')?.errors?.['minlength']">Item name must be at least 3 characters</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label [for]="'itemAmount_' + i">Allocated Amount *</label>
+              <input
+                type="number"
+                [id]="'itemAmount_' + i"
+                formControlName="allocatedAmount"
+                class="form-control"
+                placeholder="0.00"
+                (change)="onAllocationChange()"
+                [class.is-invalid]="budgetItems.at(i).get('allocatedAmount')?.invalid && budgetItems.at(i).get('allocatedAmount')?.touched"
+              />
+              <div *ngIf="budgetItems.at(i).get('allocatedAmount')?.invalid && budgetItems.at(i).get('allocatedAmount')?.touched" class="error-message">
+                <span *ngIf="budgetItems.at(i).get('allocatedAmount')?.errors?.['required']">Amount is required</span>
+                <span *ngIf="budgetItems.at(i).get('allocatedAmount')?.errors?.['min']">Amount must be greater than 0</span>
+              </div>
+            </div>
+
+            <div class="form-group action-group">
+              <button
+                type="button"
+                class="btn btn-danger btn-small"
+                (click)="removeBudgetItem(i)"
+                [disabled]="budgetItems.length === 1"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="goBack()">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="saveBudgetPlanner()"
+        [disabled]="isSaving || budgetPlannerForm.invalid"
+      >
+        <span *ngIf="!isSaving">{{ isEditMode ? 'Update' : 'Create' }} Budget Planner</span>
+        <span *ngIf="isSaving"><i class="fa fa-spinner fa-spin"></i> Saving...</span>
+      </button>
+    </div>
+  </form>
+</div>

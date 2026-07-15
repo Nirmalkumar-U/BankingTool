@@ -1,0 +1,69 @@
+<div class="budget-planner-container">
+  <div class="page-header">
+    <h1>Budget Planner</h1>
+    <button class="btn btn-primary" (click)="createNewPlan()">
+      <i class="fa fa-plus"></i> Create New Plan
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && budgetPlannerList.length === 0" class="empty-state">
+    <p>No budget planners found. Create your first budget plan to get started.</p>
+    <button class="btn btn-primary" (click)="createNewPlan()">
+      Create First Plan
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && budgetPlannerList.length > 0" class="budget-planner-grid">
+    <div *ngFor="let planner of budgetPlannerList" class="planner-card">
+      <div class="card-header">
+        <h3>{{ planner.PlanName }}</h3>
+        <div class="card-actions">
+          <button class="btn-icon" title="Edit" (click)="editPlan(planner.BudgetPlannerId)">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button class="btn-icon" title="Delete" (click)="deletePlan(planner.BudgetPlannerId)">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p class="description">{{ planner.Description }}</p>
+
+        <div class="budget-info">
+          <div class="info-row">
+            <label>Total Budget:</label>
+            <span class="amount">{{ planner.TotalBudget | currency }}</span>
+          </div>
+          <div class="info-row">
+            <label>Allocated Amount:</label>
+            <span class="amount">{{ planner.AllocatedAmount | currency }}</span>
+          </div>
+          <div class="info-row">
+            <label>Remaining:</label>
+            <span class="amount" [class.negative]="getRemainingBudget(planner) < 0">
+              {{ getRemainingBudget(planner) | currency }}
+            </span>
+          </div>
+          <div class="info-row">
+            <label>Budget Items:</label>
+            <span>{{ planner.TotalItems }}</span>
+          </div>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getPercentageAllocated(planner)"></div>
+          </div>
+          <p class="progress-text">{{ getPercentageAllocated(planner) | number: '1.0-0' }}% Allocated</p>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn btn-secondary" (click)="viewDetails(planner.BudgetPlannerId)">
+          <i class="fa fa-eye"></i> View Details
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

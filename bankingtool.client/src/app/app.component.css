@@ -447,3 +447,8 @@ h1, .h1 {
     left: 0;
   }
 }
+
+textarea.form-control {
+  min-height: calc(1.5em + 25.75rem + calc(var(--bs-border-width) * 2)) !important;
+}
+

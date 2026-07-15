@@ -1,0 +1,55 @@
+<div class="budget-item-list-container">
+  <div class="items-header">
+    <h3>Budget Items</h3>
+    <span class="item-count">{{ budgetItems.length }} item(s)</span>
+  </div>
+
+  <div *ngIf="budgetItems.length === 0" class="empty-state">
+    <p>No budget items available</p>
+  </div>
+
+  <div *ngIf="budgetItems.length > 0" class="items-list">
+    <div class="summary-bar">
+      <div class="summary-item">
+        <span class="label">Total Budget:</span>
+        <span class="value">{{ totalBudget | currency }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Total Allocated:</span>
+        <span class="value">{{ getTotalAllocated() | currency }}</span>
+      </div>
+      <div class="summary-item" [class.warning]="getRemainingBudget() < 0">
+        <span class="label">Remaining:</span>
+        <span class="value">{{ getRemainingBudget() | currency }}</span>
+      </div>
+    </div>
+
+    <div class="items-table">
+      <div class="table-header">
+        <div class="col-name">Item Name</div>
+        <div class="col-amount">Amount</div>
+        <div class="col-percentage">% of Budget</div>
+        <div class="col-actions">Actions</div>
+      </div>
+
+      <div *ngFor="let item of budgetItems" class="table-row">
+        <div class="col-name">{{ item.BudgetName }}</div>
+        <div class="col-amount">{{ item.AllocatedAmount | currency }}</div>
+        <div class="col-percentage">
+          <div class="progress-mini">
+            <div class="progress-fill" [style.width.%]="getPercentageAllocated(item)"></div>
+          </div>
+          <span class="percentage-text">{{ getPercentageAllocated(item) | number: '1.0-0' }}%</span>
+        </div>
+        <div class="col-actions">
+          <button class="btn-icon edit" (click)="editItem(item)" title="Edit">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button class="btn-icon delete" (click)="deleteItem(item.BudgetItemId)" title="Delete">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -10,6 +10,7 @@ import { AccountNotificationResolver } from '../core/resolver/account-notificati
 import { AccountStatementReportResolver } from '../core/resolver/account-statement-report.resolver';
 import { AddEditUserResolver } from '../core/resolver/add-edit-user.resolver';
 import { BudgetListResolver } from '../core/resolver/budget-list.resolver';
+import { BudgetPlannerListResolver } from '../core/resolver/budget-planner-list.resolver';
 import { BudgetNotificationResolver } from '../core/resolver/budget-notification.resolver';
 import { BudgetStatementReportResolver } from '../core/resolver/budget-statement-report.resolver';
 import { BudgetTransactionListResolver } from '../core/resolver/budget-transaction-list.resolver';
@@ -53,6 +54,10 @@ import { WalletDepositResolver } from '../core/resolver/wallet-deposit.resolver'
 import { WalletTransferResolver } from '../core/resolver/wallet-transfer.resolver';
 import { BulkTransactionComponent } from './bulk-transaction/bulk-transaction.component';
 import { BulkTransactionResolver } from '../core/resolver/bulk-transaction.resolver';
+import { BudgetPlannerListComponent } from './budget-planner-list/budget-planner-list.component';
+import { BudgetPlannerFormComponent } from './budget-planner-form/budget-planner-form.component';
+import { BudgetItemListComponent } from './budget-item-list/budget-item-list.component';
+import { BudgetPlannerDetailComponent } from './budget-planner-detail/budget-planner-detail.component';
 
 const routes: Routes = [
   {
@@ -212,6 +217,27 @@ const routes: Routes = [
     title: PageTitle.bulkTransaction,
     component: BulkTransactionComponent,
     resolve: { DataResolver: BulkTransactionResolver }
+  },
+  {
+    path: AppPaths.budgetPlannerList,
+    title: PageTitle.budgetPlannerList,
+    component: BudgetPlannerListComponent,
+    resolve: { DataResolver: BudgetPlannerListResolver }
+  },
+  {
+    path: AppPaths.createBudgetPlanner,
+    title: PageTitle.budgetPlannerForm,
+    component: BudgetPlannerFormComponent
+  },
+  {
+    path: AppPaths.editBudgetPlanner,
+    title: PageTitle.budgetPlannerForm,
+    component: BudgetPlannerFormComponent
+  },
+  {
+    path: AppPaths.budgetPlannerDetail,
+    title: PageTitle.budgetPlannerDetail,
+    component: BudgetPlannerDetailComponent
   }
 ];
 @NgModule({
@@ -242,7 +268,11 @@ const routes: Routes = [
     WalletTransferComponent,
     DepositWalletComponent,
     WalletTransactionListComponent,
-    BulkTransactionComponent
+    BulkTransactionComponent,
+    BudgetPlannerListComponent,
+    BudgetPlannerFormComponent,
+    BudgetItemListComponent,
+    BudgetPlannerDetailComponent
   ],
   imports: [
     RouterModule.forChild(routes),
