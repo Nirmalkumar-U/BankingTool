@@ -39,7 +39,7 @@
           </ng-template>
         </table>
 
-        
+
         <!-- Pagination for User Investments -->
         <nav *ngIf='totalPagesInvestments > 1' class='d-flex justify-content-between align-items-center mt-3'>
           <small class='text-muted'>Showing {{ (currentPageInvestments - 1) * pageSizeInvestments + 1 }} to {{ Math.min(currentPageInvestments * pageSizeInvestments, userInvestmentList.length) }} of {{ userInvestmentList.length }} investments</small>
@@ -73,7 +73,7 @@
 </div>
 
 <!-- Investment Modal -->
-<app-invest-modal #investModal 
-  [mutualFundsList]='mutualFundsDbList'
-  (investmentSubmitted)='onInvestmentSubmitted($event)'>
+<app-invest-modal #investModal
+                  [mutualFundsList]='mutualFundsDbList'
+                  (investmentSubmitted)='onInvestmentSubmitted($event)'>
 </app-invest-modal>

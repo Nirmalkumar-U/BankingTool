@@ -13,7 +13,7 @@
             <select class="form-control" id="schemeCode" formControlName="schemeCode">
               <option value="" disabled>-- Select a Scheme --</option>
               <option *ngFor="let fund of mutualFundsList" [value]="fund.schemeCode">
-                {{ fund.schemeName }} ({{ fund.schemeCode }})
+                {{fund.isinDivReinvestment}} {{ fund.schemeName }} ({{ fund.schemeCode }})
               </option>
             </select>
             <div class="invalid-feedback d-block" *ngIf="schemeCodeControl?.invalid && schemeCodeControl?.touched">

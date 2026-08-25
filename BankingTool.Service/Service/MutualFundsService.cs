@@ -209,7 +209,7 @@ namespace BankingTool.Service.Service
             { 
                 InvestmentId = x.InvestmentId,
                 SchemeCode = x.Scheme.SchemeCode,
-                SchemeName = x.Scheme.SchemeName,
+                SchemeName = x.Scheme.ISINDivReinvestment + x.Scheme.SchemeName,
                 InstallmentAmount = x.InstallmentAmount,
                 UnitsPurchased = x.UnitsPurchased,
                 PurchaseDate = x.PurchaseDate,
