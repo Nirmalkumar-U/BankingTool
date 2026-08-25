@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { AppPaths, PageTitle } from '../constant/constant';
@@ -53,6 +53,11 @@ import { WalletDepositResolver } from '../core/resolver/wallet-deposit.resolver'
 import { WalletTransferResolver } from '../core/resolver/wallet-transfer.resolver';
 import { BulkTransactionComponent } from './bulk-transaction/bulk-transaction.component';
 import { BulkTransactionResolver } from '../core/resolver/bulk-transaction.resolver';
+import { MutualFundsListComponent } from './mutual-funds/mutual-funds-list.component';
+import { MutualFundsResolver } from '../core/resolver/mutual-funds.resolver';
+import { InvestModalComponent } from './investment/invest-modal/invest-modal.component';
+import { InvestmentComponent } from './investment/investment.component';
+import { InvestmentResolver } from '../core/resolver/investment.resolver';
 
 const routes: Routes = [
   {
@@ -212,6 +217,18 @@ const routes: Routes = [
     title: PageTitle.bulkTransaction,
     component: BulkTransactionComponent,
     resolve: { DataResolver: BulkTransactionResolver }
+  },
+  {
+    path: AppPaths.mutualFundsList,
+    title: PageTitle.mutualFundsList,
+    component: MutualFundsListComponent,
+    resolve: { DataResolver: MutualFundsResolver }
+  },
+  {
+    path: AppPaths.investment,
+    title: PageTitle.investment,
+    component: InvestmentComponent,
+    resolve: { DataResolver: InvestmentResolver }
   }
 ];
 @NgModule({
@@ -242,11 +259,15 @@ const routes: Routes = [
     WalletTransferComponent,
     DepositWalletComponent,
     WalletTransactionListComponent,
-    BulkTransactionComponent
+    BulkTransactionComponent,
+    MutualFundsListComponent,
+    InvestModalComponent,
+    InvestmentComponent
   ],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
+    FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
     SharedModule,

@@ -1,0 +1,79 @@
+<div class='dashboard-content'>
+  <div class='container-fluid'>
+    <!-- User Investments Section -->
+    <div class='card'>
+      <div class='card-header'>
+        <div class='d-flex justify-content-between align-items-center'>
+          <h2>My Investments</h2>
+          <button class='btn btn-success' (click)='openInvestModal()'>+ Invest</button>
+        </div>
+      </div>
+      <div class='card-body'>
+        <table class='table table-hover'>
+          <thead>
+            <tr>
+              <th scope='col'>Scheme Name</th>
+              <th scope='col'>Installment Amount</th>
+              <th scope='col'>Units Purchased</th>
+              <th scope='col'>Purchase Date</th>
+              <th scope='col'>Fund Value at Purchase</th>
+              <th scope='col'>Fund Current Value</th>
+            </tr>
+          </thead>
+          <tbody *ngIf='paginatedUserInvestments && paginatedUserInvestments.length > 0; else noInvestments'>
+            <tr *ngFor='let investment of paginatedUserInvestments'>
+              <td>{{ investment.schemeName || 'N/A' }}</td>
+              <td>{{ investment.installmentAmount | number: '1.2-2': 'en-US' }}</td>
+              <td>{{ investment.unitsPurchased | number: '1.2-4': 'en-US' }}</td>
+              <td>{{ investment.purchaseDate | date: 'MMM dd, yyyy' }}</td>
+              <td>{{ investment.mutualFundAtPurchase | number: '1.2-2': 'en-US' }}</td>
+              <td>{{ investment.mutualFundCurrentValue | number: '1.2-2': 'en-US' }}</td>
+            </tr>
+          </tbody>
+          <ng-template #noInvestments>
+            <tbody>
+              <tr>
+                <td colspan='5' class='text-center text-muted'>No investments yet. Click "Invest" to start.</td>
+              </tr>
+            </tbody>
+          </ng-template>
+        </table>
+
+        
+        <!-- Pagination for User Investments -->
+        <nav *ngIf='totalPagesInvestments > 1' class='d-flex justify-content-between align-items-center mt-3'>
+          <small class='text-muted'>Showing {{ (currentPageInvestments - 1) * pageSizeInvestments + 1 }} to {{ Math.min(currentPageInvestments * pageSizeInvestments, userInvestmentList.length) }} of {{ userInvestmentList.length }} investments</small>
+          <ul class='pagination mb-0'>
+            <li class='page-item' [class.disabled]='currentPageInvestments === 1'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageInvestments(1)' *ngIf='currentPageInvestments !== 1'>First</a>
+              <span class='page-link' *ngIf='currentPageInvestments === 1'>First</span>
+            </li>
+            <li class='page-item' [class.disabled]='currentPageInvestments === 1'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageInvestments(currentPageInvestments - 1)' *ngIf='currentPageInvestments !== 1'>Previous</a>
+              <span class='page-link' *ngIf='currentPageInvestments === 1'>Previous</span>
+            </li>
+            <li class='page-item' *ngFor='let page of getPagesInvestments()' [class.active]='page === currentPageInvestments'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageInvestments(page)' *ngIf='page !== currentPageInvestments'>{{ page }}</a>
+              <span class='page-link' *ngIf='page === currentPageInvestments'>{{ page }}</span>
+            </li>
+            <li class='page-item' [class.disabled]='currentPageInvestments === totalPagesInvestments'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageInvestments(currentPageInvestments + 1)' *ngIf='currentPageInvestments !== totalPagesInvestments'>Next</a>
+              <span class='page-link' *ngIf='currentPageInvestments === totalPagesInvestments'>Next</span>
+            </li>
+            <li class='page-item' [class.disabled]='currentPageInvestments === totalPagesInvestments'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageInvestments(totalPagesInvestments)' *ngIf='currentPageInvestments !== totalPagesInvestments'>Last</a>
+              <span class='page-link' *ngIf='currentPageInvestments === totalPagesInvestments'>Last</span>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Investment Modal -->
+<app-invest-modal #investModal 
+  [mutualFundsList]='mutualFundsDbList'
+  (investmentSubmitted)='onInvestmentSubmitted($event)'>
+</app-invest-modal>

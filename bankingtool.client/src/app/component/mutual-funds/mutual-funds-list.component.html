@@ -1,0 +1,101 @@
+<div class='dashboard-content'>
+  <div class='container-fluid'>
+    <!-- Selected Schemes Section -->
+    <div class='card mb-4' *ngIf='selectedSchemes && selectedSchemes.length > 0'>
+      <div class='card-header'>
+        <h2>Selected Schemes ({{ selectedSchemes.length }})</h2>
+      </div>
+      <div class='card-body'>
+        <div class='row mb-3'>
+          <div class='col-12'>
+            <div class='list-group'>
+              <div class='list-group-item' *ngFor='let schemeCode of selectedSchemes; let i = index'>
+                <div class='d-flex justify-content-between align-items-center'>
+                  <div>
+                    <h5 class='mb-1'>{{ getSchemeNameByCode(schemeCode) }}</h5>
+                    <p class='mb-0 text-muted'>Code: {{ schemeCode }}</p>
+                  </div>
+                  <button class='btn btn-sm btn-danger' (click)='removeScheme(schemeCode)'>Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='col-12'>
+            <button class='btn btn-primary me-2' (click)='saveSchemes()'>
+              Save Schemes
+            </button>
+            <button class='btn btn-secondary' (click)='selectedSchemes = []'>Clear Selection</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Mutual Funds List Section -->
+    <div class='card mb-4'>
+      <div class='card-header'>
+        <h1>Available Mutual Funds</h1>
+        <p class="text-muted">Click "Add" to select schemes you want to invest in</p>
+      </div>
+      <div class='card-body'>
+        <table class='table table-hover'>
+          <thead>
+            <tr>
+              <th scope='col'>Scheme Code</th>
+              <th scope='col'>Scheme Name</th>
+              <th scope='col'>Fund Value</th>
+              <th scope='col'>Fund Date</th>
+              <th scope='col'>Action</th>
+            </tr>
+          </thead>
+          <tbody *ngIf='paginatedMutualFunds && paginatedMutualFunds.length > 0; else noMutualFunds'>
+            <tr *ngFor='let fund of paginatedMutualFunds'>
+              <td>{{ fund.schemeCode }}</td>
+              <td>{{ fund.schemeName }}</td>
+              <td>{{ fund.mutualFundValue | number: '1.2-2': 'en-US' }}</td>
+              <td>{{ fund.mutualFundDate | date: 'MMM dd, yyyy' }}</td>
+              <td>
+                <button class='btn btn-sm btn-success' (click)='addScheme(fund)'>Add</button>
+              </td>
+            </tr>
+          </tbody>
+          <ng-template #noMutualFunds>
+            <tbody>
+              <tr>
+                <td colspan='5' class='text-center text-muted'>No mutual funds available</td>
+              </tr>
+            </tbody>
+          </ng-template>
+        </table>
+
+        <!-- Pagination for Mutual Funds -->
+        <nav *ngIf='totalPagesMutualFunds > 1' class='d-flex justify-content-between align-items-center mt-3'>
+          <small class='text-muted'>Showing {{ (currentPageMutualFunds - 1) * pageSize + 1 }} to {{ Math.min(currentPageMutualFunds * pageSize, mutualFundsList.length) }} of {{ mutualFundsList.length }} funds</small>
+          <ul class='pagination mb-0'>
+            <li class='page-item' [class.disabled]='currentPageMutualFunds === 1'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageMutualFunds(1)' *ngIf='currentPageMutualFunds !== 1'>First</a>
+              <span class='page-link' *ngIf='currentPageMutualFunds === 1'>First</span>
+            </li>
+            <li class='page-item' [class.disabled]='currentPageMutualFunds === 1'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageMutualFunds(currentPageMutualFunds - 1)' *ngIf='currentPageMutualFunds !== 1'>Previous</a>
+              <span class='page-link' *ngIf='currentPageMutualFunds === 1'>Previous</span>
+            </li>
+            <li class='page-item' *ngFor='let page of getPagesMutualFunds()' [class.active]='page === currentPageMutualFunds'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageMutualFunds(page)' *ngIf='page !== currentPageMutualFunds'>{{ page }}</a>
+              <span class='page-link' *ngIf='page === currentPageMutualFunds'>{{ page }}</span>
+            </li>
+            <li class='page-item' [class.disabled]='currentPageMutualFunds === totalPagesMutualFunds'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageMutualFunds(currentPageMutualFunds + 1)' *ngIf='currentPageMutualFunds !== totalPagesMutualFunds'>Next</a>
+              <span class='page-link' *ngIf='currentPageMutualFunds === totalPagesMutualFunds'>Next</span>
+            </li>
+            <li class='page-item' [class.disabled]='currentPageMutualFunds === totalPagesMutualFunds'>
+              <a class='page-link' href='javascript:void(0)' (click)='goToPageMutualFunds(totalPagesMutualFunds)' *ngIf='currentPageMutualFunds !== totalPagesMutualFunds'>Last</a>
+              <span class='page-link' *ngIf='currentPageMutualFunds === totalPagesMutualFunds'>Last</span>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+</div>

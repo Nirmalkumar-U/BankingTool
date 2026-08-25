@@ -1,13 +1,15 @@
-﻿using System.IO.Compression;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using BankingTool.Model;
+﻿using BankingTool.Model;
 using BankingTool.Repository;
+using BankingTool.Service.IService;
+using BankingTool.Service.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IO.Compression;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BankingTool.Api.ApplicationSetUp
 {
@@ -78,6 +80,7 @@ namespace BankingTool.Api.ApplicationSetUp
         public static IServiceCollection AddSingletonService(this IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpClient<IMutualFundsService, MutualFundsService>();
             return services;
         }
         public static IServiceCollection AddJWTService(this IServiceCollection services, IConfiguration configuration)

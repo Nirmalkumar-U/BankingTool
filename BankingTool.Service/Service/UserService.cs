@@ -6,6 +6,7 @@ using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.User;
 using BankingTool.Model.Dto.Response;
 using BankingTool.Repository;
+using BankingTool.Service.IService;
 using BankingTool.Service.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -14,9 +15,10 @@ namespace BankingTool.Service
 {
     public class UserService(IUserRepository userRepository, IEncriptDecriptService encriptDecriptService,
         IRoleRepository roleRepository, ICommonRepository commonRepository,
-        IConfiguration configuration) : IUserService
+        IConfiguration configuration, IMutualFundsService mutualFundsService) : IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
+        private readonly IMutualFundsService _mutualFundsService = mutualFundsService;
         private readonly IEncriptDecriptService _encriptDecriptService = encriptDecriptService;
         private readonly IRoleRepository _roleRepository = roleRepository;
         private readonly ICommonRepository _commonRepository = commonRepository;
@@ -109,6 +111,8 @@ namespace BankingTool.Service
 
             var actionPaths = await _userRepository.GetActionsByUserId(user.Id);
             var accessToken = GenerateToken(user.Id.ToString(), claims, securityKey, issuer, audience, expiresAt);
+
+            var updateMutualFunds = await _mutualFundsService.InsertDailyMutualFundValue();
 
             response.Response = new()
             {
