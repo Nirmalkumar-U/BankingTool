@@ -6,6 +6,26 @@ import { ResponseDto } from '../../dto/internal-dto/response-dto';
 import { MutualFundsDto, UserInvestmentDto, InsertUserInvestmentRequest, MutualFundsInitialLoadResponse } from '../../dto/mutual-funds-dto';
 import { InvestModalComponent } from './invest-modal/invest-modal.component';
 
+// Interface for monthly investments within a scheme
+interface MonthlyInvestmentDetail {
+  monthYear: string;
+  month: number;
+  year: number;
+  totalInvestmentAmount: number;
+  totalUnits: number;
+  investments: UserInvestmentDto[];
+}
+
+// Interface for scheme-wise grouped investments
+interface SchemeInvestmentGroup {
+  schemeName: string;
+  schemeCode: string;
+  totalInvestmentAmount: number;
+  totalUnits: number;
+  monthlyBreakdown: MonthlyInvestmentDetail[];
+  expanded: boolean;
+}
+
 @Component({
   selector: 'app-investment',
   templateUrl: './investment.component.html',
@@ -27,8 +47,9 @@ export class InvestmentComponent implements OnInit {
   pageSize: number = 10;
   totalPagesMutualFunds: number = 0;
 
-  // Pagination for User Investments
-  paginatedUserInvestments: UserInvestmentDto[] = [];
+  // Pagination for User Investments - Now with scheme grouping
+  allSchemeInvestments: SchemeInvestmentGroup[] = [];
+  paginatedSchemeInvestments: SchemeInvestmentGroup[] = [];
   currentPageInvestments: number = 1;
   pageSizeInvestments: number = 5;
   totalPagesInvestments: number = 0;
@@ -66,8 +87,86 @@ export class InvestmentComponent implements OnInit {
     this.mutualFundsDbList = initialData.response.mutualFundsDbList || [];
     this.userInvestmentList = initialData.response.userInvestmentList || [];
 
-    // Initialize pagination
+    // Group investments by scheme with monthly breakdown
+    this.groupInvestmentsByScheme();
     this.paginateUserInvestments(1);
+  }
+
+  // === GROUP INVESTMENTS BY SCHEME WITH MONTHLY BREAKDOWN ===
+  groupInvestmentsByScheme() {
+    const schemeMap = new Map<string, SchemeInvestmentGroup>();
+
+    // Group by scheme
+    this.userInvestmentList.forEach(investment => {
+      const schemeKey = investment.schemeCode || investment.schemeName || 'Unknown';
+
+      if (!schemeMap.has(schemeKey)) {
+        schemeMap.set(schemeKey, {
+          schemeName: investment.schemeName || 'Unknown',
+          schemeCode: investment.schemeCode || '',
+          totalInvestmentAmount: 0,
+          totalUnits: 0,
+          monthlyBreakdown: [],
+          expanded: false
+        });
+      }
+
+      const scheme = schemeMap.get(schemeKey)!;
+      scheme.totalInvestmentAmount += investment.installmentAmount;
+      scheme.totalUnits += investment.unitsPurchased;
+    });
+
+    // Now group by month within each scheme
+    schemeMap.forEach((scheme) => {
+      const schemeInvestments = this.userInvestmentList.filter(
+        inv => (inv.schemeCode || inv.schemeName) === (scheme.schemeCode || scheme.schemeName)
+      );
+
+      const monthMap = new Map<string, MonthlyInvestmentDetail>();
+
+      schemeInvestments.forEach(investment => {
+        const date = new Date(investment.purchaseDate);
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        const monthYear = `${this.getMonthName(month)} ${year}`;
+        const key = `${year}-${month}`;
+
+        if (!monthMap.has(key)) {
+          monthMap.set(key, {
+            monthYear,
+            month,
+            year,
+            totalInvestmentAmount: 0,
+            totalUnits: 0,
+            investments: []
+          });
+        }
+
+        const monthDetail = monthMap.get(key)!;
+        monthDetail.investments.push(investment);
+        monthDetail.totalInvestmentAmount += investment.installmentAmount;
+        monthDetail.totalUnits += investment.unitsPurchased;
+      });
+
+      // Convert to array and sort by year-month descending
+      scheme.monthlyBreakdown = Array.from(monthMap.values()).sort((a, b) => {
+        if (a.year !== b.year) {
+          return b.year - a.year;
+        }
+        return b.month - a.month;
+      });
+    });
+
+    // Convert to array and sort by scheme name
+    this.allSchemeInvestments = Array.from(schemeMap.values()).sort((a, b) =>
+      (a.schemeName || '').localeCompare(b.schemeName || '')
+    );
+  }
+
+  getMonthName(month: number): string {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'];
+    return monthNames[month];
   }
 
 
@@ -83,14 +182,14 @@ export class InvestmentComponent implements OnInit {
   paginateUserInvestments(pageNumber: number) {
     if (pageNumber < 1) return;
 
-    this.totalPagesInvestments = Math.ceil(this.userInvestmentList.length / this.pageSizeInvestments);
+    this.totalPagesInvestments = Math.ceil(this.allSchemeInvestments.length / this.pageSizeInvestments);
 
     if (pageNumber > this.totalPagesInvestments && this.totalPagesInvestments > 0) return;
 
     this.currentPageInvestments = pageNumber;
     const startIndex = (pageNumber - 1) * this.pageSizeInvestments;
     const endIndex = startIndex + this.pageSizeInvestments;
-    this.paginatedUserInvestments = this.userInvestmentList.slice(startIndex, endIndex);
+    this.paginatedSchemeInvestments = this.allSchemeInvestments.slice(startIndex, endIndex);
   }
 
   goToPageInvestments(pageNumber: number) {
@@ -103,6 +202,11 @@ export class InvestmentComponent implements OnInit {
       pages.push(i);
     }
     return pages;
+  }
+
+  // === TOGGLE SCHEME EXPAND/COLLAPSE ===
+  toggleSchemeExpand(schemeGroup: SchemeInvestmentGroup) {
+    schemeGroup.expanded = !schemeGroup.expanded;
   }
 
   addScheme(scheme: MutualFundsDto) {
@@ -189,6 +293,7 @@ export class InvestmentComponent implements OnInit {
       (response: ResponseDto<UserInvestmentDto[]>) => {
         if (response.status) {
           this.userInvestmentList = response.response || [];
+          this.groupInvestmentsByScheme();
           this.paginateUserInvestments(1);
         }
       }

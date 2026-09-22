@@ -58,6 +58,8 @@ import { MutualFundsResolver } from '../core/resolver/mutual-funds.resolver';
 import { InvestModalComponent } from './investment/invest-modal/invest-modal.component';
 import { InvestmentComponent } from './investment/investment.component';
 import { InvestmentResolver } from '../core/resolver/investment.resolver';
+import { InvestmentProfileComponent } from './investment-profile/investment-profile.component';
+import { InvestmentProfileResolver } from '../core/resolver/investment-profile.resolver';
 
 const routes: Routes = [
   {
@@ -229,6 +231,12 @@ const routes: Routes = [
     title: PageTitle.investment,
     component: InvestmentComponent,
     resolve: { DataResolver: InvestmentResolver }
+  },
+  {
+    path: AppPaths.investmentProfile,
+    title: PageTitle.investmentProfile,
+    component: InvestmentProfileComponent,
+    resolve: { DataResolver: InvestmentProfileResolver }
   }
 ];
 @NgModule({
@@ -262,7 +270,8 @@ const routes: Routes = [
     BulkTransactionComponent,
     MutualFundsListComponent,
     InvestModalComponent,
-    InvestmentComponent
+    InvestmentComponent,
+    InvestmentProfileComponent
   ],
   imports: [
     RouterModule.forChild(routes),

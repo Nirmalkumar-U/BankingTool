@@ -38,7 +38,7 @@
         <p class="text-muted">Click "Add" to select schemes you want to invest in</p>
       </div>
       <div class='card-body'>
-        <table class='table table-hover'>
+        <!--<table class='table table-hover'>
           <thead>
             <tr>
               <th scope='col'>Scheme Code</th>
@@ -51,8 +51,8 @@
           <tbody *ngIf='paginatedMutualFunds && paginatedMutualFunds.length > 0; else noMutualFunds'>
             <tr *ngFor='let fund of paginatedMutualFunds'>
               <td>{{ fund.schemeCode }}</td>
-              <td>{{ fund.schemeName }}</td>
-              <td>{{ fund.mutualFundValue | number: '1.2-2': 'en-US' }}</td>
+              <td>{{ fund.isinDivReinvestment }} {{ fund.schemeName }}</td>
+              <td>{{ fund.mutualFundValue | number: '1.2-4': 'en-US' }}</td>
               <td>{{ fund.mutualFundDate | date: 'MMM dd, yyyy' }}</td>
               <td>
                 <button class='btn btn-sm btn-success' (click)='addScheme(fund)'>Add</button>
@@ -66,10 +66,14 @@
               </tr>
             </tbody>
           </ng-template>
-        </table>
+        </table>-->
+
+        <app-data-table [columns]="columns"
+                        [data]="mutualFundsList">
+        </app-data-table>
 
         <!-- Pagination for Mutual Funds -->
-        <nav *ngIf='totalPagesMutualFunds > 1' class='d-flex justify-content-between align-items-center mt-3'>
+        <!--<nav *ngIf='totalPagesMutualFunds > 1' class='d-flex justify-content-between align-items-center mt-3'>
           <small class='text-muted'>Showing {{ (currentPageMutualFunds - 1) * pageSize + 1 }} to {{ Math.min(currentPageMutualFunds * pageSize, mutualFundsList.length) }} of {{ mutualFundsList.length }} funds</small>
           <ul class='pagination mb-0'>
             <li class='page-item' [class.disabled]='currentPageMutualFunds === 1'>
@@ -93,7 +97,7 @@
               <span class='page-link' *ngIf='currentPageMutualFunds === totalPagesMutualFunds'>Last</span>
             </li>
           </ul>
-        </nav>
+        </nav>-->
       </div>
     </div>
 

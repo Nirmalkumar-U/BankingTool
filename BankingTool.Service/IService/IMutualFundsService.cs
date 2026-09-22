@@ -13,5 +13,6 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> InsertUserInvestment(List<string> codes, decimal installmentAmount);
         Task<ResponseDto<List<MutualFundsDto>>> GetAllMutualFundsInDB();
         Task<ResponseDto<bool>> InsertDailyMutualFundValue();
+        Task<ResponseDto<List<UserInvestmentProfileDto>>> GetUserInvestmentProfile();
     }
 }

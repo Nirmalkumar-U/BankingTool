@@ -62,6 +62,7 @@ export class AppPaths {
   //Mutual Funds
   public static mutualFundsList: string = 'mutualFundsList';
   public static investment: string = 'investment';
+  public static investmentProfile: string = 'userInvestmentProflie';
 }
 
 export class AppRoute {
@@ -164,6 +165,7 @@ export class PageTitle {
   //Mutual Funds
   public static mutualFundsList: string = 'Mutual Funds';
   public static investment: string = 'My Investments';
+  public static investmentProfile: string = 'Investment Profile';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';

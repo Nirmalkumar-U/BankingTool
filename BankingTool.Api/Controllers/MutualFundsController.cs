@@ -27,6 +27,18 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<List<UserInvestmentProfileDto>>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<List<UserInvestmentProfileDto>>), 400)]
+        public Task<IActionResult> GetUserInvestmentProfile()
+        {
+            return HandleRequestAsync<bool?, List<UserInvestmentProfileDto>>(
+                null,
+                null,
+                () => _mutualFundsService.GetUserInvestmentProfile()
+            );
+        }
+
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<List<MutualFundsDto>>), 200)]
         [ProducesResponseType(typeof(ResponseDto<List<MutualFundsDto>>), 400)]
         public Task<IActionResult> GetAllMutualFundsInDB()

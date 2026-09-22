@@ -9,40 +9,77 @@
         </div>
       </div>
       <div class='card-body'>
-        <table class='table table-hover'>
+        <!-- Schemes Table with Collapsible Monthly Details -->
+        <table class='table table-hover' *ngIf='paginatedSchemeInvestments && paginatedSchemeInvestments.length > 0; else noInvestments'>
           <thead>
             <tr>
+              <th scope='col' style='width: 30px;'></th>
               <th scope='col'>Scheme Name</th>
-              <th scope='col'>Installment Amount</th>
-              <th scope='col'>Units Purchased</th>
-              <th scope='col'>Purchase Date</th>
-              <th scope='col'>Fund Value at Purchase</th>
-              <th scope='col'>Fund Current Value</th>
+              <th scope='col'>Total Investment</th>
+              <th scope='col'>Total Units</th>
+              <th scope='col'>Investments Count</th>
             </tr>
           </thead>
-          <tbody *ngIf='paginatedUserInvestments && paginatedUserInvestments.length > 0; else noInvestments'>
-            <tr *ngFor='let investment of paginatedUserInvestments'>
-              <td>{{ investment.schemeName || 'N/A' }}</td>
-              <td>{{ investment.installmentAmount | number: '1.2-2': 'en-US' }}</td>
-              <td>{{ investment.unitsPurchased | number: '1.2-4': 'en-US' }}</td>
-              <td>{{ investment.purchaseDate | date: 'MMM dd, yyyy' }}</td>
-              <td>{{ investment.mutualFundAtPurchase | number: '1.2-2': 'en-US' }}</td>
-              <td>{{ investment.mutualFundCurrentValue | number: '1.2-2': 'en-US' }}</td>
-            </tr>
-          </tbody>
-          <ng-template #noInvestments>
-            <tbody>
-              <tr>
-                <td colspan='5' class='text-center text-muted'>No investments yet. Click "Invest" to start.</td>
+          <tbody>
+            <ng-container *ngFor='let schemeGroup of paginatedSchemeInvestments'>
+              <!-- Scheme Row -->
+              <tr class='scheme-row' (click)='toggleSchemeExpand(schemeGroup)' [class.expanded]='schemeGroup.expanded'>
+                <td class='expand-icon'>
+                  <i class='bi' [ngClass]="schemeGroup.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                </td>
+                <td class='scheme-name'><strong>{{ schemeGroup.schemeName }}</strong></td>
+                <td>{{ schemeGroup.totalInvestmentAmount | number: '1.2-2': 'en-US' }}</td>
+                <td>{{ schemeGroup.totalUnits | number: '1.2-4': 'en-US' }}</td>
+                <td><span class='badge bg-secondary'>{{ schemeGroup.monthlyBreakdown.length }}</span></td>
               </tr>
-            </tbody>
-          </ng-template>
+
+              <!-- Monthly Details - Shown when expanded -->
+              <tr *ngIf='schemeGroup.expanded' class='details-row'>
+                <td colspan='5'>
+                  <div class='monthly-details-container'>
+                    <div class='monthly-detail' *ngFor='let monthDetail of schemeGroup.monthlyBreakdown'>
+                      <div class='month-header-small'>
+                        <strong>{{ monthDetail.monthYear }}</strong>
+                        <span class='badge bg-info ms-2'>Amount: {{ monthDetail.totalInvestmentAmount | number: '1.2-2': 'en-US' }}</span>
+                        <span class='badge bg-primary ms-1'>Units: {{ monthDetail.totalUnits | number: '1.2-4': 'en-US' }}</span>
+                      </div>
+                      <table class='table table-sm detail-table'>
+                        <thead>
+                          <tr>
+                            <th scope='col'>Purchase Date</th>
+                            <th scope='col'>Amount</th>
+                            <th scope='col'>Units</th>
+                            <th scope='col'>Fund Value @ Purchase</th>
+                            <th scope='col'>Fund Current Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor='let investment of monthDetail.investments'>
+                            <td>{{ investment.purchaseDate | date: 'MMM dd, yyyy' }}</td>
+                            <td>{{ investment.installmentAmount | number: '1.2-2': 'en-US' }}</td>
+                            <td>{{ investment.unitsPurchased | number: '1.2-4': 'en-US' }}</td>
+                            <td>{{ investment.mutualFundAtPurchase | number: '1.2-2': 'en-US' }}</td>
+                            <td>{{ investment.mutualFundCurrentValue | number: '1.2-2': 'en-US' }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
         </table>
 
+        <ng-template #noInvestments>
+          <div class='alert alert-info text-center'>
+            <p class='mb-0'>No investments yet. Click "Invest" to start.</p>
+          </div>
+        </ng-template>
 
         <!-- Pagination for User Investments -->
         <nav *ngIf='totalPagesInvestments > 1' class='d-flex justify-content-between align-items-center mt-3'>
-          <small class='text-muted'>Showing {{ (currentPageInvestments - 1) * pageSizeInvestments + 1 }} to {{ Math.min(currentPageInvestments * pageSizeInvestments, userInvestmentList.length) }} of {{ userInvestmentList.length }} investments</small>
+          <small class='text-muted'>Showing {{ (currentPageInvestments - 1) * pageSizeInvestments + 1 }} to {{ Math.min(currentPageInvestments * pageSizeInvestments, allSchemeInvestments.length) }} of {{ allSchemeInvestments.length }} scheme(s)</small>
           <ul class='pagination mb-0'>
             <li class='page-item' [class.disabled]='currentPageInvestments === 1'>
               <a class='page-link' href='javascript:void(0)' (click)='goToPageInvestments(1)' *ngIf='currentPageInvestments !== 1'>First</a>

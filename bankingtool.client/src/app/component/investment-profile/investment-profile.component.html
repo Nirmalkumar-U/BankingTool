@@ -1,0 +1,147 @@
+<div class='dashboard-content'>
+  <div class='container-fluid'>
+    <!-- Page Header -->
+    <div class='page-header'>
+      <h2>Investment Profile</h2>
+      <p class='subtitle'>View your investment portfolio performance</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class='summary-cards'>
+      <div class='summary-card total-invested'>
+        <div class='card-icon'>💰</div>
+        <div class='card-content'>
+          <div class='card-label'>Total Invested</div>
+          <div class='card-value'>{{ totalInvested | number: '1.2-2': 'en-US' }}</div>
+        </div>
+      </div>
+
+      <div class='summary-card current-value'>
+        <div class='card-icon'>📈</div>
+        <div class='card-content'>
+          <div class='card-label'>Current Value</div>
+          <div class='card-value'>{{ totalCurrentValue | number: '1.2-2': 'en-US' }}</div>
+        </div>
+      </div>
+
+      <div class='summary-card' [ngClass]="getReturnClass(totalUnrealisedGain)">
+        <div class='card-icon'>📊</div>
+        <div class='card-content'>
+          <div class='card-label'>Unrealised Gain</div>
+          <div class='card-value'>{{ totalUnrealisedGain | number: '1.2-2': 'en-US' }}</div>
+        </div>
+      </div>
+
+      <div class='summary-card' [ngClass]="getReturnClass(overallAbsoluteReturn)">
+        <div class='card-icon'>📉</div>
+        <div class='card-content'>
+          <div class='card-label'>Overall Return %</div>
+          <div class='card-value'>{{ formatNumber(overallAbsoluteReturn, 2) }}%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Investment Cards -->
+    <div class='investment-cards-container'>
+      <div *ngIf='investmentProfiles && investmentProfiles.length > 0; else noInvestments'>
+        <div class='cards-grid'>
+          <div class='investment-card' *ngFor='let profile of investmentProfiles'>
+            <!-- Card Header -->
+            <div class='card-header-section'>
+              <div class='scheme-info'>
+                <h3 class='scheme-name'>{{ profile.schemeName }}</h3>
+                <p class='scheme-code'>{{ profile.schemeCode }}</p>
+              </div>
+              <div class='header-right-section'>
+                <!--<div class='invested-date'>{{ getInvestedMonthYear(profile.investedDate) }}</div>-->
+                <div class='card-badge'>{{ getInvestedMonthYear(profile.investedDate) }}</div>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class='card-body-section'>
+              <!-- First Row: Units and Investment Cost -->
+              <div class='info-row'>
+                <div class='info-item'>
+                  <span class='info-label'>Units Purchased</span>
+                  <span class='info-value'>{{ profile.totalUnitsPurchased | number: '1.2-4': 'en-US' }}</span>
+                </div>
+                <div class='info-item'>
+                  <span class='info-label'>Investment Cost</span>
+                  <span class='info-value'>₹ {{ profile.investmentCost | number: '1.2-2': 'en-US' }}</span>
+                </div>
+              </div>
+
+              <!-- Second Row: Current Value and Unrealised Gain -->
+              <div class='info-row'>
+                <div class='info-item'>
+                  <span class='info-label'>Current Value</span>
+                  <span class='info-value'>₹ {{ profile.currentValue | number: '1.2-2': 'en-US' }}</span>
+                </div>
+                <div class='info-item'>
+                  <span class='info-label' [ngClass]="getReturnClass(profile.unrealisedGain)">Unrealised Gain</span>
+                  <span class='info-value' [ngClass]="getReturnClass(profile.unrealisedGain)">
+                    ₹ {{ profile.unrealisedGain | number: '1.2-2': 'en-US' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Third Row: Realised Gain and Absolute Return -->
+              <div class='info-row'>
+                <div class='info-item'>
+                  <span class='info-label' [ngClass]="getReturnClass(profile.realisedGain)">Realised Gain</span>
+                  <span class='info-value' [ngClass]="getReturnClass(profile.realisedGain)">
+                    ₹ {{ profile.realisedGain | number: '1.2-2': 'en-US' }}
+                  </span>
+                </div>
+                <div class='info-item'>
+                  <span class='info-label' [ngClass]="getReturnClass(profile.absoluteReturnPercent)">Absolute Return %</span>
+                  <span class='info-value' [ngClass]="getReturnClass(profile.absoluteReturnPercent)">
+                    {{ formatNumber(profile.absoluteReturnPercent, 2) }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- Fourth Row: XIRR and One Day Change -->
+              <div class='info-row'>
+                <div class='info-item'>
+                  <span class='info-label' [ngClass]="getReturnClass(profile.xirrPercent)">XIRR %</span>
+                  <span class='info-value' [ngClass]="getReturnClass(profile.xirrPercent)">
+                    {{ formatNumber(profile.xirrPercent, 2) }}%
+                  </span>
+                </div>
+                <div class='info-item'>
+                  <span class='info-label' [ngClass]="getReturnClass(profile.oneDayChange)">1 Day Change</span>
+                  <span class='info-value' [ngClass]="getReturnClass(profile.oneDayChange)">
+                    ₹ {{ profile.oneDayChange | number: '1.2-2': 'en-US' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Footer: Progress Bar -->
+            <div class='card-footer-section'>
+              <div class='progress-bar-label'>
+                <span>Portfolio Allocation</span>
+                <span>
+                  {{ ((profile.currentValue / totalCurrentValue) * 100) | number: '1.2-2': 'en-US' }}%
+                </span>
+              </div>
+              <div class='progress-bar'>
+                <div class='progress-fill' [style.width.%]="(profile.currentValue / totalCurrentValue) * 100"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noInvestments>
+        <div class='no-data-message'>
+          <div class='no-data-icon'>📊</div>
+          <h3>No Investments Found</h3>
+          <p>You haven't made any investments yet. Start investing to see your portfolio here.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

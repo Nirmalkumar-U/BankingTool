@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { TableColumn } from '../../core/component/data-table/data-table.component';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { MutualFundsService } from '../../core/service/mutual-funds.service';
 import { ResponseDto } from '../../dto/internal-dto/response-dto';
@@ -12,7 +13,13 @@ import { MutualFundsDto, UserInvestmentDto, InsertUserInvestmentRequest, MutualF
   styleUrls: ['./mutual-funds-list.component.css']
 })
 export class MutualFundsListComponent implements OnInit {
-
+  columns: TableColumn[] = [
+    { field: 'schemeCode', header: 'Scheme Code', sortable: true, width: '13%' },
+    { field: 'isinDivReinvestment', header: 'Scheme Name', sortable: true, width: '13%' },
+    { field: 'schemeName', header: 'Category', sortable: true, width: '10%' },
+    { field: 'mutualFundValue', header: 'Mutual Fund Value', sortable: true, width: '8%' },
+    { field: 'mutualFundDate', header: 'Date', sortable: true, width: '11%', format: 'date', dateFormat: 'dd/MM/yyyy' }
+  ];
   // Math object for template use
   Math = Math;
 

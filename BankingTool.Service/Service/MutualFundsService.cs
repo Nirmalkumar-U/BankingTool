@@ -205,8 +205,8 @@ namespace BankingTool.Service.Service
         {
             var userInvestments = await _mutualFundsRepository.GetUserInvestmentByUserId();
 
-            var response =  userInvestments.Select(x => new UserInvestmentDto 
-            { 
+            var response = userInvestments.Select(x => new UserInvestmentDto
+            {
                 InvestmentId = x.InvestmentId,
                 SchemeCode = x.Scheme.SchemeCode,
                 SchemeName = x.Scheme.ISINDivReinvestment + x.Scheme.SchemeName,
@@ -301,5 +301,74 @@ namespace BankingTool.Service.Service
             return result;
         }
 
+        public async Task<ResponseDto<List<UserInvestmentProfileDto>>> GetUserInvestmentProfile()
+        {
+            var userInvestments = await _mutualFundsRepository.GetUserInvestmentByUserId();
+            var profiles = new List<UserInvestmentProfileDto>();
+
+            foreach (var investment in userInvestments)
+            {
+                var scheme = await _mutualFundsRepository.GetSchemeByCode(investment.Scheme.SchemeCode);
+                var lastMutualFund = await _mutualFundsRepository.GetLastMutualFundsBySchemeId(scheme.SchemeId);
+
+                // Current value = units × latest NAV
+                var currentValue = investment.UnitsPurchased * lastMutualFund.MutualFundValue;
+
+                // Unrealised gain = current value − invested amount
+                var unrealisedGain = currentValue - investment.InstallmentAmount;
+
+                // Absolute return %
+                var absoluteReturn = investment.InstallmentAmount > 0
+                    ? (unrealisedGain / investment.InstallmentAmount) * 100
+                    : 0;
+
+                // XIRR calculation (approximate)
+                var xirr = CalculateXIRR(
+                    investment.InstallmentAmount,
+                    currentValue,
+                    investment.PurchaseDate,
+                    DateTime.Now
+                ) * 100; // convert to %
+
+                // 1-day change = latest NAV − NAV at purchase
+                var oneDayChange = lastMutualFund.MutualFundValue - investment.MutualFundAtPurchase;
+
+                profiles.Add(new UserInvestmentProfileDto
+                {
+                    InvestmentId = investment.InvestmentId,
+                    SchemeId = investment.SchemeId,
+                    InvestedDate = investment.PurchaseDate,
+                    SchemeCode = scheme.SchemeCode,
+                    SchemeName = scheme.ISINDivReinvestment + scheme.SchemeName,
+                    TotalUnitsPurchased = investment.UnitsPurchased,
+                    InvestmentCost = investment.InstallmentAmount,
+                    CurrentValue = currentValue,
+                    UnrealisedGain = unrealisedGain,
+                    RealisedGain = 0, // placeholder until redemption logic is added
+                    AbsoluteReturnPercent = absoluteReturn,
+                    XirrPercent = xirr,
+                    OneDayChange = oneDayChange
+                });
+            }
+            var result = new ResponseDto<List<UserInvestmentProfileDto>>
+            {
+                DropDownList = [],
+                Errors = [],
+                Response = [.. profiles.OrderBy(x => x.SchemeId)],
+                StatuCode = 200,
+                Status = true,
+                ValidationErrors = []
+            };
+            return result;
+        }
+
+
+        private static double CalculateXIRR(decimal investmentAmount, decimal currentValue, DateTime purchaseDate, DateTime currentDate)
+        {
+            // Implement XIRR calculation logic here
+            var days = (currentDate - purchaseDate).TotalDays;
+            var xirr = Math.Pow((double)(currentValue / investmentAmount), (365 / days)) - 1;
+            return xirr;
+        }
     }
 }

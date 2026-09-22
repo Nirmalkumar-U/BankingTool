@@ -239,10 +239,153 @@ nav small {
   }
 }
 
+/* Scheme Collapse/Expand Styling */
+.scheme-row {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.scheme-row:hover {
+  background-color: #f8f9fa !important;
+}
+
+.scheme-row.expanded {
+  background-color: #e7f3ff;
+}
+
+.expand-icon {
+  text-align: center;
+  font-size: 16px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.scheme-row i {
+  transition: transform 0.3s ease;
+}
+
+.scheme-row.expanded i {
+  transform: rotate(90deg);
+}
+
+.scheme-name {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Details Row */
+.details-row {
+  background-color: #fafbfc !important;
+}
+
+.details-row:hover {
+  background-color: #fafbfc !important;
+}
+
+.monthly-details-container {
+  padding: 20px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding: 0 20px;
+  }
+  to {
+    opacity: 1;
+    max-height: 2000px;
+    padding: 20px;
+  }
+}
+
+.monthly-detail {
+  margin-bottom: 20px;
+  border-left: 3px solid #007bff;
+  padding-left: 15px;
+}
+
+.monthly-detail:last-child {
+  margin-bottom: 0;
+}
+
+.month-header-small {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.month-header-small strong {
+  color: #333;
+  font-size: 14px;
+  min-width: 120px;
+}
+
+.detail-table {
+  margin-bottom: 0;
+  font-size: 13px;
+}
+
+.detail-table thead {
+  background-color: #f0f0f0;
+}
+
+.detail-table thead th {
+  font-weight: 600;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  color: #555;
+}
+
+.detail-table tbody td {
+  padding: 8px;
+}
+
+.detail-table tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+.detail-table tbody tr:hover {
+  background-color: #f8f8f8;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .me-2 {
     margin-right: 0.5rem !important;
     margin-bottom: 0.5rem;
+  }
+
+  .month-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .month-title {
+    width: 100%;
+  }
+
+  .month-totals {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .month-details .table {
+    font-size: 13px;
+  }
+
+  .month-details .table td {
+    padding: 8px;
   }
 }
