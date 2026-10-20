@@ -3,7 +3,7 @@
     <!-- Page Header -->
     <div class='page-header'>
       <h2>Investment Profile</h2>
-      <p class='subtitle'>View your investment portfolio performance</p>
+      <p class='subtitle'>{{ totalMonthlyInvestments }} monthly investments across {{ schemeGroups.length }} schemes</p>
     </div>
 
     <!-- Summary Cards -->
@@ -12,7 +12,7 @@
         <div class='card-icon'>💰</div>
         <div class='card-content'>
           <div class='card-label'>Total Invested</div>
-          <div class='card-value'>{{ totalInvested | number: '1.2-2': 'en-US' }}</div>
+          <div class='card-value'>₹ {{ totalInvested | number: '1.2-2': 'en-US' }}</div>
         </div>
       </div>
 
@@ -20,7 +20,7 @@
         <div class='card-icon'>📈</div>
         <div class='card-content'>
           <div class='card-label'>Current Value</div>
-          <div class='card-value'>{{ totalCurrentValue | number: '1.2-2': 'en-US' }}</div>
+          <div class='card-value'>₹ {{ totalCurrentValue | number: '1.2-2': 'en-US' }}</div>
         </div>
       </div>
 
@@ -28,7 +28,7 @@
         <div class='card-icon'>📊</div>
         <div class='card-content'>
           <div class='card-label'>Unrealised Gain</div>
-          <div class='card-value'>{{ totalUnrealisedGain | number: '1.2-2': 'en-US' }}</div>
+          <div class='card-value'>₹ {{ totalUnrealisedGain | number: '1.2-2': 'en-US' }}</div>
         </div>
       </div>
 
@@ -41,94 +41,214 @@
       </div>
     </div>
 
-    <!-- Investment Cards -->
+    <!-- Accordion Container -->
     <div class='investment-cards-container'>
-      <div *ngIf='investmentProfiles && investmentProfiles.length > 0; else noInvestments'>
-        <div class='cards-grid'>
-          <div class='investment-card' *ngFor='let profile of investmentProfiles'>
-            <!-- Card Header -->
-            <div class='card-header-section'>
-              <div class='scheme-info'>
-                <h3 class='scheme-name'>{{ profile.schemeName }}</h3>
-                <p class='scheme-code'>{{ profile.schemeCode }}</p>
-              </div>
-              <div class='header-right-section'>
-                <!--<div class='invested-date'>{{ getInvestedMonthYear(profile.investedDate) }}</div>-->
-                <div class='card-badge'>{{ getInvestedMonthYear(profile.investedDate) }}</div>
-              </div>
-            </div>
-
-            <!-- Card Body -->
-            <div class='card-body-section'>
-              <!-- First Row: Units and Investment Cost -->
-              <div class='info-row'>
-                <div class='info-item'>
-                  <span class='info-label'>Units Purchased</span>
-                  <span class='info-value'>{{ profile.totalUnitsPurchased | number: '1.2-4': 'en-US' }}</span>
+      <div *ngIf='schemeGroups && schemeGroups.length > 0; else noInvestments'>
+        <div class='accordion-container'>
+          <!-- SCHEME ACCORDION (Level 1) -->
+          <div class='accordion-item scheme-accordion' *ngFor='let scheme of schemeGroups'>
+            <!-- Scheme Accordion Header -->
+            <div class='accordion-header scheme-header' (click)='toggleSchemeExpand(scheme)'>
+              <div class='header-left'>
+                <div class='expand-icon' [class.expanded]='scheme.isExpanded'>
+                  <span>▶</span>
                 </div>
-                <div class='info-item'>
-                  <span class='info-label'>Investment Cost</span>
-                  <span class='info-value'>₹ {{ profile.investmentCost | number: '1.2-2': 'en-US' }}</span>
+                <div class='scheme-title-section'>
+                  <h3 class='scheme-name'>{{ scheme.schemeName }}</h3>
+                  <p class='scheme-code'>{{ scheme.schemeCode }}</p>
                 </div>
               </div>
 
-              <!-- Second Row: Current Value and Unrealised Gain -->
-              <div class='info-row'>
-                <div class='info-item'>
-                  <span class='info-label'>Current Value</span>
-                  <span class='info-value'>₹ {{ profile.currentValue | number: '1.2-2': 'en-US' }}</span>
+              <div class='header-right'>
+                <div class='scheme-stat'>
+                  <span class='stat-label text-dark'>Invested</span>
+                  <span class='stat-value text-dark'>₹ {{ scheme.totalInvested | number: '1.2-2': 'en-US' }}</span>
                 </div>
-                <div class='info-item'>
-                  <span class='info-label' [ngClass]="getReturnClass(profile.unrealisedGain)">Unrealised Gain</span>
-                  <span class='info-value' [ngClass]="getReturnClass(profile.unrealisedGain)">
-                    ₹ {{ profile.unrealisedGain | number: '1.2-2': 'en-US' }}
-                  </span>
+                <div class='scheme-stat'>
+                  <span class='stat-label'>Current</span>
+                  <span class='stat-value'>₹ {{ scheme.totalCurrentValue | number: '1.2-2': 'en-US' }}</span>
                 </div>
-              </div>
-
-              <!-- Third Row: Realised Gain and Absolute Return -->
-              <div class='info-row'>
-                <div class='info-item'>
-                  <span class='info-label' [ngClass]="getReturnClass(profile.realisedGain)">Realised Gain</span>
-                  <span class='info-value' [ngClass]="getReturnClass(profile.realisedGain)">
-                    ₹ {{ profile.realisedGain | number: '1.2-2': 'en-US' }}
-                  </span>
+                <div class='scheme-stat' [ngClass]="getReturnClass(scheme.totalUnrealisedGain)">
+                  <span class='stat-label'>Gain</span>
+                  <span class='stat-value'>₹ {{ scheme.totalUnrealisedGain | number: '1.2-2': 'en-US' }}</span>
                 </div>
-                <div class='info-item'>
-                  <span class='info-label' [ngClass]="getReturnClass(profile.absoluteReturnPercent)">Absolute Return %</span>
-                  <span class='info-value' [ngClass]="getReturnClass(profile.absoluteReturnPercent)">
-                    {{ formatNumber(profile.absoluteReturnPercent, 2) }}%
-                  </span>
-                </div>
-              </div>
-
-              <!-- Fourth Row: XIRR and One Day Change -->
-              <div class='info-row'>
-                <div class='info-item'>
-                  <span class='info-label' [ngClass]="getReturnClass(profile.xirrPercent)">XIRR %</span>
-                  <span class='info-value' [ngClass]="getReturnClass(profile.xirrPercent)">
-                    {{ formatNumber(profile.xirrPercent, 2) }}%
-                  </span>
-                </div>
-                <div class='info-item'>
-                  <span class='info-label' [ngClass]="getReturnClass(profile.oneDayChange)">1 Day Change</span>
-                  <span class='info-value' [ngClass]="getReturnClass(profile.oneDayChange)">
-                    ₹ {{ profile.oneDayChange | number: '1.2-2': 'en-US' }}
-                  </span>
+                <div class='scheme-stat' [ngClass]="getReturnClass(scheme.totalXirrPercent)">
+                  <span class='stat-label'>XIRR</span>
+                  <span class='stat-value'>{{ formatNumber(scheme.totalXirrPercent, 2) }}%</span>
                 </div>
               </div>
             </div>
 
-            <!-- Card Footer: Progress Bar -->
-            <div class='card-footer-section'>
-              <div class='progress-bar-label'>
-                <span>Portfolio Allocation</span>
-                <span>
-                  {{ ((profile.currentValue / totalCurrentValue) * 100) | number: '1.2-2': 'en-US' }}%
-                </span>
+            <!-- Scheme Content (Expandable) -->
+            <div class='accordion-content scheme-content' *ngIf='scheme.isExpanded'>
+              <!-- MONTH ACCORDION (Level 2) - Nested inside Scheme -->
+              <div class='nested-accordion-container'>
+                <div class='nested-accordion-item month-accordion' *ngFor='let month of scheme.monthlyInvestments; let last = last' [class.last-month]='last'>
+                  <!-- Month Accordion Header -->
+                  <div class='nested-accordion-header month-header' (click)='toggleMonthExpand(month)'>
+                    <div class='header-left'>
+                      <div class='expand-icon nested' [class.expanded]='month.isExpanded'>
+                        <span>▶</span>
+                      </div>
+                      <div class='month-title-section'>
+                        <h4 class='month-date'>{{ month.monthYear }}</h4>
+                        <p class='month-meta'>{{ month.profile.totalUnitsPurchased | number: '1.2-4': 'en-US' }} units @ ₹ {{ formatNumber(month.navPrice, 2) }}/unit</p>
+                      </div>
+                    </div>
+
+                    <div class='header-right'>
+                      <div class='month-stat'>
+                        <span class='stat-label text-secondary'>Cost</span>
+                        <span class='stat-value text-dark'>₹ {{ month.profile.investmentCost | number: '1.2-2': 'en-US' }}</span>
+                      </div>
+                      <div class='month-stat'>
+                        <span class='stat-label text-secondary'>Current</span>
+                        <span class='stat-value text-dark'>₹ {{ month.profile.currentValue | number: '1.2-2': 'en-US' }}</span>
+                      </div>
+                      <div class='month-stat' [ngClass]="getReturnClass(month.profile.unrealisedGain)">
+                        <span class='stat-label text-secondary'>Gain</span>
+                        <span class='stat-value text-dark'>₹ {{ month.profile.unrealisedGain | number: '1.2-2': 'en-US' }}</span>
+                      </div>
+                      <div class='month-stat' [ngClass]="getReturnClass(month.profile.absoluteReturnPercent)">
+                        <span class='stat-label text-secondary'>Return</span>
+                        <span class='stat-value text-dark'>{{ formatNumber(month.profile.absoluteReturnPercent, 2) }}%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Month Content (Expandable) -->
+                  <div class='nested-accordion-content month-content' *ngIf='month.isExpanded'>
+                    <div class='details-grid'>
+                      <!-- Units & Allocation -->
+                      <div class='detail-section'>
+                        <h5 class='section-title'>Units & Allocation</h5>
+                        <div class='detail-row'>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Units Purchased</span>
+                            <span class='detail-value'>{{ month.profile.totalUnitsPurchased | number: '1.2-4': 'en-US' }}</span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>NAV Price</span>
+                            <span class='detail-value'>₹ {{ formatNumber(month.navPrice, 2) }}</span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Portfolio %</span>
+                            <span class='detail-value'>{{ formatNumber(month.monthlyAllocationPercent, 2) }}%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Investment Details -->
+                      <div class='detail-section'>
+                        <h5 class='section-title'>Investment Breakdown</h5>
+                        <div class='detail-row'>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Investment Cost</span>
+                            <span class='detail-value'>₹ {{ month.profile.investmentCost | number: '1.2-2': 'en-US' }}</span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Current Value</span>
+                            <span class='detail-value'>₹ {{ month.profile.currentValue | number: '1.2-2': 'en-US' }}</span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Unrealised Gain</span>
+                            <span class='detail-value' [ngClass]="getReturnClass(month.profile.unrealisedGain)">
+                              ₹ {{ month.profile.unrealisedGain | number: '1.2-2': 'en-US' }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Returns Analysis -->
+                      <div class='detail-section'>
+                        <h5 class='section-title'>Returns Analysis</h5>
+                        <div class='detail-row'>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Absolute Return %</span>
+                            <span class='detail-value' [ngClass]="getReturnClass(month.profile.absoluteReturnPercent)">
+                              {{ formatNumber(month.profile.absoluteReturnPercent, 2) }}%
+                            </span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>XIRR %</span>
+                            <span class='detail-value' [ngClass]="getReturnClass(month.profile.xirrPercent)">
+                              {{ formatNumber(month.profile.xirrPercent, 2) }}%
+                            </span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>1-Day Change</span>
+                            <span class='detail-value' [ngClass]="getReturnClass(month.profile.oneDayChange)">
+                              ₹ {{ month.profile.oneDayChange | number: '1.2-2': 'en-US' }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Realised Gains -->
+                      <div class='detail-section'>
+                        <h5 class='section-title'>Realised Gains</h5>
+                        <div class='detail-row'>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Realised Gain</span>
+                            <span class='detail-value' [ngClass]="getReturnClass(month.profile.realisedGain)">
+                              ₹ {{ month.profile.realisedGain | number: '1.2-2': 'en-US' }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Month-over-Month Comparison -->
+                      <div class='detail-section comparison-section' *ngIf='month.monthOverMonthGrowth !== undefined'>
+                        <h5 class='section-title'>
+                          <span>Previous Month Comparison</span>
+                          <span class='trend-badge' [ngClass]="getReturnClass(month.monthOverMonthGrowth ?? 0)">
+                            {{ getTrendIndicator(month.monthOverMonthGrowth) }}
+                          </span>
+                        </h5>
+                        <div class='detail-row'>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Previous Value</span>
+                            <span class='detail-value'>₹ {{ month.previousMonthValue | number: '1.2-2': 'en-US' }}</span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Growth Amount</span>
+                            <span class='detail-value' [ngClass]="getReturnClass(month.monthOverMonthGrowth ?? 0)">
+                              ₹ {{ month.monthOverMonthGrowth | number: '1.2-2': 'en-US' }}
+                            </span>
+                          </div>
+                          <div class='detail-cell'>
+                            <span class='detail-label'>Growth %</span>
+                            <span class='detail-value' [ngClass]="getReturnClass(month.monthOverMonthGrowthPercent ?? 0)">
+                              {{ formatNumber(month.monthOverMonthGrowthPercent ?? 0, 2) }}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class='month-progress-section'>
+                      <div class='progress-label'>
+                        <span>Monthly Allocation in {{ scheme.schemeName }}</span>
+                        <span class='allocation-percent'>{{ formatNumber(month.monthlyAllocationPercent, 2) }}%</span>
+                      </div>
+                      <div class='progress-bar'>
+                        <div class='progress-fill' [style.width.%]="month.monthlyAllocationPercent"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class='progress-bar'>
-                <div class='progress-fill' [style.width.%]="(profile.currentValue / totalCurrentValue) * 100"></div>
+
+              <!-- Scheme Footer Progress Bar -->
+              <div class='scheme-footer'>
+                <div class='progress-bar-label'>
+                  <span>Total {{ scheme.schemeName }} Allocation in Portfolio</span>
+                  <span>{{ formatNumber((scheme.totalCurrentValue / totalCurrentValue) * 100, 2) }}%</span>
+                </div>
+                <div class='progress-bar'>
+                  <div class='progress-fill' [style.width.%]="(scheme.totalCurrentValue / totalCurrentValue) * 100"></div>
+                </div>
               </div>
             </div>
           </div>

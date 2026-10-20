@@ -4,7 +4,7 @@ import { EmitterService } from './core/emitter.service';
 import { IndexedDbServiceService } from './core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from './core/local-storage.service';
 import { faBell, faHandshake, faMoneyBill1, faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
-import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faHouse } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './core/service/auth.service';
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { GetActionsByUserIdDto } from './dto/internal-dto/get-actions-by-user-id-dto';
@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   isCompact: boolean = false;
   aBell = faBell;
   aHouse = faHouse;
+  aBars = faBars;
   aHandshake = faHandshake;
   aMoneyBill1 = faMoneyBill1;
   aArrowAltCircleRight = faArrowAltCircleRight;
@@ -65,6 +66,10 @@ export class AppComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  toggleMobileNav(): void {
+    this.isMobileNavVisible = !this.isMobileNavVisible;
   }
 
   toggleDropdown(dropdown: Menu): void {

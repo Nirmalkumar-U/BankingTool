@@ -34,14 +34,23 @@
     </div>
     <div class="dashboard-app" [class.dashboard-compact]="isCompact">
       <header class="dashboard-toolbar">
-        <div class="container">
-          <div class="row justify-content-end">
-            <div class="col-1 text-end">
+        <div class="container-fluid">
+          <div class="toolbar-row d-flex justify-content-between align-items-center gap-3">
+            <button class="mobile-menu-toggle" type="button" (click)="toggleMobileNav()" aria-label="Toggle menu">
+              <fa-icon [icon]="aBars"></fa-icon>
+            </button>
+
+            <div class="d-flex align-items-center gap-3 ms-auto">
+              <div class="toolbar-badge">
+                <fa-icon [icon]="aBell"></fa-icon>
+                <span class="ms-2">Updates</span>
+              </div>
+
               <div class="dropdown">
-                <span class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="btn btn-light dropdown-toggle topbar-icon-btn" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                   <fa-icon [icon]="aBell"></fa-icon>
                 </span>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="dropdownMenuButton1">
                   <ng-container *ngFor="let menu of notificationMenus">
                     <li *ngFor="let item of menu.items">
                       <a class="dropdown-item" [routerLink]="[item.path]">{{ item.menu }}</a>
@@ -49,9 +58,11 @@
                   </ng-container>
                 </ul>
               </div>
-            </div>
-            <div class="col-2">
-              {{logggedInUserName}}
+
+              <div class="user-chip">
+                <span class="user-avatar">{{ logggedInUserName?.charAt(0)?.toUpperCase() || 'U' }}</span>
+                <span>{{ logggedInUserName }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -59,6 +70,11 @@
       <div class="dashboard-content p-1">
         <router-outlet></router-outlet>
       </div>
+      <footer class="dashboard-footer">
+        <span>© 2026 Banking Tool</span>
+        <span class="footer-divider">|</span>
+        <span>Secure • Smart • Simple</span>
+      </footer>
     </div>
   </div>
 

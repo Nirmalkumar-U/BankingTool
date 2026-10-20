@@ -3,6 +3,16 @@ using BankingTool.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel to use development certificate
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5271); // HTTP
+    serverOptions.ListenAnyIP(7113, listenOptions =>
+    {
+        listenOptions.UseHttps(); // Will use the default dev certificate
+    });
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
