@@ -1,11 +1,17 @@
 <div class='dashboard-content'>
   <div class='container'>
-    <div class='card'>
-      <div class='card-header'>
-        <h1>Bulk Transaction</h1>
+    <div class='transaction-action-page'>
+      <div class='page-header'>
+        <div>
+          <span class='eyebrow'>Batch operations</span>
+          <h1>Bulk Transaction</h1>
+        </div>
+        <div class='header-badge'>
+          Import & submit
+        </div>
       </div>
-      <div class='card-body'>
-        <!-- Excel Import Section -->
+
+      <div class='card-panel'>
         <div class="row mb-3">
           <div class="col-md-12">
             <div class="alert alert-info" role="alert">
@@ -13,20 +19,14 @@
             </div>
             <div class="mb-3">
               <label for="excelFileInput" class="form-label">Select Excel File</label>
-              <input 
-                type="file" 
-                class="form-control" 
-                id="excelFileInput" 
-                accept=".xlsx,.xls"
-                (change)="onExcelFileSelected($event)"
-                [disabled]="isExcelImporting"
+              <input type="file" class="form-control" id="excelFileInput" accept=".xlsx,.xls"
+                (change)="onExcelFileSelected($event)" [disabled]="isExcelImporting"
                 aria-label="Upload Excel file for bulk transactions">
               <small class="form-text text-muted">Expected format: .xlsx or .xls with Transaction and Budget sheets</small>
             </div>
           </div>
         </div>
 
-        <!-- Loading spinner for import -->
         <div *ngIf="isExcelImporting" class="text-center mb-3">
           <div class="spinner-border" role="status" aria-label="Importing Excel file">
             <span class="visually-hidden">Importing...</span>
@@ -35,8 +35,7 @@
         </div>
 
         <form class="was-validated" novalidate [formGroup]="bulkTransactionForm" (ngSubmit)="submitTransactions()">
-          <!-- Transactions Table -->
-          <div class="col-md-12">
+          <div class="col-md-12 panel-block">
             <label class="form-label">Transactions</label>
             <div class="table-responsive">
               <table class="table table-bordered">
@@ -55,81 +54,56 @@
                 <tbody formArrayName="transactions">
                   <tr *ngFor="let transaction of transactions.controls; let i = index" [formGroupName]="i">
                     <td>
-                      <select class="form-select" formControlName="transactionCategory" required
-                              aria-label="Select transaction category">
+                      <select class="form-select" formControlName="transactionCategory" required aria-label="Select transaction category">
                         <option value="">Select</option>
                         <option *ngFor="let account of transactionCatagoryList" [ngValue]="account.value">{{ account.value }}</option>
-                        
                       </select>
-                      <div class="invalid-feedback" *ngIf="transaction.get('transactionCategory')?.invalid">
-                        Required
-                      </div>
+                      <div class="invalid-feedback" *ngIf="transaction.get('transactionCategory')?.invalid">Required</div>
                     </td>
                     <td>
-                      <select class="form-select" formControlName="fromAccountId"
-                        aria-label="Select from account">
+                      <select class="form-select" formControlName="fromAccountId" aria-label="Select from account">
                         <option value="">Select</option>
                         <option *ngFor="let account of fromList" [ngValue]="account.key">{{ account.value }}</option>
                       </select>
-                      <div class="invalid-feedback" *ngIf="transaction.get('fromAccountId')?.invalid">
-                        Required
-                      </div>
+                      <div class="invalid-feedback" *ngIf="transaction.get('fromAccountId')?.invalid">Required</div>
                     </td>
                     <td>
-                      <select class="form-select" formControlName="toAccountId"
-                        aria-label="Select to account">
+                      <select class="form-select" formControlName="toAccountId" aria-label="Select to account">
                         <option value="">Select</option>
                         <option *ngFor="let account of toList" [ngValue]="account.key">{{ account.value }}</option>
                       </select>
-                      <div class="invalid-feedback" *ngIf="transaction.get('toAccountId')?.invalid">
-                        Required
-                      </div>
+                      <div class="invalid-feedback" *ngIf="transaction.get('toAccountId')?.invalid">Required</div>
                     </td>
                     <td>
-                      <input type="number" class="form-control" formControlName="amount" placeholder="0.00"
-                        min="0.01" step="0.01" required aria-label="Transaction amount">
-                      <div class="invalid-feedback" *ngIf="transaction.get('amount')?.invalid">
-                        Required & > 0
-                      </div>
+                      <input type="number" class="form-control" formControlName="amount" placeholder="0.00" min="0.01" step="0.01" required aria-label="Transaction amount">
+                      <div class="invalid-feedback" *ngIf="transaction.get('amount')?.invalid">Required & > 0</div>
                     </td>
                     <td>
-                      <input type="text" class="form-control" formControlName="description" required
-                        aria-label="Transaction description">
-                      <div class="invalid-feedback" *ngIf="transaction.get('description')?.invalid">
-                        Required
-                      </div>
+                      <input type="text" class="form-control" formControlName="description" required aria-label="Transaction description">
+                      <div class="invalid-feedback" *ngIf="transaction.get('description')?.invalid">Required</div>
                     </td>
                     <td>
-                      <input type="date" class="form-control" formControlName="transactionDate" required
-                        aria-label="Transaction date">
-                      <div class="invalid-feedback" *ngIf="transaction.get('transactionDate')?.invalid">
-                        Required
-                      </div>
+                      <input type="date" class="form-control" formControlName="transactionDate" required aria-label="Transaction date">
+                      <div class="invalid-feedback" *ngIf="transaction.get('transactionDate')?.invalid">Required</div>
                     </td>
                     <td>
-                      <select class="form-select" formControlName="transactionTag" required
-                              aria-label="Select transaction tag">
+                      <select class="form-select" formControlName="transactionTag" required aria-label="Select transaction tag">
                         <option value="">Select</option>
                         <option *ngFor="let account of transactionTagList" [ngValue]="account.value">{{ account.value }}</option>
                       </select>
-                      <div class="invalid-feedback" *ngIf="transaction.get('transactionTag')?.invalid">
-                        Required
-                      </div>
+                      <div class="invalid-feedback" *ngIf="transaction.get('transactionTag')?.invalid">Required</div>
                     </td>
                     <td>
-                      <button *ngIf="transactions.length > 1" type="button" class="btn btn-danger btn-sm"
-                        (click)="removeTransaction(i)" aria-label="Remove transaction">X</button>
+                      <button *ngIf="transactions.length > 1" type="button" class="btn btn-danger btn-sm" (click)="removeTransaction(i)" aria-label="Remove transaction">X</button>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm mb-3" (click)="addTransaction()"
-              aria-label="Add new transaction">+ Add Transaction</button>
+            <button type="button" class="btn btn-secondary btn-sm mb-3" (click)="addTransaction()" aria-label="Add new transaction">+ Add Transaction</button>
           </div>
 
-          <!-- Budget Entries for each Transaction -->
-          <div class="col-md-12" *ngFor="let transaction of transactions.controls; let i = index">
+          <div class="col-md-12 panel-block" *ngFor="let transaction of transactions.controls; let i = index">
             <label class="form-label">Budget Entries for Transaction {{ i + 1 }}</label>
             <div class="table-responsive">
               <table class="table table-bordered table-sm">
@@ -143,38 +117,28 @@
                 <tbody>
                   <tr *ngFor="let entry of getBudgetEntries(i).controls; let j = index" [formGroup]="$any(entry)">
                     <td>
-                      <select class="form-select" formControlName="budgetAccountId" required
-                        aria-label="Select budget account">
+                      <select class="form-select" formControlName="budgetAccountId" required aria-label="Select budget account">
                         <option value="">Select</option>
                         <option *ngFor="let budget of budgetAccountsList" [ngValue]="budget.key">{{ budget.value }}</option>
                       </select>
-                      <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAccountId')?.invalid">
-                        Required
-                      </div>
+                      <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAccountId')?.invalid">Required</div>
                     </td>
                     <td>
-                      <input type="number" class="form-control" formControlName="budgetAmount" placeholder="0.00"
-                        min="0.01" step="0.01" required aria-label="Budget amount">
-                      <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAmount')?.invalid">
-                        Required & > 0
-                      </div>
+                      <input type="number" class="form-control" formControlName="budgetAmount" placeholder="0.00" min="0.01" step="0.01" required aria-label="Budget amount">
+                      <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAmount')?.invalid">Required & > 0</div>
                     </td>
                     <td>
-                      <button *ngIf="j > 0" type="button" class="btn btn-danger btn-sm"
-                        (click)="removeBudgetEntry(i, j)" aria-label="Remove budget entry">X</button>
+                      <button *ngIf="j > 0" type="button" class="btn btn-danger btn-sm" (click)="removeBudgetEntry(i, j)" aria-label="Remove budget entry">X</button>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <button type="button" class="btn btn-outline-secondary btn-sm mb-4"
-              (click)="addBudgetEntry(i)" aria-label="Add budget entry">+ Add Budget Entry</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm mb-4" (click)="addBudgetEntry(i)" aria-label="Add budget entry">+ Add Budget Entry</button>
           </div>
 
-          <!-- Submit Button -->
-          <div class="col-12">
-            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary"
-              [disabled]="!isFormValid() || isLoading">
+          <div class="col-12 action-row">
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary" [disabled]="!isFormValid() || isLoading">
               <span *ngIf="!isLoading">Submit Transactions</span>
               <span *ngIf="isLoading">
                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>

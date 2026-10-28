@@ -184,13 +184,16 @@ namespace BankingTool.Service.Service
                 Value = x.AccountDescription,
                 IsSelected = false
             }).ToList();
+
+            var fromDate = DateTime.Now.AddMonths(-1).Date;
+
             return new ResponseDto<GetTransactionsListResponse>
             {
                 Response = new GetTransactionsListResponse
                 {
                     AccountInfo = await _bankAccountRepository.GetAccountInfo(accountId, accountType, name, bankName),
                     CardInfo = await _bankAccountRepository.GetCardInfoByAccountId(accountId, name, bankName),
-                    TransactionsList = await _bankAccountRepository.GetTransactionByAccountId(accountId, null, null, null, null, null, null),
+                    TransactionsList = await _bankAccountRepository.GetTransactionByAccountId(accountId, null, fromDate, DateTime.Now.Date, null, null, null),
                 },
                 StatuCode = 200,
                 Status = true,

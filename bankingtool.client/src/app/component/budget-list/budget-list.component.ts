@@ -15,8 +15,13 @@ import { GetBudgetList, GetBudgetListResponse } from '../../dto/response/get-bud
 export class BudgetListComponent {
   budgetList: GetBudgetList[] = [];
   inActiveBudgetList: GetBudgetList[] = [];
+  isInactiveBudgetListOpen: boolean = false;
   constructor(private readonly activatedRoute: ActivatedRoute, private budgetService: BudgetService,
     private readonly router: Router, private notificationService: NotificationService) {
+  }
+
+  toggleInactiveBudgetList(): void {
+    this.isInactiveBudgetListOpen = !this.isInactiveBudgetListOpen;
   }
   ngOnInit() {
     const initialData: ResponseDto<GetBudgetListResponse> = this.activatedRoute.snapshot.data['DataResolver'];

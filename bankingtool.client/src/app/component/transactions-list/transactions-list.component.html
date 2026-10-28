@@ -1,10 +1,17 @@
 <div class='dashboard-content'>
   <div class='container'>
-    <div class='card'>
-      <div class='card-header'>
-        <h1>Transactions</h1>
+    <div class='transactions-page'>
+      <div class='page-header'>
+        <div>
+          <span class='eyebrow'>Account activity</span>
+          <h1>Transactions</h1>
+        </div>
+        <div class='header-badge' *ngIf="accountInfo && accountInfo != null">
+          {{accountInfo.accountType || 'Account'}}
+        </div>
       </div>
-      <div class='card-body'>
+
+      <div class='card-panel selection-panel'>
         <form class="row g-3 was-validated" novalidate [formGroup]="transactionForm">
           <div class="col-md-4">
             <label class="form-label">Bank</label>
@@ -28,89 +35,105 @@
             </div>
           </div>
         </form>
-        <hr *ngIf="cardInfo && cardInfo != null && cardInfo.length != 0" />
-        <div class="row">
-          <div class="col-md-4 p-3" *ngFor="let card of cardInfo">
-            <div class="atm-card">
+      </div>
+
+      <div class="row card-strip" *ngIf="cardInfo && cardInfo != null && cardInfo.length != 0">
+        <div class="col-md-4 p-3" *ngFor="let card of cardInfo">
+          <div class="atm-card">
+            <div class="card-top-row">
               <h5 class="card-title">{{card.bankName}}</h5>
-              <h6 class="card-number">{{card.cardNumber}}</h6>
-              <h6>CVV: {{card.cvv}}</h6>
-              <div [ngStyle]="{ position: 'relative', top: card.cardType === 'DebitCard' ? '62px' : '43px' }">
-                <h6 class="mt-2" *ngIf="card.balanceLimit != null">{{card.balanceLimit}}</h6>
-                <h6 class="card-holder">{{card.holderName}}</h6>
-                <h6 class="card-type">{{card.cardType}}</h6>
-              </div>
+              <span class="chip">{{card.cardType}}</span>
+            </div>
+            <h6 class="card-number">{{card.cardNumber}}</h6>
+            <h6 class="card-meta">CVV: {{card.cvv}}</h6>
+            <div [ngStyle]="{ position: 'relative', top: card.cardType === 'DebitCard' ? '62px' : '43px' }">
+              <h6 class="mt-2" *ngIf="card.balanceLimit != null">{{card.balanceLimit}}</h6>
+              <h6 class="card-holder">{{card.holderName}}</h6>
+              <h6 class="card-type">{{card.cardType}}</h6>
             </div>
           </div>
         </div>
-        <hr *ngIf="accountInfo && accountInfo != null" />
-        <div class="row p-2" *ngIf="accountInfo && accountInfo != null">
-          <div class="col-md-3">
-            <h4 class="fw-bold">Bank Name</h4>
-            <h5 class="fw-bold">{{accountInfo.bankName}}</h5>
+      </div>
+
+      <div class="card-panel overview-panel" *ngIf="accountInfo && accountInfo != null">
+        <div class="panel-header">
+          <h3>Account overview</h3>
+        </div>
+        <div class="row overview-grid">
+          <div class="col-md-3 overview-item">
+            <span class="overview-label">Bank Name</span>
+            <strong>{{accountInfo.bankName}}</strong>
           </div>
-          <div class="col-md-3">
-            <h4 class="fw-bold">Account Holder Name</h4>
-            <h5 class="fw-bold">{{accountInfo.accountHolderName}}</h5>
+          <div class="col-md-3 overview-item">
+            <span class="overview-label">Account Holder Name</span>
+            <strong>{{accountInfo.accountHolderName}}</strong>
           </div>
-          <div class="col-md-3">
-            <h4 class="fw-bold">Account Number</h4>
-            <h5 class="fw-bold">{{accountInfo.accountNumber}}</h5>
+          <div class="col-md-3 overview-item">
+            <span class="overview-label">Account Number</span>
+            <strong>{{accountInfo.accountNumber}}</strong>
           </div>
-          <div class="col-md-3">
-            <h4 class="fw-bold">Account Type</h4>
-            <h5 class="fw-bold">{{accountInfo.accountType}}</h5>
+          <div class="col-md-3 overview-item">
+            <span class="overview-label">Account Type</span>
+            <strong>{{accountInfo.accountType}}</strong>
           </div>
-          <div class="col-md-3">
-            <h4 class="fw-bold">Balance</h4>
-            <h5 class="fw-bold">{{accountInfo.balance}}</h5>
+          <div class="col-md-3 overview-item highlight-item">
+            <span class="overview-label">Balance</span>
+            <strong>{{accountInfo.balance}}</strong>
           </div>
         </div>
-        <hr />
-        <div>
-          <form class="row g-3" [formGroup]="transactionFilterForm" (ngSubmit)="getTransactionList()">
-            <div class="col-md-3">
-              <label class="form-label">From Date</label>
-              <input type="date" class="form-control" formControlName="fromDate" (blur)="setFromDate($event)" />
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">To Date</label>
-              <input type="date" class="form-control" formControlName="toDate" (blur)="setToDate($event)">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Category</label>
-              <select class="form-select" formControlName="category">
-                <option value="">Select</option>
-                <option *ngFor="let bank of transactionCategoryList" [ngValue]="bank.value">{{ bank.value }}</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Tag</label>
-              <select class="form-select" formControlName="transactionTag">
-                <option value="">Select</option>
-                <option *ngFor="let bank of transactionTagList" [ngValue]="bank.codeValue1">{{ bank.value }}</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Sender</label>
-              <select class="form-select" formControlName="senderAccountId">
-                <option value="">Select</option>
-                <option *ngFor="let bank of senderAccountList" [ngValue]="bank.key">{{ bank.value }}</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Receiver</label>
-              <select class="form-select" formControlName="receiverAccountId">
-                <option value="">Select</option>
-                <option *ngFor="let bank of receiverAccoountList" [ngValue]="bank.key">{{ bank.value }}</option>
-              </select>
-            </div>
-            <div class="col-md-3" style="padding-top: 30px;">
-              <button type="submit" class="btn btn-primary">Search</button>
-            </div>
-          </form>
+      </div>
+
+      <div class='card-panel filter-panel'>
+        <div class="panel-header">
+          <h3>Filters</h3>
         </div>
-        <hr />
+        <form class="row g-3" [formGroup]="transactionFilterForm" (ngSubmit)="getTransactionList()">
+          <div class="col-md-3">
+            <label class="form-label">From Date</label>
+            <input type="date" class="form-control" formControlName="fromDate" (blur)="setFromDate($event)" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">To Date</label>
+            <input type="date" class="form-control" formControlName="toDate" (blur)="setToDate($event)">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" formControlName="category">
+              <option value="">Select</option>
+              <option *ngFor="let bank of transactionCategoryList" [ngValue]="bank.value">{{ bank.value }}</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Tag</label>
+            <select class="form-select" formControlName="transactionTag">
+              <option value="">Select</option>
+              <option *ngFor="let bank of transactionTagList" [ngValue]="bank.codeValue1">{{ bank.value }}</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Sender</label>
+            <select class="form-select" formControlName="senderAccountId">
+              <option value="">Select</option>
+              <option *ngFor="let bank of senderAccountList" [ngValue]="bank.key">{{ bank.value }}</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Receiver</label>
+            <select class="form-select" formControlName="receiverAccountId">
+              <option value="">Select</option>
+              <option *ngFor="let bank of receiverAccoountList" [ngValue]="bank.key">{{ bank.value }}</option>
+            </select>
+          </div>
+          <div class="col-md-3 filter-action-col">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+        </form>
+      </div>
+
+      <div class='card-panel table-panel'>
+        <div class="panel-header">
+          <h3>Transaction history</h3>
+        </div>
         <app-data-table [columns]="columns"
                         [data]="transactionsList">
         </app-data-table>
