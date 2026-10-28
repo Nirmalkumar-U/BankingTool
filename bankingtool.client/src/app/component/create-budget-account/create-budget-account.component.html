@@ -1,20 +1,31 @@
 <div class='dashboard-content'>
   <div class='container'>
-    <div class='card'>
-      <div class='card-header'>
-        <h1>Create Budget Account</h1>
+    <div class='transaction-action-page'>
+      <div class='page-header'>
+        <div>
+          <span class='eyebrow'>Budget planning</span>
+          <h1>Create Budget Account</h1>
+        </div>
+        <div class='header-badge'>
+          New budget
+        </div>
       </div>
-      <div class='card-body'>
+
+      <div class='card-panel'>
         <form class="row g-3 was-validated" novalidate [formGroup]="budgetAccountForm" (ngSubmit)="createBudgetAccount()">
-          <div class="col-md-3">
+          <div class="col-md-5">
             <label class="form-label">Budget Name</label>
             <input type="text" class="form-control" formControlName="budgetName" required>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <label class="form-label">Budget Amount</label>
             <input type="text" class="form-control" formControlName="amount" required>
           </div>
-          <div class="col-12">
+          <div class="col-md-3 info-box">
+            <label class="form-label">Status</label>
+            <div class="info-value">Ready to setup</div>
+          </div>
+          <div class="col-12 action-row">
             <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Create Budget Account</button>
           </div>
         </form>

@@ -1,34 +1,265 @@
-.atm-card {
-  width: 320px;
-  height: 180px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #007bff, #00c6ff);
-  color: white;
-  padding: 15px;
-  position: relative;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.transactions-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1rem;
 }
 
-  .atm-card h5,
-  .atm-card h6 {
-    margin: 0;
-  }
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0.25rem 0;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  font-weight: 700;
+  color: #5a6b87;
+  margin-bottom: 0.4rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2a3d;
+}
+
+.header-badge {
+  background: linear-gradient(135deg, #e8f1ff, #dfeeff);
+  color: #174ea6;
+  border: 1px solid rgba(23, 78, 166, 0.15);
+  border-radius: 999px;
+  padding: 0.55rem 0.9rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.card-panel {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 1.25rem 1.3rem;
+}
+
+.selection-panel,
+.filter-panel,
+.table-panel {
+  overflow: hidden;
+}
+
+.selection-panel form,
+.filter-panel form {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4c5a6f;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  background: #f8fafc;
+  border: 1px solid #dfe7f4;
+  border-radius: 12px;
+  min-height: 46px;
+  color: #1f2937;
+  box-shadow: none;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #80b5ff;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+}
+
+.card-strip {
+  margin: 0 -0.75rem;
+}
+
+.card-strip .col-md-4 {
+  display: flex;
+}
+
+.atm-card {
+  width: 100%;
+  min-height: 180px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0f172a, #1f63d8 45%, #38bdf8);
+  color: white;
+  padding: 18px 18px 12px;
+  position: relative;
+  box-shadow: 0 14px 28px rgba(31, 99, 216, 0.38);
+  overflow: hidden;
+}
+
+.atm-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 50%);
+  pointer-events: none;
+}
+
+.atm-card h5,
+.atm-card h6 {
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04rem;
+}
 
 .card-number {
   font-size: 1.2rem;
   letter-spacing: 2px;
-  margin-top: 10px;
+  margin-top: 18px !important;
+}
+
+.card-meta {
+  margin-top: 10px !important;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
 }
 
 .card-holder {
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.05rem;
 }
 
 .card-type {
   position: absolute;
-  bottom: 10px;
-  right: 15px;
+  bottom: 12px;
+  right: 18px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.overview-panel {
+  padding-top: 1rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1e2b3d;
+}
+
+.overview-grid {
+  row-gap: 1rem;
+}
+
+.overview-item {
+  padding: 1rem 1rem 0.8rem;
+  border: 1px solid #edf2f9;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f9fbff, #f3f7ff);
+}
+
+.overview-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.overview-item strong {
   font-size: 1rem;
+  color: #1f2a3d;
+  word-break: break-word;
+}
+
+.highlight-item {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.08), rgba(14, 165, 233, 0.08));
+  border-color: rgba(37, 99, 235, 0.15);
+}
+
+.highlight-item strong {
+  color: #0f3c8f;
+  font-size: 1.08rem;
+}
+
+.filter-action-col {
+  display: flex;
+  align-items: end;
+  padding-top: 1.7rem;
+}
+
+.filter-action-col .btn {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 12px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  border: none;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+}
+
+.table-panel {
+  padding-bottom: 0.5rem;
+}
+
+.table-panel app-data-table {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-action-col {
+    padding-top: 0.5rem;
+  }
+
+  .card-strip {
+    margin: 0;
+  }
 }

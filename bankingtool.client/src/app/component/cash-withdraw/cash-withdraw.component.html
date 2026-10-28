@@ -1,10 +1,17 @@
 <div class='dashboard-content'>
   <div class='container'>
-    <div class='card'>
-      <div class='card-header'>
-        <h1>Cash Withdraw</h1>
+    <div class='transaction-action-page'>
+      <div class='page-header'>
+        <div>
+          <span class='eyebrow'>Cash flow</span>
+          <h1>Cash Withdraw</h1>
+        </div>
+        <div class='header-badge'>
+          Balance: {{ balance }}
+        </div>
       </div>
-      <div class='card-body'>
+
+      <div class='card-panel'>
         <form class="row g-3 was-validated" novalidate [formGroup]="cashWithdrawForm" (ngSubmit)="cashWithdraw()">
           <div class="col-md-4">
             <label class="form-label">Account</label>
@@ -16,61 +23,67 @@
               Please Select Account...
             </div>
           </div>
-          <div class="col-md-3">
-            <label class="form-label">Balance</label>
-            <h6>{{balance}}</h6>
-          </div>
           <div class="col-md-4">
-          </div>
-          <div class="col-md-3">
             <label class="form-label">Transaction Date</label>
             <input type="date" class="form-control" formControlName="transferDate" (blur)="setTransferDate($event)" />
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4 info-box">
+            <label class="form-label">Available Balance</label>
+            <div class="info-value">{{ balance }}</div>
+          </div>
+          <div class="col-md-4">
             <label for="inputPassword4" class="form-label">Amount</label>
             <input type="text" class="form-control" formControlName="amount" required>
             <div class="invalid-feedback">
               Please Enter amount...
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-8">
             <label for="inputPassword4" class="form-label">Description</label>
             <input type="text" class="form-control" formControlName="description" required>
             <div class="invalid-feedback">
               Please Enter Description...
             </div>
           </div>
-          <div class="col-12">
-            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Cash Withdraw</button>
+
+          <div class="col-12" *ngIf="budgetAccountList && budgetAccountList.length != 0">
+            <div class="budget-section">
+              <div class="section-header">
+                <h3>Budget Allocation</h3>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="addBudgetAccount()">Add Row</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-bordered allocation-table">
+                  <thead>
+                    <tr>
+                      <th>Budget Account</th>
+                      <th>Budget Amount</th>
+                      <th style="width: 50px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="budgetAccount">
+                    <tr *ngFor="let budget of budgetAccount.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <select class="form-select" formControlName="budgetAccountId" required>
+                          <option value="">Select</option>
+                          <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input type="number" class="form-control" formControlName="budgetAmount" required />
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-danger btn-sm" (click)="removeBudgetAccount(i)">X</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-          <div class="col-md-12" *ngIf="budgetAccountList && budgetAccountList.length != 0">
-            <label class="form-label">Budget Allocation (Optional)</label>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Budget Account</th>
-                  <th>Budget Amount</th>
-                  <th style="width: 50px;">Action</th>
-                </tr>
-              </thead>
-              <tbody formArrayName="budgetAccount">
-                <tr *ngFor="let budget of budgetAccount.controls; let i = index" [formGroupName]="i">
-                  <td>
-                    <select class="form-select" formControlName="budgetAccountId" required>
-                      <option value="">Select</option>
-                      <option *ngFor="let ta of budgetAccountList" [ngValue]="ta.key">{{ ta.value }}</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input type="number" class="form-control" formControlName="budgetAmount" required />
-                  </td>
-                  <td>
-                    <button type="button" class="btn btn-danger btn-sm" (click)="removeBudgetAccount(i)">X</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <button type="button" class="btn btn-secondary btn-sm" (click)="addBudgetAccount()">Add Row</button>
+
+          <div class="col-12 action-row">
+            <button type="submit" [attr.disabled]="isSubmitted == true ? true : null" class="btn btn-primary">Cash Withdraw</button>
           </div>
         </form>
       </div>

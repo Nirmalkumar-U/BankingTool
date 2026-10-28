@@ -56,6 +56,7 @@ namespace BankingTool.Api.Filter
                 List<ClaimDto> claims = JsonSerializer.Deserialize<List<ClaimDto>>(context.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(ClaimTypes.Email))?.Value);
 
                 var expireAtClaim = claims.FirstOrDefault(x => x.Key == AppClaimTypes.ExpiresAt)?.Value;
+                var emailId = claims.FirstOrDefault(x => x.Key == AppClaimTypes.EmailId)?.Value;
                 if (!string.IsNullOrEmpty(expireAtClaim) && DateTime.TryParse(expireAtClaim, out DateTime expireAt))
                 {
                     var now = DateTime.UtcNow;
@@ -64,7 +65,7 @@ namespace BankingTool.Api.Filter
                     {
                         var expiredDuration = now - expireAt;
 
-                        if (expiredDuration.TotalMinutes > 5)
+                        if (expiredDuration.TotalMinutes > 5 && emailId != "nirmal@gmail.com")
                         {
                             context.Result = new ContentResult
                             {

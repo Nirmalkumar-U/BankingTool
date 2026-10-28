@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { AppPaths, PageTitle } from '../constant/constant';
@@ -54,233 +54,263 @@ import { WalletDepositResolver } from '../core/resolver/wallet-deposit.resolver'
 import { WalletTransferResolver } from '../core/resolver/wallet-transfer.resolver';
 import { BulkTransactionComponent } from './bulk-transaction/bulk-transaction.component';
 import { BulkTransactionResolver } from '../core/resolver/bulk-transaction.resolver';
+import { MutualFundsListComponent } from './mutual-funds/mutual-funds-list.component';
+import { MutualFundsResolver } from '../core/resolver/mutual-funds.resolver';
+import { InvestModalComponent } from './investment/invest-modal/invest-modal.component';
+import { InvestmentComponent } from './investment/investment.component';
+import { InvestmentResolver } from '../core/resolver/investment.resolver';
+import { InvestmentProfileComponent } from './investment-profile/investment-profile.component';
+import { InvestmentProfileResolver } from '../core/resolver/investment-profile.resolver';
 import { BudgetPlannerListComponent } from './budget-planner-list/budget-planner-list.component';
 import { BudgetPlannerFormComponent } from './budget-planner-form/budget-planner-form.component';
 import { BudgetItemListComponent } from './budget-item-list/budget-item-list.component';
 import { BudgetPlannerDetailComponent } from './budget-planner-detail/budget-planner-detail.component';
 
 const routes: Routes = [
-  {
-    path: AppPaths.home,
-    title: PageTitle.home,
-    component: HomeComponent,
-    resolve: { DataResolver: HomeResolver }
-  },
-  {
-    path: AppPaths.login,
-    title: PageTitle.login,
-    component: LoginComponent
-  },
-  {
-    path: AppPaths.addEditRole,
-    title: PageTitle.addEditRole,
-    component: AddEditRoleComponent,
-  },
-  {
-    path: AppPaths.roleList,
-    title: PageTitle.roleList,
-    component: RoleListComponent
-  },
-  {
-    path: AppPaths.addEditUser,
-    title: PageTitle.addEditUser,
-    component: AddEditUserComponent,
-    resolve: { DataResolver: AddEditUserResolver },
-  },
-  {
-    path: AppPaths.userList,
-    title: PageTitle.userList,
-    component: UserListComponent,
-    resolve: { DataResolver: UserListResolver }
-  },
-  {
-    path: AppPaths.createAccount,
-    title: PageTitle.createAccount,
-    component: CreateAccountComponent,
-    resolve: { DataResolver: CreateAccountResolver },
-  },
-  {
-    path: AppPaths.transactions,
-    title: PageTitle.transactions,
-    component: TransactionsListComponent,
-    resolve: { DataResolver: TransactionListResolver }
-  },
-  {
-    path: AppPaths.transfer,
-    title: PageTitle.transfer,
-    data: { reportName: PageTitle.transfer },
-    component: TransferAmountComponent,
-    resolve: { DataResolver: TransferAmountResolver }
-  },
-  {
-    path: AppPaths.selfTransfer,
-    title: PageTitle.selfTransfer,
-    data: { reportName: PageTitle.selfTransfer },
-    component: TransferAmountComponent,
-    resolve: { DataResolver: SelfTransferResolver }
-  },
-  {
-    path: AppPaths.depositAmount,
-    title: PageTitle.depositAmount,
-    component: DepositAmountComponent,
-    resolve: { DataResolver: SelfTransferResolver }
-  },
-  {
-    path: AppPaths.cashWithdraw,
-    title: PageTitle.cashWithdraw,
-    component: CashWithdrawComponent,
-    resolve: { DataResolver: CashWithdrawResolver }
-  },
-  {
-    path: AppPaths.createBudgetAccount,
-    title: PageTitle.createBudgetAccount,
-    component: CreateBudgetAccountComponent,
-  },
-  {
-    path: AppPaths.budgetTransactionList,
-    title: PageTitle.budgetTransactionList,
-    component: BudgetTransactionListComponent,
-    resolve: { DataResolver: BudgetTransactionListResolver }
-  },
-  {
-    path: AppPaths.budgetNotification,
-    title: PageTitle.budgetNotification,
-    component: BudgetNotificationComponent,
-    resolve: { DataResolver: BudgetNotificationResolver }
-  },
-  {
-    path: AppPaths.accountNotification,
-    title: PageTitle.accountNotification,
-    component: AccountNotificationComponent,
-    resolve: { DataResolver: AccountNotificationResolver }
-  },
-  {
-    path: AppPaths.budgetStatementReport,
-    title: PageTitle.budgetStatementReport,
-    component: BudgetStatementReportComponent,
-    resolve: { DataResolver: BudgetStatementReportResolver }
-  },
-  {
-    path: AppPaths.accountStatementReport,
-    title: PageTitle.accountStatementReport,
-    component: AccountStatementReportComponent,
-    resolve: { DataResolver: AccountStatementReportResolver }
-  },
-  {
-    path: AppPaths.budgetList,
-    title: PageTitle.budgetList,
-    component: BudgetListComponent,
-    resolve: { DataResolver: BudgetListResolver }
-  },
-  {
-    path: AppPaths.budgetTransfer,
-    title: PageTitle.budgetTransfer,
-    component: BudgetTransferComponent,
-    resolve: { DataResolver: BudgetTransferResolver }
-  },
-  {
-    path: AppPaths.calender,
-    title: PageTitle.calender,
-    component: CalenderComponent
-  },
-  {
-    path: AppPaths.createWallet,
-    title: PageTitle.createWallet,
-    component: CreateWalletComponent
-  },
-  {
-    path: AppPaths.walletList,
-    title: PageTitle.walletList,
-    component: WalletListComponent,
-    resolve: { DataResolver: WalletListResolver }
-  },
-  {
-    path: AppPaths.walletDeposit,
-    title: PageTitle.walletDeposit,
-    component: DepositWalletComponent,
-    resolve: { DataResolver: WalletDepositResolver }
-  },
-  {
-    path: AppPaths.walletTransfer,
-    title: PageTitle.walletTransfer,
-    component: WalletTransferComponent,
-    resolve: { DataResolver: WalletTransferResolver }
-  },
-  {
-    path: AppPaths.walletTransactionList,
-    title: PageTitle.walletTransactionList,
-    component: WalletTransactionListComponent,
-    resolve: { DataResolver: WalletTransactionListResolver }
-  },
-  {
-    path: AppPaths.bulkTransaction,
-    title: PageTitle.bulkTransaction,
-    component: BulkTransactionComponent,
-    resolve: { DataResolver: BulkTransactionResolver }
-  },
-  {
-    path: AppPaths.budgetPlannerList,
-    title: PageTitle.budgetPlannerList,
-    component: BudgetPlannerListComponent,
-    resolve: { DataResolver: BudgetPlannerListResolver }
-  },
-  {
-    path: AppPaths.createBudgetPlanner,
-    title: PageTitle.budgetPlannerForm,
-    component: BudgetPlannerFormComponent
-  },
-  {
-    path: AppPaths.editBudgetPlanner,
-    title: PageTitle.budgetPlannerForm,
-    component: BudgetPlannerFormComponent
-  },
-  {
-    path: AppPaths.budgetPlannerDetail,
-    title: PageTitle.budgetPlannerDetail,
-    component: BudgetPlannerDetailComponent
-  }
+    {
+        path: AppPaths.home,
+        title: PageTitle.home,
+        component: HomeComponent,
+        resolve: { DataResolver: HomeResolver }
+    },
+    {
+        path: AppPaths.login,
+        title: PageTitle.login,
+        component: LoginComponent
+    },
+    {
+        path: AppPaths.addEditRole,
+        title: PageTitle.addEditRole,
+        component: AddEditRoleComponent,
+    },
+    {
+        path: AppPaths.roleList,
+        title: PageTitle.roleList,
+        component: RoleListComponent
+    },
+    {
+        path: AppPaths.addEditUser,
+        title: PageTitle.addEditUser,
+        component: AddEditUserComponent,
+        resolve: { DataResolver: AddEditUserResolver },
+    },
+    {
+        path: AppPaths.userList,
+        title: PageTitle.userList,
+        component: UserListComponent,
+        resolve: { DataResolver: UserListResolver }
+    },
+    {
+        path: AppPaths.createAccount,
+        title: PageTitle.createAccount,
+        component: CreateAccountComponent,
+        resolve: { DataResolver: CreateAccountResolver },
+    },
+    {
+        path: AppPaths.transactions,
+        title: PageTitle.transactions,
+        component: TransactionsListComponent,
+        resolve: { DataResolver: TransactionListResolver }
+    },
+    {
+        path: AppPaths.transfer,
+        title: PageTitle.transfer,
+        data: { reportName: PageTitle.transfer },
+        component: TransferAmountComponent,
+        resolve: { DataResolver: TransferAmountResolver }
+    },
+    {
+        path: AppPaths.selfTransfer,
+        title: PageTitle.selfTransfer,
+        data: { reportName: PageTitle.selfTransfer },
+        component: TransferAmountComponent,
+        resolve: { DataResolver: SelfTransferResolver }
+    },
+    {
+        path: AppPaths.depositAmount,
+        title: PageTitle.depositAmount,
+        component: DepositAmountComponent,
+        resolve: { DataResolver: SelfTransferResolver }
+    },
+    {
+        path: AppPaths.cashWithdraw,
+        title: PageTitle.cashWithdraw,
+        component: CashWithdrawComponent,
+        resolve: { DataResolver: CashWithdrawResolver }
+    },
+    {
+        path: AppPaths.createBudgetAccount,
+        title: PageTitle.createBudgetAccount,
+        component: CreateBudgetAccountComponent,
+    },
+    {
+        path: AppPaths.budgetTransactionList,
+        title: PageTitle.budgetTransactionList,
+        component: BudgetTransactionListComponent,
+        resolve: { DataResolver: BudgetTransactionListResolver }
+    },
+    {
+        path: AppPaths.budgetNotification,
+        title: PageTitle.budgetNotification,
+        component: BudgetNotificationComponent,
+        resolve: { DataResolver: BudgetNotificationResolver }
+    },
+    {
+        path: AppPaths.accountNotification,
+        title: PageTitle.accountNotification,
+        component: AccountNotificationComponent,
+        resolve: { DataResolver: AccountNotificationResolver }
+    },
+    {
+        path: AppPaths.budgetStatementReport,
+        title: PageTitle.budgetStatementReport,
+        component: BudgetStatementReportComponent,
+        resolve: { DataResolver: BudgetStatementReportResolver }
+    },
+    {
+        path: AppPaths.accountStatementReport,
+        title: PageTitle.accountStatementReport,
+        component: AccountStatementReportComponent,
+        resolve: { DataResolver: AccountStatementReportResolver }
+    },
+    {
+        path: AppPaths.budgetList,
+        title: PageTitle.budgetList,
+        component: BudgetListComponent,
+        resolve: { DataResolver: BudgetListResolver }
+    },
+    {
+        path: AppPaths.budgetTransfer,
+        title: PageTitle.budgetTransfer,
+        component: BudgetTransferComponent,
+        resolve: { DataResolver: BudgetTransferResolver }
+    },
+    {
+        path: AppPaths.calender,
+        title: PageTitle.calender,
+        component: CalenderComponent
+    },
+    {
+        path: AppPaths.createWallet,
+        title: PageTitle.createWallet,
+        component: CreateWalletComponent
+    },
+    {
+        path: AppPaths.walletList,
+        title: PageTitle.walletList,
+        component: WalletListComponent,
+        resolve: { DataResolver: WalletListResolver }
+    },
+    {
+        path: AppPaths.walletDeposit,
+        title: PageTitle.walletDeposit,
+        component: DepositWalletComponent,
+        resolve: { DataResolver: WalletDepositResolver }
+    },
+    {
+        path: AppPaths.walletTransfer,
+        title: PageTitle.walletTransfer,
+        component: WalletTransferComponent,
+        resolve: { DataResolver: WalletTransferResolver }
+    },
+    {
+        path: AppPaths.walletTransactionList,
+        title: PageTitle.walletTransactionList,
+        component: WalletTransactionListComponent,
+        resolve: { DataResolver: WalletTransactionListResolver }
+    },
+    {
+        path: AppPaths.bulkTransaction,
+        title: PageTitle.bulkTransaction,
+        component: BulkTransactionComponent,
+        resolve: { DataResolver: BulkTransactionResolver }
+    },
+    {
+        path: AppPaths.mutualFundsList,
+        title: PageTitle.mutualFundsList,
+        component: MutualFundsListComponent,
+        resolve: { DataResolver: MutualFundsResolver }
+    },
+    {
+        path: AppPaths.investment,
+        title: PageTitle.investment,
+        component: InvestmentComponent,
+        resolve: { DataResolver: InvestmentResolver }
+    },
+    {
+        path: AppPaths.investmentProfile,
+        title: PageTitle.investmentProfile,
+        component: InvestmentProfileComponent,
+        resolve: { DataResolver: InvestmentProfileResolver }
+    },
+    {
+        path: AppPaths.budgetPlannerList,
+        title: PageTitle.budgetPlannerList,
+        component: BudgetPlannerListComponent,
+        resolve: { DataResolver: BudgetPlannerListResolver }
+    },
+    {
+        path: AppPaths.createBudgetPlanner,
+        title: PageTitle.budgetPlannerForm,
+        component: BudgetPlannerFormComponent
+    },
+    {
+        path: AppPaths.editBudgetPlanner,
+        title: PageTitle.budgetPlannerForm,
+        component: BudgetPlannerFormComponent
+    },
+    {
+        path: AppPaths.budgetPlannerDetail,
+        title: PageTitle.budgetPlannerDetail,
+        component: BudgetPlannerDetailComponent
+    }
 ];
 @NgModule({
-  declarations: [
-    HomeComponent,
-    LoginComponent,
-    AddEditRoleComponent,
-    RoleListComponent,
-    AddEditUserComponent,
-    UserListComponent,
-    CreateAccountComponent,
-    TransactionsListComponent,
-    TransferAmountComponent,
-    DepositAmountComponent,
-    CashWithdrawComponent,
-    CreateBudgetAccountComponent,
-    BudgetTransactionListComponent,
-    BudgetNotificationComponent,
-    AccountNotificationComponent,
-    AccountStatementReportComponent,
-    BudgetStatementReportComponent,
-    BudgetListComponent,
-    BudgetTransferComponent,
-    CalenderComponent,
-    AddEventModalComponent,
-    CreateWalletComponent,
-    WalletListComponent,
-    WalletTransferComponent,
-    DepositWalletComponent,
-    WalletTransactionListComponent,
-    BulkTransactionComponent,
-    BudgetPlannerListComponent,
-    BudgetPlannerFormComponent,
-    BudgetItemListComponent,
-    BudgetPlannerDetailComponent
-  ],
-  imports: [
-    RouterModule.forChild(routes),
-    CommonModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    SharedModule,
-    FullCalendarModule
-  ]
+    declarations: [
+        HomeComponent,
+        LoginComponent,
+        AddEditRoleComponent,
+        RoleListComponent,
+        AddEditUserComponent,
+        UserListComponent,
+        CreateAccountComponent,
+        TransactionsListComponent,
+        TransferAmountComponent,
+        DepositAmountComponent,
+        CashWithdrawComponent,
+        CreateBudgetAccountComponent,
+        BudgetTransactionListComponent,
+        BudgetNotificationComponent,
+        AccountNotificationComponent,
+        AccountStatementReportComponent,
+        BudgetStatementReportComponent,
+        BudgetListComponent,
+        BudgetTransferComponent,
+        CalenderComponent,
+        AddEventModalComponent,
+        CreateWalletComponent,
+        WalletListComponent,
+        WalletTransferComponent,
+        DepositWalletComponent,
+        WalletTransactionListComponent,
+        BulkTransactionComponent,
+        MutualFundsListComponent,
+        InvestModalComponent,
+        InvestmentComponent,
+        InvestmentProfileComponent,
+        BudgetPlannerListComponent,
+        BudgetPlannerFormComponent,
+        BudgetItemListComponent,
+        BudgetPlannerDetailComponent
+    ],
+    imports: [
+        RouterModule.forChild(routes),
+        CommonModule,
+        FormsModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        SharedModule,
+        FullCalendarModule
+    ]
 })
 export class ComponentModule { }

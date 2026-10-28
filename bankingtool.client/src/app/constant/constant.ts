@@ -62,6 +62,11 @@ export class AppPaths {
 
   //Bulk Transaction
   public static bulkTransaction: string = 'bulkTransaction';
+
+  //Mutual Funds
+  public static mutualFundsList: string = 'mutualFundsList';
+  public static investment: string = 'investment';
+  public static investmentProfile: string = 'userInvestmentProflie';
 }
 
 export class AppRoute {
@@ -114,6 +119,9 @@ export class AppRoute {
 
   //Bulk Transaction
   public static bulkTransaction: string = '/bulkTransaction';
+
+  //Mutual Funds
+  public static mutualFundsList: string = '/mutualFundsList';
 }
 export class PageTitle {
   public static home: string = 'Home';
@@ -164,6 +172,11 @@ export class PageTitle {
 
   //Bulk Transaction
   public static bulkTransaction: string = 'Bulk Transaction';
+
+  //Mutual Funds
+  public static mutualFundsList: string = 'Mutual Funds';
+  public static investment: string = 'My Investments';
+  public static investmentProfile: string = 'Investment Profile';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';
