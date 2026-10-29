@@ -46,9 +46,21 @@ namespace BankingTool.Service.Service
                 if (request?.BudgetPlanner == null)
                     return false;
 
-                var budgetPlanner = await _budgetPlannerRepository.GetBudgetPlannerDetailById(request.BudgetPlanner.BudgetPlannerId);
+                var budgetPlanner = new BudgetPlanner
+                {
+                    BudgetPlannerId = request.BudgetPlanner.BudgetPlannerId,
+                    PlanName = request.BudgetPlanner.PlanName,
+                    Description = request.BudgetPlanner.Description,
+                    TotalBudget = request.BudgetPlanner.TotalBudget
+                };
 
-                return await _budgetPlannerRepository.UpdateBudgetPlanner(budgetPlanner);
+                var budgetItems = request.BudgetPlanner.BudgetItems?.Select(x => new BudgetItem
+                {
+                    BudgetName = x.BudgetName,
+                    AllocatedAmount = x.AllocatedAmount
+                }).ToList() ?? new List<BudgetItem>();
+
+                return await _budgetPlannerRepository.UpdateBudgetPlanner(budgetPlanner, budgetItems);
             }
             catch (Exception ex)
             {
@@ -84,7 +96,7 @@ namespace BankingTool.Service.Service
                         PlanName = x.PlanName,
                         Description = x.Description,
                         TotalBudget = x.TotalBudget,
-                        AllocatedAmount = x.
+                        AllocatedAmount = x.BudgetItems.Sum(c=>c.AllocatedAmount)
                     }).ToList()
                 };
             }

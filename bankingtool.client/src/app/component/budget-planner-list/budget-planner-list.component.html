@@ -6,38 +6,38 @@
     </button>
   </div>
 
-  <div *ngIf="!isLoading && budgetPlannerList.length === 0" class="empty-state">
+  <div *ngIf="budgetPlannerList.length === 0" class="empty-state">
     <p>No budget planners found. Create your first budget plan to get started.</p>
     <button class="btn btn-primary" (click)="createNewPlan()">
       Create First Plan
     </button>
   </div>
 
-  <div *ngIf="!isLoading && budgetPlannerList.length > 0" class="budget-planner-grid">
+  <div *ngIf="budgetPlannerList.length > 0" class="budget-planner-grid">
     <div *ngFor="let planner of budgetPlannerList" class="planner-card">
       <div class="card-header">
-        <h3>{{ planner.PlanName }}</h3>
+        <h3>{{ planner.planName }}</h3>
         <div class="card-actions">
-          <button class="btn-icon" title="Edit" (click)="editPlan(planner.BudgetPlannerId)">
+          <button class="btn-icon" title="Edit" (click)="editPlan(planner.budgetPlannerId)">
             <i class="fa fa-edit"></i>
           </button>
-          <button class="btn-icon" title="Delete" (click)="deletePlan(planner.BudgetPlannerId)">
+          <button class="btn-icon" title="Delete" (click)="deletePlan(planner.budgetPlannerId)">
             <i class="fa fa-trash"></i>
           </button>
         </div>
       </div>
 
       <div class="card-body">
-        <p class="description">{{ planner.Description }}</p>
+        <p class="description">{{ planner.description }}</p>
 
         <div class="budget-info">
           <div class="info-row">
             <label>Total Budget:</label>
-            <span class="amount">{{ planner.TotalBudget | currency }}</span>
+            <span class="amount">{{ planner.totalBudget | currency }}</span>
           </div>
           <div class="info-row">
             <label>Allocated Amount:</label>
-            <span class="amount">{{ planner.AllocatedAmount | currency }}</span>
+            <span class="amount">{{ planner.allocatedAmount | currency }}</span>
           </div>
           <div class="info-row">
             <label>Remaining:</label>
@@ -47,7 +47,7 @@
           </div>
           <div class="info-row">
             <label>Budget Items:</label>
-            <span>{{ planner.TotalItems }}</span>
+            <span>{{ planner.totalItems }}</span>
           </div>
         </div>
 
@@ -60,7 +60,7 @@
       </div>
 
       <div class="card-footer">
-        <button class="btn btn-secondary" (click)="viewDetails(planner.BudgetPlannerId)">
+        <button class="btn btn-secondary" (click)="viewDetails(planner.budgetPlannerId)">
           <i class="fa fa-eye"></i> View Details
         </button>
       </div>

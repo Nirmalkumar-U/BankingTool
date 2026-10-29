@@ -10,7 +10,7 @@
     <!-- Plan Information Card -->
     <div class="info-card">
       <div class="card-header">
-        <h2>{{ budgetPlannerDetail.PlanName }}</h2>
+        <h2>{{ budgetPlannerDetail.planName }}</h2>
         <div class="card-actions">
           <button class="btn btn-primary btn-small" (click)="editBudgetPlanner()">
             <i class="fa fa-edit"></i> Edit
@@ -24,14 +24,14 @@
       <div class="card-body">
         <div class="description">
           <strong>Description:</strong>
-          <p>{{ budgetPlannerDetail.Description }}</p>
+          <p>{{ budgetPlannerDetail.description }}</p>
         </div>
 
         <!-- Budget Summary -->
         <div class="budget-summary">
           <div class="summary-card">
             <h3>Total Budget</h3>
-            <p class="amount">{{ budgetPlannerDetail.TotalBudget | currency }}</p>
+            <p class="amount">{{ budgetPlannerDetail.totalBudget | currency }}</p>
           </div>
           <div class="summary-card">
             <h3>Total Allocated</h3>
@@ -59,27 +59,27 @@
 
     <!-- Budget Items -->
     <div class="items-card">
-      <h2>Budget Items ({{ budgetPlannerDetail.BudgetItems.length }})</h2>
+      <h2>Budget Items ({{ budgetPlannerDetail.budgetItems.length }})</h2>
 
-      <div *ngIf="budgetPlannerDetail.BudgetItems.length === 0" class="empty-state">
+      <div *ngIf="budgetPlannerDetail.budgetItems.length === 0" class="empty-state">
         <p>No budget items available</p>
       </div>
 
-      <div *ngIf="budgetPlannerDetail.BudgetItems.length > 0" class="items-table">
+      <div *ngIf="budgetPlannerDetail.budgetItems.length > 0" class="items-table">
         <div class="table-header">
           <div class="col-name">Item Name</div>
           <div class="col-amount">Amount</div>
           <div class="col-percentage">% of Total</div>
         </div>
 
-        <div *ngFor="let item of budgetPlannerDetail.BudgetItems" class="table-row">
-          <div class="col-name">{{ item.BudgetName }}</div>
-          <div class="col-amount">{{ item.AllocatedAmount | currency }}</div>
+        <div *ngFor="let item of budgetPlannerDetail.budgetItems" class="table-row">
+          <div class="col-name">{{ item.budgetName }}</div>
+          <div class="col-amount">{{ item.allocatedAmount | currency }}</div>
           <div class="col-percentage">
             <div class="progress-mini">
-              <div class="progress-fill" [style.width.%]="(item.AllocatedAmount / budgetPlannerDetail.TotalBudget) * 100"></div>
+              <div class="progress-fill" [style.width.%]="(item.allocatedAmount / budgetPlannerDetail.totalBudget) * 100"></div>
             </div>
-            <span>{{ (item.AllocatedAmount / budgetPlannerDetail.TotalBudget) * 100 | number: '1.0-0' }}%</span>
+            <span>{{ (item.allocatedAmount / budgetPlannerDetail.totalBudget) * 100 | number: '1.0-0' }}%</span>
           </div>
         </div>
       </div>

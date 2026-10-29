@@ -16,5 +16,6 @@ namespace BankingTool.Model.Dto.RequestDto.BudgetPlanner
         public string PlanName { get; set; }
         public string Description { get; set; }
         public decimal TotalBudget { get; set; }
+        public List<BudgetItemData> BudgetItems { get; set; } = new List<BudgetItemData>();
     }
 }

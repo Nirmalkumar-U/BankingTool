@@ -13,7 +13,7 @@ export class BudgetItemListComponent {
   @Output() itemEdited = new EventEmitter<BudgetItemResponse>();
 
   getTotalAllocated(): number {
-    return this.budgetItems.reduce((sum, item) => sum + item.AllocatedAmount, 0);
+    return this.budgetItems.reduce((sum, item) => sum + item.allocatedAmount, 0);
   }
 
   getRemainingBudget(): number {
@@ -22,7 +22,7 @@ export class BudgetItemListComponent {
 
   getPercentageAllocated(item: BudgetItemResponse): number {
     if (this.totalBudget === 0) return 0;
-    return (item.AllocatedAmount / this.totalBudget) * 100;
+    return (item.allocatedAmount / this.totalBudget) * 100;
   }
 
   deleteItem(itemId: number) {

@@ -80,11 +80,11 @@ export class BudgetPlannerListComponent implements OnInit {
   }
 
   getPercentageAllocated(planner: GetBudgetPlannerList): number {
-    if (planner.TotalBudget === 0) return 0;
-    return (planner.AllocatedAmount / planner.TotalBudget) * 100;
+    if (planner.totalBudget === 0) return 0;
+    return (planner.allocatedAmount / planner.totalBudget) * 100;
   }
 
   getRemainingBudget(planner: GetBudgetPlannerList): number {
-    return planner.TotalBudget - planner.AllocatedAmount;
+    return planner.totalBudget - planner.allocatedAmount;
   }
 }

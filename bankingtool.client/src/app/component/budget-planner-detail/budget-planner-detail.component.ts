@@ -88,18 +88,18 @@ export class BudgetPlannerDetailComponent implements OnInit {
   }
 
   getTotalAllocated(): number {
-    if (!this.budgetPlannerDetail || !this.budgetPlannerDetail.BudgetItems) return 0;
-    return this.budgetPlannerDetail.BudgetItems.reduce((sum, item) => sum + item.AllocatedAmount, 0);
+    if (!this.budgetPlannerDetail || !this.budgetPlannerDetail.budgetItems) return 0;
+    return this.budgetPlannerDetail.budgetItems.reduce((sum, item) => sum + item.allocatedAmount, 0);
   }
 
   getRemainingBudget(): number {
     if (!this.budgetPlannerDetail) return 0;
-    return this.budgetPlannerDetail.TotalBudget - this.getTotalAllocated();
+    return this.budgetPlannerDetail.totalBudget - this.getTotalAllocated();
   }
 
   getPercentageAllocated(): number {
-    if (!this.budgetPlannerDetail || this.budgetPlannerDetail.TotalBudget === 0) return 0;
-    return (this.getTotalAllocated() / this.budgetPlannerDetail.TotalBudget) * 100;
+    if (!this.budgetPlannerDetail || this.budgetPlannerDetail.totalBudget === 0) return 0;
+    return (this.getTotalAllocated() / this.budgetPlannerDetail.totalBudget) * 100;
   }
 
   goBack() {

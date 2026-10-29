@@ -42,9 +42,13 @@ namespace BankingTool.Repository.Repository
 
         public async Task<bool> UpdateBudgetPlanner(BudgetPlanner budgetPlanner)
         {
+            using var transaction = dataContext.Database.BeginTransaction();
             try
             {
-                var existing = await dataContext.BudgetPlanner.FirstOrDefaultAsync(x => x.BudgetPlannerId == budgetPlanner.BudgetPlannerId);
+                var existing = await dataContext.BudgetPlanner
+                    .Include(x => x.BudgetItems)
+                    .FirstOrDefaultAsync(x => x.BudgetPlannerId == budgetPlanner.BudgetPlannerId);
+
                 if (existing == null)
                     return false;
 
@@ -54,10 +58,58 @@ namespace BankingTool.Repository.Repository
 
                 dataContext.BudgetPlanner.Update(existing);
                 await dataContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
                 return true;
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateBudgetPlanner(BudgetPlanner budgetPlanner, List<BudgetItem> budgetItems)
+        {
+            using var transaction = dataContext.Database.BeginTransaction();
+            try
+            {
+                var existing = await dataContext.BudgetPlanner
+                    .Include(x => x.BudgetItems)
+                    .FirstOrDefaultAsync(x => x.BudgetPlannerId == budgetPlanner.BudgetPlannerId);
+
+                if (existing == null)
+                    return false;
+
+                existing.PlanName = budgetPlanner.PlanName;
+                existing.Description = budgetPlanner.Description;
+                existing.TotalBudget = budgetPlanner.TotalBudget;
+
+                // Remove existing budget items
+                dataContext.BudgetItem.RemoveRange(existing.BudgetItems);
+                await dataContext.SaveChangesAsync();
+
+                // Add new budget items
+                if (budgetItems != null && budgetItems.Count > 0)
+                {
+                    foreach (var item in budgetItems)
+                    {
+                        item.BudgetPlannerId = budgetPlanner.BudgetPlannerId;
+                    }
+                    await dataContext.BudgetItem.AddRangeAsync(budgetItems);
+                    await dataContext.SaveChangesAsync();
+                }
+
+                dataContext.BudgetPlanner.Update(existing);
+                await dataContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
                 Console.WriteLine(ex.Message);
                 return false;
             }

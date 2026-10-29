@@ -3,24 +3,24 @@ export interface GetBudgetPlannerListResponse {
 }
 
 export interface GetBudgetPlannerList {
-  BudgetPlannerId: number;
-  PlanName: string;
-  Description: string;
-  TotalBudget: number;
-  TotalItems: number;
-  AllocatedAmount: number;
+  budgetPlannerId: number;
+  planName: string;
+  description: string;
+  totalBudget: number;
+  totalItems: number;
+  allocatedAmount: number;
 }
 
 export interface GetBudgetPlannerDetailResponse {
-  BudgetPlannerId: number;
-  PlanName: string;
-  Description: string;
-  TotalBudget: number;
-  BudgetItems: BudgetItemResponse[];
+  budgetPlannerId: number;
+  planName: string;
+  description: string;
+  totalBudget: number;
+  budgetItems: BudgetItemResponse[];
 }
 
 export interface BudgetItemResponse {
-  BudgetItemId: number;
-  BudgetName: string;
-  AllocatedAmount: number;
+  budgetItemId: number;
+  budgetName: string;
+  allocatedAmount: number;
 }

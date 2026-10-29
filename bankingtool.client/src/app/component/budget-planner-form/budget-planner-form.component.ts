@@ -85,17 +85,17 @@ export class BudgetPlannerFormComponent implements OnInit {
 
   populateForm(data: GetBudgetPlannerDetailResponse) {
     this.budgetPlannerForm.patchValue({
-      planName: data.PlanName,
-      description: data.Description,
-      totalBudget: data.TotalBudget
+      planName: data.planName,
+      description: data.description,
+      totalBudget: data.totalBudget
     });
 
-    if (data.BudgetItems && data.BudgetItems.length > 0) {
-      data.BudgetItems.forEach(item => {
+    if (data.budgetItems && data.budgetItems.length > 0) {
+      data.budgetItems.forEach(item => {
         this.budgetItems.push(
           this.formBuilder.group({
-            budgetName: [item.BudgetName, [Validators.required, Validators.minLength(3)]],
-            allocatedAmount: [item.AllocatedAmount, [Validators.required, Validators.min(0.01)]]
+            budgetName: [item.budgetName, [Validators.required, Validators.minLength(3)]],
+            allocatedAmount: [item.allocatedAmount, [Validators.required, Validators.min(0.01)]]
           })
         );
       });
@@ -218,7 +218,11 @@ export class BudgetPlannerFormComponent implements OnInit {
           budgetPlannerId: this.budgetPlannerId,
           planName: formValue.planName,
           description: formValue.description,
-          totalBudget: formValue.totalBudget
+          totalBudget: formValue.totalBudget,
+          budgetItems: formValue.budgetItems.map((item: any) => ({
+            budgetName: item.budgetName,
+            allocatedAmount: item.allocatedAmount
+          }))
         }
       }
     };
