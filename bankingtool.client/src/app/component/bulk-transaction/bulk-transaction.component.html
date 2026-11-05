@@ -34,25 +34,38 @@
           <p class="mt-2">Processing Excel file...</p>
         </div>
 
-        <form class="was-validated" novalidate [formGroup]="bulkTransactionForm" (ngSubmit)="submitTransactions()">
-          <div class="col-md-12 panel-block">
-            <label class="form-label">Transactions</label>
-            <div class="table-responsive">
-              <table class="table table-bordered">
+        <form class='was-validated' novalidate [formGroup]='bulkTransactionForm' (ngSubmit)='submitTransactions()'>
+          <div class='col-md-12 panel-block'>
+            <div class='bulk-page-toolbar'>
+              <div class='bulk-summary'>
+                <span class='bulk-summary-label'>Transactions</span>
+                <strong>{{ transactions.length }}</strong>
+              </div>
+              <button type='button' class='btn btn-primary btn-sm' (click)='addTransaction()' aria-label='Add new transaction'>
+                + Add Transaction
+              </button>
+            </div>
+
+            <div class='bulk-table-wrapper'>
+              <table class='table table-bordered bulk-data-table'>
                 <thead>
                   <tr>
-                    <th style="width: 120px;">Category</th>
-                    <th style="width: 150px;">From Account</th>
-                    <th style="width: 150px;">To Account</th>
-                    <th style="width: 100px;">Amount</th>
-                    <th style="width: 150px;">Description</th>
-                    <th style="width: 130px;">Date</th>
-                    <th style="width: 120px;">Tag</th>
-                    <th style="width: 50px;">Action</th>
+                    <th class='transaction-no-column'>#</th>
+                    <th style='width: 120px;'>Category</th>
+                    <th style='width: 150px;'>From Account</th>
+                    <th style='width: 150px;'>To Account</th>
+                    <th style='width: 100px;'>Amount</th>
+                    <th style='width: 150px;'>Description</th>
+                    <th style='width: 130px;'>Date</th>
+                    <th style='width: 120px;'>Tag</th>
+                    <th style='width: 60px;'>Action</th>
                   </tr>
                 </thead>
-                <tbody formArrayName="transactions">
-                  <tr *ngFor="let transaction of transactions.controls; let i = index" [formGroupName]="i">
+                <tbody formArrayName='transactions'>
+                  <tr *ngFor='let transaction of transactions.controls; let i = index' [formGroupName]='i' class='bulk-row'>
+                    <td class='transaction-no-cell'>
+                      <span class='transaction-chip'>T{{ i + 1 }}</span>
+                    </td>
                     <td>
                       <select class="form-select" formControlName="transactionCategory" required aria-label="Select transaction category">
                         <option value="">Select</option>
@@ -100,41 +113,55 @@
                 </tbody>
               </table>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm mb-3" (click)="addTransaction()" aria-label="Add new transaction">+ Add Transaction</button>
           </div>
 
-          <div class="col-md-12 panel-block" *ngFor="let transaction of transactions.controls; let i = index">
-            <label class="form-label">Budget Entries for Transaction {{ i + 1 }}</label>
-            <div class="table-responsive">
-              <table class="table table-bordered table-sm">
-                <thead>
-                  <tr>
-                    <th>Budget Account</th>
-                    <th style="width: 150px;">Budget Amount</th>
-                    <th style="width: 50px;">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
+          <div class='col-md-12 panel-block budget-panel'>
+            <div class='section-title-row'>
+              <label class='form-label'>Budget Entries</label>
+              <span class='section-meta'>{{ transactions.length }} transactions</span>
+            </div>
+
+            <div class='budget-list-wrapper'>
+              <div class='budget-transaction-card' *ngFor='let transaction of transactions.controls; let i = index'>
+                <div class='budget-card-header'>
+                  <strong>Transaction {{ i + 1 }}</strong>
+                </div>
+
+                <div class='table-responsive budget-table-shell'>
+                  <table class='table table-bordered table-sm budget-table'>
+                    <thead>
+                      <tr>
+                        <th>Budget Account</th>
+                        <th style='width: 150px;'>Budget Amount</th>
+                        <th style='width: 60px;'>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                   <tr *ngFor="let entry of getBudgetEntries(i).controls; let j = index" [formGroup]="$any(entry)">
-                    <td>
+                        <td>
                       <select class="form-select" formControlName="budgetAccountId" required aria-label="Select budget account">
                         <option value="">Select</option>
                         <option *ngFor="let budget of budgetAccountsList" [ngValue]="budget.key">{{ budget.value }}</option>
-                      </select>
+                          </select>
                       <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAccountId')?.invalid">Required</div>
-                    </td>
-                    <td>
+                        </td>
+                        <td>
                       <input type="number" class="form-control" formControlName="budgetAmount" placeholder="0.00" min="0.01" step="0.01" required aria-label="Budget amount">
                       <div class="invalid-feedback" *ngIf="$any(entry).get('budgetAmount')?.invalid">Required & > 0</div>
-                    </td>
-                    <td>
+                        </td>
+                        <td>
                       <button *ngIf="j > 0" type="button" class="btn btn-danger btn-sm" (click)="removeBudgetEntry(i, j)" aria-label="Remove budget entry">X</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <button type='button' class='btn btn-outline-secondary btn-sm add-budget-btn' (click)='addBudgetEntry(i)' aria-label='Add budget entry'>
+                  + Add Budget Entry
+                </button>
+              </div>
             </div>
-            <button type="button" class="btn btn-outline-secondary btn-sm mb-4" (click)="addBudgetEntry(i)" aria-label="Add budget entry">+ Add Budget Entry</button>
           </div>
 
           <div class="col-12 action-row">

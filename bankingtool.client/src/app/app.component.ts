@@ -4,7 +4,27 @@ import { EmitterService } from './core/emitter.service';
 import { IndexedDbServiceService } from './core/indexedDBService/indexed-db-service.service';
 import { LocalStorageService } from './core/local-storage.service';
 import { faBell, faHandshake, faMoneyBill1, faArrowAltCircleRight } from '@fortawesome/free-regular-svg-icons';
-import { faBars, faHouse } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faHouse,
+  faPiggyBank,
+  faWallet,
+  faLandmark,
+  faMoneyCheckDollar,
+  faChartLine,
+  faCalendar,
+  faUser,
+  faClipboard,
+  faChartPie,
+  faFileInvoiceDollar,
+  faUsers,
+  faBriefcase,
+  faCreditCard,
+  faGear,
+  faListCheck,
+  faSackDollar
+} from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { AuthService } from './core/service/auth.service';
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { GetActionsByUserIdDto } from './dto/internal-dto/get-actions-by-user-id-dto';
@@ -89,6 +109,29 @@ export class AppComponent implements OnInit {
     ).then(() => this.loadMenus());
   }
 
+  private getMenuIcon(label: string): IconDefinition {
+    const normalizedLabel = label?.toLowerCase() ?? '';
+
+    if (normalizedLabel.includes('budget')) return faPiggyBank;
+    if (normalizedLabel.includes('wallet')) return faWallet;
+    if (normalizedLabel.includes('account') || normalizedLabel.includes('bank')) return faLandmark;
+    if (normalizedLabel.includes('transaction') || normalizedLabel.includes('transfer')) return faMoneyCheckDollar;
+    if (normalizedLabel.includes('report') || normalizedLabel.includes('statement')) return faChartLine;
+    if (normalizedLabel.includes('calendar') || normalizedLabel.includes('event')) return faCalendar;
+    if (normalizedLabel.includes('user') || normalizedLabel.includes('role')) return faUser;
+    if (normalizedLabel.includes('note')) return faClipboard;
+    if (normalizedLabel.includes('mutual') || normalizedLabel.includes('fund')) return faChartPie;
+    if (normalizedLabel.includes('card') || normalizedLabel.includes('credit')) return faCreditCard;
+    if (normalizedLabel.includes('setting') || normalizedLabel.includes('config')) return faGear;
+    if (normalizedLabel.includes('home')) return faHouse;
+    if (normalizedLabel.includes('invoice') || normalizedLabel.includes('payment')) return faFileInvoiceDollar;
+    if (normalizedLabel.includes('team') || normalizedLabel.includes('employee')) return faUsers;
+    if (normalizedLabel.includes('task') || normalizedLabel.includes('list')) return faListCheck;
+    if (normalizedLabel.includes('plan')) return faSackDollar;
+
+    return faMoneyBill1;
+  }
+
   private loadMenus(): void {
     this.Menus = [];
     this.notificationMenus = [];
@@ -105,7 +148,7 @@ export class AppComponent implements OnInit {
 
         this.Menus.push({
           label: path.actionName,
-          icon: 'aMoneyBill1',
+          icon: this.getMenuIcon(path.actionName),
           isOpen: false,
           items: sMenu
         });
@@ -121,7 +164,7 @@ export class AppComponent implements OnInit {
 
         this.notificationMenus.push({
           label: path.actionName,
-          icon: 'aMoneyBill1',
+          icon: this.getMenuIcon(path.actionName),
           isOpen: false,
           items: sMenu
         });
@@ -143,7 +186,7 @@ interface MenuItem {
 
 interface Menu {
   label: string;
-  icon: string;
+  icon: IconDefinition;
   isOpen: boolean;
   items: MenuItem[];
 }
