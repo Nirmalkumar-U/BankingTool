@@ -140,12 +140,15 @@ export class HttpService {
       return response.json();
     } else if (!response || response.status === 204) {
       return;
-    } else if (response && response.status >= 401) {
-      this.loaderService.hide();
-      this.notificationService.show("Session expired...", 'error');
-      this.authService.logout();
-      throw response;
     } else if (response && response.status >= 500) {
+      this.loaderService.hide();
+      this.notificationService.show("Internal server error " + response.status.toString(), 'error');
+      throw response;
+    } if (response && response.status == 500) {
+      this.loaderService.hide();
+      this.notificationService.show("Internal server error " + response.status.toString(), 'error');
+      throw response;
+    } else if (response && response.status >= 400) {
       this.loaderService.hide();
       this.notificationService.show("Internal server error " + response.status.toString(), 'error');
       throw response;

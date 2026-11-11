@@ -265,6 +265,23 @@ namespace BankingTool.Service.Service
                 Errors = []
             };
         }
+
+        public async Task<ResponseDto<bool>> GetCustomerAccountsForCreditCard()
+        {
+            return new ResponseDto<bool>
+            {
+                Response = true,
+                DropDownList = new List<DropDownListDto>
+                {
+                    new DropDownListDto{ Name = "Account", DropDown = await _bankAccountRepository.GetFromAccountListByCustomerId() }
+                },
+                StatuCode = 200,
+                Status = true,
+                ValidationErrors = [],
+                Errors = []
+            };
+        }
+
         public async Task<ResponseDto<bool>> GetSelfTransferInitialLoad()
         {
             return new ResponseDto<bool>

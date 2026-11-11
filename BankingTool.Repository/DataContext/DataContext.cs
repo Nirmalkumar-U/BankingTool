@@ -66,6 +66,14 @@ namespace BankingTool.Repository
         public DbSet<BudgetPlanner> BudgetPlanner { get; set; }
         public DbSet<BudgetItem> BudgetItem { get; set; }
 
+        // Credit Card Feature
+        public DbSet<CreditCard> CreditCard { get; set; }
+        public DbSet<CreditCardApplication> CreditCardApplication { get; set; }
+        public DbSet<CreditCardTransaction> CreditCardTransaction { get; set; }
+        public DbSet<CreditCardStatement> CreditCardStatement { get; set; }
+        public DbSet<CreditCardStatementDetail> CreditCardStatementDetail { get; set; }
+        public DbSet<CreditCardFee> CreditCardFee { get; set; }
+
         // SP
         public DbSet<GetActionsByUserIdDto> GetActionsByUserIdDto { get; set; }
         public DbSet<GetTransactionsListResponseTransactionList> GetTransactionsListResponseTransactionList { get; set; }
@@ -106,6 +114,14 @@ namespace BankingTool.Repository
             modelBuilder.ApplyConfiguration(new UserInvestmentConfiguration());
             modelBuilder.ApplyConfiguration(new BudgetPlannerConfiguration());
             modelBuilder.ApplyConfiguration(new BudgetItemConfiguration());
+
+            // Credit Card Configurations
+            modelBuilder.ApplyConfiguration(new CreditCardApplicationConfiguration());
+            modelBuilder.ApplyConfiguration(new CreditCardConfiguration());
+            modelBuilder.ApplyConfiguration(new CreditCardTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new CreditCardStatementConfiguration());
+            modelBuilder.ApplyConfiguration(new CreditCardStatementDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new CreditCardFeeConfiguration());
 
             //SPs
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());

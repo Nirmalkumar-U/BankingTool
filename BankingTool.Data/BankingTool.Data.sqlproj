@@ -96,4 +96,7 @@
   <ItemGroup>
     <None Include="PostProductionScripts\Sprint2\ActionTable.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <Build Include="CreditCard.sql" />
+  </ItemGroup>
 </Project>

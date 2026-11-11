@@ -67,6 +67,14 @@ export class AppPaths {
   public static mutualFundsList: string = 'mutualFundsList';
   public static investment: string = 'investment';
   public static investmentProfile: string = 'userInvestmentProflie';
+
+  //Credit Card
+  public static creditCardApplication: string = 'creditCardApplication';
+  public static creditCardDashboard: string = 'creditCardDashboard';
+  public static creditCardTransactions: string = 'creditCardTransactions/:cardId';
+  public static creditCardPayment: string = 'creditCardPayment';
+  public static creditCardStatement: string = 'creditCardStatement/:cardId';
+  public static creditCardManagement: string = 'creditCardManagement';
 }
 
 export class AppRoute {
@@ -122,7 +130,16 @@ export class AppRoute {
 
   //Mutual Funds
   public static mutualFundsList: string = '/mutualFundsList';
+
+  //Credit Card
+  public static creditCardApplication: string = '/creditCardApplication';
+  public static creditCardDashboard: string = '/creditCardDashboard';
+  public static creditCardTransactions = (cardId: number): string => { return `/creditCardTransactions/${cardId}`; }
+  public static creditCardPayment: string = '/creditCardPayment';
+  public static creditCardStatement = (cardId: number): string => { return `/creditCardStatement/${cardId}`; }
+  public static creditCardManagement: string = '/creditCardManagement';
 }
+
 export class PageTitle {
   public static home: string = 'Home';
   public static login: string = 'Login';
@@ -174,9 +191,17 @@ export class PageTitle {
   public static bulkTransaction: string = 'Bulk Transaction';
 
   //Mutual Funds
-  public static mutualFundsList: string = 'Mutual Funds';
-  public static investment: string = 'My Investments';
+  public static mutualFundsList: string = 'Mutual Funds List';
+  public static investment: string = 'Investment';
   public static investmentProfile: string = 'Investment Profile';
+
+  //Credit Card
+  public static creditCardApplication: string = 'Credit Card Application';
+  public static creditCardDashboard: string = 'Credit Card Dashboard';
+  public static creditCardTransactions: string = 'Credit Card Transactions';
+  public static creditCardPayment: string = 'Credit Card Payment';
+  public static creditCardStatement: string = 'Credit Card Statement';
+  public static creditCardManagement: string = 'Credit Card Management';
 }
 export class ClaimKey {
   public static accessToken: string = 'accessToken';
@@ -184,5 +209,6 @@ export class ClaimKey {
   public static userName: string = 'UserName';
   public static idb: string = 'idb';
   public static customerId: string = 'CustomerId';
+  public static accountId: string = 'AccountId';
   public static staffId: string = 'StaffId';
 }

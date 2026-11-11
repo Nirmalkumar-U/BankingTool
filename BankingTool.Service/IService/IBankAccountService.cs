@@ -16,6 +16,7 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<bool>> BankDropDownList();
         Task<ResponseDto<bool>> GetAccountTypeDropDownListByCustomerIdAndBankId(int customerId, int bankId);
         Task<ResponseDto<bool>> GetTransferAmountInitialLoad();
+        Task<ResponseDto<bool>> GetCustomerAccountsForCreditCard();
         Task<ResponseDto<decimal>> GetAccountBalance(int accountId);
         Task<ResponseDto<bool>> TransferAmount(int fromAccountId, int toAccountId, decimal amount, string description, DateTime transactionDate, TransactionTagEnum transactionTag, List<TransferAmountRequestBudgetAccount> budgetAccount);
         Task<ResponseDto<bool>> GetSelfTransferInitialLoad();

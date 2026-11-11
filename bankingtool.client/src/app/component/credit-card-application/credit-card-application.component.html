@@ -1,0 +1,76 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">Apply for Credit Card</h3>
+        </div>
+        <div class="card-body" *ngIf="!isSubmitted">
+          <form [formGroup]="applicationForm">
+            <div class="mb-3">
+              <label for="account" class="form-label">Select Account <span class="text-danger">*</span></label>
+              <select id="account" class="form-select" formControlName="account" [disabled]="isLoading">
+                <option value="">Select Your Account</option>
+                <option *ngFor="let acc of accounts" [value]="acc.key">{{ acc.value }}</option>
+              </select>
+              <small class="text-muted d-block mt-1">Choose the account to apply credit card from</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="cardType" class="form-label">Card Type <span class="text-danger">*</span></label>
+              <select id="cardType" class="form-select" formControlName="cardType" [disabled]="isLoading">
+                <option value="">Select Card Type</option>
+                <option *ngFor="let cardType of cardTypes" [value]="cardType">{{ cardType }}</option>
+              </select>
+              <small class="text-muted d-block mt-1">Choose the type of credit card you want to apply for</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="desiredLimit" class="form-label">Desired Credit Limit <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input id="desiredLimit" type="number" class="form-control" formControlName="desiredLimit" 
+                       [disabled]="isLoading" placeholder="5000" min="1000" max="100000" />
+              </div>
+              <small class="text-muted d-block mt-1">Between $1,000 and $100,000</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="incomeDocuments" class="form-label">Upload Income Documents</label>
+              <input id="incomeDocuments" type="file" class="form-control" formControlName="incomeDocuments" 
+                     [disabled]="isLoading" accept=".pdf,.jpg,.png" (change)="onFileSelected($event)" />
+              <small class="text-muted d-block mt-1">Optional: Upload recent pay stubs, tax returns, or bank statements to speed up approval</small>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+              <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isLoading">
+                Reset
+              </button>
+              <button type="button" class="btn btn-primary" (click)="applyCreditCard()" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isLoading ? 'Submitting...' : 'Apply Now' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card-body" *ngIf="isSubmitted">
+          <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Application Submitted!</h4>
+            <p class="mb-0">
+              Your credit card application has been successfully submitted. You will receive updates on your application via email.
+              <br><br>
+              Keep your application ID handy to track the status of your application.
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary w-100" (click)="resetForm(); isSubmitted = false">
+            Apply for Another Card
+          </button>
+          <button type="button" class="btn btn-outline-primary w-100 mt-2" routerLink="/credit-card-dashboard">
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

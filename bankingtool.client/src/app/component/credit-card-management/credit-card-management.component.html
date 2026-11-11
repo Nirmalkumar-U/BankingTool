@@ -1,0 +1,233 @@
+<div class="container-fluid mt-4">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <h2 class="mb-0">Credit Card Management</h2>
+      <small class="text-muted">Administrative tools for managing customer credit cards</small>
+    </div>
+  </div>
+
+  <!-- Filter & Search -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label class="form-label">Search</label>
+              <div class="input-group">
+                <input type="text" class="form-control" [(ngModel)]="searchText" 
+                       placeholder="Cardholder name or card number" (keyup)="searchCards()">
+                <button class="btn btn-outline-secondary" type="button" (click)="searchCards()">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Filter by Status</label>
+              <select class="form-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+                <option value="">All Statuses</option>
+                <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+              </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
+                <i class="fas fa-times"></i> Reset Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card stat-card">
+        <div class="card-body">
+          <small class="text-muted">Total Cards</small>
+          <h3 class="mb-0">{{ totalCards }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stat-card">
+        <div class="card-body">
+          <small class="text-muted">Active</small>
+          <h3 class="mb-0 text-success">{{ getActiveCardsCount() }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stat-card">
+        <div class="card-body">
+          <small class="text-muted">Blocked</small>
+          <h3 class="mb-0 text-warning">{{ getBlockedCardsCount() }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stat-card">
+        <div class="card-body">
+          <small class="text-muted">Closed</small>
+          <h3 class="mb-0 text-danger">{{ getClosedCardsCount() }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credit Cards Table -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Credit Cards ({{ filteredCreditCards.length }})</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Cardholder</th>
+                  <th>Card Number</th>
+                  <th>Type</th>
+                  <th>Limit</th>
+                  <th>Current Balance</th>
+                  <th>Status</th>
+                  <th>Expiry Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="filteredCreditCards.length === 0">
+                  <td colspan="8" class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox"></i> No credit cards found
+                  </td>
+                </tr>
+                <tr *ngFor="let card of filteredCreditCards">
+                  <td class="font-weight-bold">{{ card.cardHolderName }}</td>
+                  <td>{{ card.maskedCardNumber }}</td>
+                  <td>
+                    <span class="badge bg-primary">{{ card.cardType }}</span>
+                  </td>
+                  <td>{{ formatCurrency(card.creditLimit) }}</td>
+                  <td [class.text-danger]="card.currentBalance > 0">{{ formatCurrency(card.currentBalance) }}</td>
+                  <td>
+                    <span [class]="getStatusBadgeClass(card.status)">
+                      {{ card.status }}
+                    </span>
+                  </td>
+                  <td>{{ card.expiryDate | date: 'MM/yyyy' }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-sm btn-outline-primary" 
+                              (click)="openLimitManagementModal(card)"
+                              [disabled]="!canModifyCard(card.status)"
+                              title="Update card limit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-warning" 
+                              (click)="blockCard(card)"
+                              *ngIf="card.status === 'Active'"
+                              title="Block card">
+                        <i class="fas fa-lock"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-info" 
+                              (click)="unblockCard(card)"
+                              *ngIf="card.status === 'Blocked'"
+                              title="Unblock card">
+                        <i class="fas fa-unlock"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-danger" 
+                              (click)="closeCard(card)"
+                              [disabled]="card.status === 'Closed'"
+                              title="Close card">
+                        <i class="fas fa-times-circle"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <nav aria-label="Page navigation" *ngIf="totalPages > 1" class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(1)" [disabled]="currentPage === 1">First</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+              </li>
+              <li class="page-item active">
+                <span class="page-link">Page {{ currentPage }} of {{ totalPages }}</span>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">Last</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Card Limit Modal -->
+  <div class="modal fade" id="managementModal" tabindex="-1" [class.show]="showManagementModal" 
+       [style.display]="showManagementModal ? 'block' : 'none'" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Card Limit</h5>
+          <button type="button" class="btn-close" (click)="closeManagementModal()"></button>
+        </div>
+        <form [formGroup]="managementForm">
+          <div class="modal-body">
+            <div *ngIf="selectedCard" class="mb-3">
+              <p><strong>Cardholder:</strong> {{ selectedCard.cardHolderName }}</p>
+              <p><strong>Card Number:</strong> {{ selectedCard.maskedCardNumber }}</p>
+              <p><strong>Current Limit:</strong> {{ formatCurrency(selectedCard.creditLimit) }}</p>
+              <p><strong>Current Balance:</strong> {{ formatCurrency(selectedCard.currentBalance) }}</p>
+            </div>
+
+            <div class="mb-3">
+              <label for="cardLimit" class="form-label">
+                New Credit Limit <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input id="cardLimit" type="number" class="form-control" formControlName="cardLimit" 
+                       placeholder="0.00" step="100" min="1000" [disabled]="isLoading">
+              </div>
+              <small class="text-muted d-block mt-1">Minimum: $1,000 | Maximum: $100,000</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="reason" class="form-label">
+                Reason for Update <span class="text-danger">*</span>
+              </label>
+              <textarea id="reason" class="form-control" formControlName="reason" rows="3" 
+                        placeholder="Explain the reason for this limit change" [disabled]="isLoading"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeManagementModal()" [disabled]="isLoading">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" (click)="updateCardLimit(selectedCard)" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Updating...' : 'Update Limit' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade" [class.show]="showManagementModal" [style.display]="showManagementModal ? 'block' : 'none'"></div>
+</div>

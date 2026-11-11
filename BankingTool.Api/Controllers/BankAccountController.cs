@@ -127,6 +127,19 @@ namespace BankingTool.Api.Controllers
             );
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> GetCustomerAccountsForCreditCard()
+        {
+            return await HandleRequestAsync<int?, bool>(
+                null,
+                null,
+                () => _bankAccountService.GetCustomerAccountsForCreditCard(),
+                true
+            );
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<decimal>), 200)]
         [ProducesResponseType(typeof(ResponseDto<decimal>), 400)]

@@ -1,0 +1,209 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow payment-card">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-credit-card"></i> Make Credit Card Payment
+          </h3>
+        </div>
+
+        <!-- Payment Successful Message -->
+        <div class="card-body" *ngIf="isSubmitted">
+          <div class="alert alert-success" role="alert">
+            <div class="text-center">
+              <i class="fas fa-check-circle" style="font-size: 3rem; color: #198754; margin-bottom: 1rem;"></i>
+              <h4 class="alert-heading">Payment Successful!</h4>
+              <p>Your payment has been processed successfully.</p>
+              <p class="mb-0">Redirecting to dashboard...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Form -->
+        <div class="card-body" *ngIf="!isSubmitted && cardDetails">
+          <form [formGroup]="paymentForm">
+            <!-- Card Information Display -->
+            <div class="alert alert-info mb-4">
+              <div class="row">
+                <div class="col-md-6">
+                  <p class="mb-2">
+                    <strong>Card:</strong> {{ cardDetails?.maskedCardNumber }}
+                  </p>
+                  <p class="mb-0">
+                    <strong>Cardholder:</strong> {{ cardDetails?.cardHolderName }}
+                  </p>
+                </div>
+                <div class="col-md-6 text-end">
+                  <h5 class="mb-2" [class.text-danger]="currentBalance > 0">
+                    Current Balance: {{ formatCurrency(currentBalance) }}
+                  </h5>
+                  <p class="mb-0 text-muted">
+                    Minimum Payment: {{ formatCurrency(minimumPayment) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Payment Buttons -->
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <label class="form-label">Quick Payment Options</label>
+                <div class="btn-group w-100" role="group">
+                  <button type="button" class="btn btn-outline-primary" (click)="quickSetPayment('minimum')">
+                    Minimum Payment<br>
+                    <small>{{ formatCurrency(minimumPayment) }}</small>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary" (click)="quickSetPayment('half')">
+                    Half Balance<br>
+                    <small>{{ formatCurrency(currentBalance / 2) }}</small>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary" (click)="quickSetPayment('full')">
+                    Full Balance<br>
+                    <small>{{ formatCurrency(currentBalance) }}</small>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Amount -->
+            <div class="mb-3">
+              <label for="paymentAmount" class="form-label">
+                Payment Amount <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input id="paymentAmount" type="number" class="form-control" formControlName="paymentAmount"
+                       placeholder="0.00" step="0.01" min="0.01" [disabled]="isLoading">
+              </div>
+              <div *ngIf="currentBalance > 0" class="progress mt-2" style="height: 6px;">
+                <div class="progress-bar" role="progressbar"
+                     [style.width.%]="getPaymentPercentage()"
+                     [attr.aria-valuenow]="getPaymentPercentage()"
+                     aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+              <small class="text-muted d-block mt-1">{{ getPaymentPercentage() | number: '1.0-0' }}% of current balance</small>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="mb-3">
+              <label for="paymentMethod" class="form-label">
+                Payment Method <span class="text-danger">*</span>
+              </label>
+              <select id="paymentMethod" class="form-select" formControlName="paymentMethod" [disabled]="isLoading">
+                <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
+              </select>
+              <small class="text-muted d-block mt-1">Select the account from which payment will be deducted</small>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea id="description" class="form-control" formControlName="description" rows="2" [disabled]="isLoading"></textarea>
+            </div>
+
+            <!-- Confirmation Checkbox -->
+            <div class="mb-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="confirmationChecked" 
+                       formControlName="confirmationChecked" [disabled]="isLoading">
+                <label class="form-check-label" for="confirmationChecked">
+                  I confirm that the payment amount and method are correct
+                </label>
+              </div>
+              <small class="text-muted d-block mt-1">
+                Please review all details before confirming your payment
+              </small>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isLoading">
+                Reset
+              </button>
+              <button type="button" class="btn btn-primary" (click)="showPaymentConfirmation()" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isLoading ? 'Processing...' : 'Continue' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Confirmation Modal -->
+  <div class="modal fade" id="paymentConfirmationModal" tabindex="-1" [class.show]="showConfirmation"
+       [style.display]="showConfirmation ? 'block' : 'none'" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Payment</h5>
+          <button type="button" class="btn-close" (click)="cancelPayment()"></button>
+        </div>
+        <div class="modal-body" *ngIf="confirmationData">
+          <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            Please review the payment details below before confirming
+          </div>
+
+          <table class="table table-borderless">
+            <tbody>
+              <tr>
+                <td><strong>Card:</strong></td>
+                <td>{{ confirmationData.cardNumber }}</td>
+              </tr>
+              <tr>
+                <td><strong>Cardholder:</strong></td>
+                <td>{{ confirmationData.cardHolder }}</td>
+              </tr>
+              <tr>
+                <td><strong>Current Balance:</strong></td>
+                <td [class.text-danger]="confirmationData.currentBalance > 0">
+                  {{ formatCurrency(confirmationData.currentBalance) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Payment Amount:</strong></td>
+                <td class="font-weight-bold text-success">
+                  <i class="fas fa-minus-circle"></i> {{ formatCurrency(confirmationData.paymentAmount) }}
+                </td>
+              </tr>
+              <tr style="border-top: 2px solid #dee2e6;">
+                <td><strong>Balance After Payment:</strong></td>
+                <td class="font-weight-bold" [class.text-success]="confirmationData.balanceAfterPayment <= 0">
+                  {{ formatCurrency(confirmationData.balanceAfterPayment) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Payment Method:</strong></td>
+                <td>{{ confirmationData.paymentMethod }}</td>
+              </tr>
+              <tr>
+                <td><strong>Description:</strong></td>
+                <td>{{ confirmationData.description }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-info" role="alert">
+            <strong>Note:</strong> This payment will be processed immediately. Once confirmed, it cannot be undone.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelPayment()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" (click)="confirmAndProcessPayment()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'Processing...' : 'Confirm Payment' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade" [class.show]="showConfirmation" [style.display]="showConfirmation ? 'block' : 'none'"></div>
+</div>

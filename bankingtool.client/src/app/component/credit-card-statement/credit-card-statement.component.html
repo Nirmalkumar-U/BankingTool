@@ -1,0 +1,273 @@
+<div class="container-fluid mt-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2 class="mb-0">Credit Card Statement</h2>
+      <small class="text-muted">View and download your credit card statements</small>
+    </div>
+    <div class="col-md-4 text-end">
+      <button class="btn btn-secondary me-2" (click)="loadCurrentStatement()" [disabled]="isLoading">
+        <i class="fas fa-sync"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Current Statement -->
+  <div class="row mb-4" *ngIf="currentStatement">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Current Statement</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p>
+                <strong>Period:</strong> 
+                {{ currentStatement.statementStartDate | date: 'MM/dd/yyyy' }} - 
+                {{ currentStatement.statementEndDate | date: 'MM/dd/yyyy' }}
+              </p>
+              <p>
+                <strong>Card:</strong> {{ currentStatement.maskedCardNumber }}
+              </p>
+              <p>
+                <strong>Cardholder:</strong> {{ currentStatement.cardHolderName }}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <p>
+                <strong>Previous Balance:</strong> 
+                <span class="text-muted">{{ formatCurrency(currentStatement.previousBalance) }}</span>
+              </p>
+              <p>
+                <strong>Statement Generated:</strong> 
+                <span class="text-muted">{{ currentStatement.generatedDate | date: 'MM/dd/yyyy' }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Summary Grid -->
+          <div class="row mt-4">
+            <div class="col-md-3">
+              <div class="summary-box">
+                <small class="text-muted">New Charges</small>
+                <h5 class="text-danger">{{ formatCurrency(currentStatement.newCharges) }}</h5>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="summary-box">
+                <small class="text-muted">Payments</small>
+                <h5 class="text-success">-{{ formatCurrency(currentStatement.totalPayments) }}</h5>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="summary-box">
+                <small class="text-muted">Fees & Interest</small>
+                <h5 class="text-warning">{{ formatCurrency(currentStatement.feesAndInterest) }}</h5>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="summary-box bg-light-primary">
+                <small class="text-muted">Current Balance</small>
+                <h5 [class.text-danger]="currentStatement.currentBalance > 0">
+                  {{ formatCurrency(currentStatement.currentBalance) }}
+                </h5>
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Info -->
+          <div class="alert alert-info mt-4" role="alert">
+            <div class="row">
+              <div class="col-md-6">
+                <p class="mb-1">
+                  <strong>Minimum Payment Due:</strong> 
+                  {{ formatCurrency(currentStatement.minimumPaymentDue) }}
+                </p>
+              </div>
+              <div class="col-md-6">
+                <p class="mb-0">
+                  <strong>Payment Due Date:</strong> 
+                  <span class="badge bg-warning">{{ currentStatement.paymentDueDate | date: 'MM/dd/yyyy' }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+            <button class="btn btn-outline-secondary" (click)="printStatement(currentStatement)" [disabled]="isLoading">
+              <i class="fas fa-print"></i> Print
+            </button>
+            <button class="btn btn-outline-info" (click)="downloadStatement(currentStatement.creditCardStatementId)" [disabled]="isLoading">
+              <i class="fas fa-download"></i> Download PDF
+            </button>
+            <button class="btn btn-primary" (click)="viewStatementDetails(currentStatement)">
+              <i class="fas fa-eye"></i> View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statement History -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Statement History</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Balance</th>
+                  <th>Min Payment</th>
+                  <th>Status</th>
+                  <th>Generated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="statementHistory.length === 0">
+                  <td colspan="6" class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox"></i> No statement history found
+                  </td>
+                </tr>
+                <tr *ngFor="let statement of statementHistory" (click)="viewStatementDetails(statement)">
+                  <td>
+                    {{ statement.statementStartDate | date: 'MM/dd/yyyy' }} - 
+                    {{ statement.statementEndDate | date: 'MM/dd/yyyy' }}
+                  </td>
+                  <td class="font-weight-bold" [class.text-danger]="statement.currentBalance > 0">
+                    {{ formatCurrency(statement.currentBalance) }}
+                  </td>
+                  <td>{{ formatCurrency(statement.minimumPaymentDue) }}</td>
+                  <td>
+                    <span class="badge" 
+                          [class.bg-success]="statement.isPaid"
+                          [class.bg-warning]="!statement.isPaid">
+                      {{ statement.isPaid ? 'Paid' : 'Unpaid' }}
+                    </span>
+                  </td>
+                  <td>{{ statement.generatedDate | date: 'MM/dd/yyyy' }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-sm btn-outline-info" 
+                              (click)="viewStatementDetails(statement); $event.stopPropagation()"
+                              title="View details">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" 
+                              (click)="printStatement(statement); $event.stopPropagation()"
+                              title="Print">
+                        <i class="fas fa-print"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-primary" 
+                              (click)="downloadStatement(statement.creditCardStatementId); $event.stopPropagation()"
+                              title="Download PDF">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <nav aria-label="Page navigation" *ngIf="totalPages > 1" class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(1)" [disabled]="currentPage === 1">First</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+              </li>
+              <li class="page-item active">
+                <span class="page-link">Page {{ currentPage }} of {{ totalPages }}</span>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">Last</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statement Details Modal -->
+  <div class="modal fade" id="statementDetailsModal" tabindex="-1" [class.show]="showStatementDetails" 
+       [style.display]="showStatementDetails ? 'block' : 'none'" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Statement Details</h5>
+          <button type="button" class="btn-close" (click)="closeStatementDetails()"></button>
+        </div>
+        <div class="modal-body" *ngIf="selectedStatement">
+          <!-- Summary -->
+          <h6 class="mb-3">Summary</h6>
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <p><strong>Previous Balance:</strong> {{ formatCurrency(selectedStatement.previousBalance) }}</p>
+              <p><strong>Total Payments:</strong> {{ formatCurrency(selectedStatement.totalPayments) }}</p>
+              <p><strong>New Charges:</strong> {{ formatCurrency(selectedStatement.newCharges) }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Fees & Interest:</strong> {{ formatCurrency(selectedStatement.feesAndInterest) }}</p>
+              <p><strong>Current Balance:</strong> <strong>{{ formatCurrency(selectedStatement.currentBalance) }}</strong></p>
+              <p><strong>Minimum Payment Due:</strong> {{ formatCurrency(selectedStatement.minimumPaymentDue) }}</p>
+            </div>
+          </div>
+
+          <!-- Transactions -->
+          <h6 class="mb-3">Transactions</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="!selectedStatement.statementDetails || selectedStatement.statementDetails.length === 0">
+                  <td colspan="4" class="text-center text-muted">No transactions</td>
+                </tr>
+                <tr *ngFor="let detail of selectedStatement.statementDetails">
+                  <td>{{ detail.transactionDate | date: 'MM/dd/yyyy' }}</td>
+                  <td>{{ detail.description }}</td>
+                  <td>{{ detail.transactionType }}</td>
+                  <td class="text-end font-weight-bold">{{ formatCurrency(detail.amount) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeStatementDetails()">Close</button>
+          <button type="button" class="btn btn-outline-secondary" 
+                  (click)="printStatement(selectedStatement)">
+            <i class="fas fa-print"></i> Print
+          </button>
+          <button type="button" class="btn btn-primary" 
+                  (click)="downloadStatement(selectedStatement.creditCardStatementId)">
+            <i class="fas fa-download"></i> Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade" [class.show]="showStatementDetails" [style.display]="showStatementDetails ? 'block' : 'none'"></div>
+</div>

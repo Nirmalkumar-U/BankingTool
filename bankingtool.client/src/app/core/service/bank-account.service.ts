@@ -46,6 +46,9 @@ export class BankAccountService {
   getTransferAmountInitialLoad(): Observable<any> {
     return this.httpService.get('BankAccount/GetTransferAmountInitialLoad');
   }
+  getCustomerAccountsForCreditCard(): Observable<any> {
+    return this.httpService.get('BankAccount/GetCustomerAccountsForCreditCard');
+  }
   getAccountBalance(model: GetAccountBalanceRequestObject): Observable<any> {
     return this.httpService.post('BankAccount/GetAccountBalance', model);
   }

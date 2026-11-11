@@ -65,6 +65,12 @@ import { BudgetPlannerListComponent } from './budget-planner-list/budget-planner
 import { BudgetPlannerFormComponent } from './budget-planner-form/budget-planner-form.component';
 import { BudgetItemListComponent } from './budget-item-list/budget-item-list.component';
 import { BudgetPlannerDetailComponent } from './budget-planner-detail/budget-planner-detail.component';
+import { CreditCardApplicationComponent } from './credit-card-application/credit-card-application.component';
+import { CreditCardDashboardComponent } from './credit-card-dashboard/credit-card-dashboard.component';
+import { CreditCardTransactionHistoryComponent } from './credit-card-transaction-history/credit-card-transaction-history.component';
+import { CreditCardPaymentComponent } from './credit-card-payment/credit-card-payment.component';
+import { CreditCardStatementComponent } from './credit-card-statement/credit-card-statement.component';
+import { CreditCardManagementComponent } from './credit-card-management/credit-card-management.component';
 
 const routes: Routes = [
     {
@@ -263,6 +269,36 @@ const routes: Routes = [
         path: AppPaths.budgetPlannerDetail,
         title: PageTitle.budgetPlannerDetail,
         component: BudgetPlannerDetailComponent
+    },
+    {
+        path: AppPaths.creditCardApplication,
+        title: PageTitle.creditCardApplication,
+        component: CreditCardApplicationComponent
+    },
+    {
+        path: AppPaths.creditCardDashboard,
+        title: PageTitle.creditCardDashboard,
+        component: CreditCardDashboardComponent
+    },
+    {
+        path: AppPaths.creditCardTransactions,
+        title: PageTitle.creditCardTransactions,
+        component: CreditCardTransactionHistoryComponent
+    },
+    {
+        path: AppPaths.creditCardPayment,
+        title: PageTitle.creditCardPayment,
+        component: CreditCardPaymentComponent
+    },
+    {
+        path: AppPaths.creditCardStatement,
+        title: PageTitle.creditCardStatement,
+        component: CreditCardStatementComponent
+    },
+    {
+        path: AppPaths.creditCardManagement,
+        title: PageTitle.creditCardManagement,
+        component: CreditCardManagementComponent
     }
 ];
 @NgModule({
@@ -301,7 +337,13 @@ const routes: Routes = [
         BudgetPlannerListComponent,
         BudgetPlannerFormComponent,
         BudgetItemListComponent,
-        BudgetPlannerDetailComponent
+        BudgetPlannerDetailComponent,
+        CreditCardApplicationComponent,
+        CreditCardDashboardComponent,
+        CreditCardTransactionHistoryComponent,
+        CreditCardPaymentComponent,
+        CreditCardStatementComponent,
+        CreditCardManagementComponent
     ],
     imports: [
         RouterModule.forChild(routes),
