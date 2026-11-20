@@ -73,5 +73,10 @@ namespace BankingTool.Repository.IRepository
         /// Gets statement details for a statement
         /// </summary>
         Task<List<CreditCardStatementDetail>> GetStatementDetails(int statementId);
+
+        /// <summary>
+        /// Creates a statement detail for a transaction
+        /// </summary>
+        Task<int> InsertStatementDetail(CreditCardStatementDetail statementDetail);
     }
 }

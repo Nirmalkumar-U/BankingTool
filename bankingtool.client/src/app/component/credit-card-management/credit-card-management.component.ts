@@ -20,6 +20,12 @@ export class CreditCardManagementComponent implements OnInit {
   showManagementModal: boolean = false;
   managementForm: FormGroup;
 
+  // Approve/Reject Modal properties
+  showApproveModal: boolean = false;
+  showRejectModal: boolean = false;
+  approveForm: FormGroup;
+  rejectForm: FormGroup;
+
   filterStatus: string = '';
   statuses: string[] = ['Active', 'Blocked', 'Closed', 'Expired', 'Pending'];
 
@@ -35,8 +41,17 @@ export class CreditCardManagementComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.managementForm = this.fb.group({
-      cardLimit: ['', [Validators.required, Validators.min(1000), Validators.max(100000)]],
+      cardLimit: ['', [Validators.required, Validators.min(1000), Validators.max(1000000)]],
       reason: ['', [Validators.required]]
+    });
+
+    this.approveForm = this.fb.group({
+      approvedLimit: ['', [Validators.required, Validators.min(1000), Validators.max(100000)]],
+      approvalRemarks: ['', []]
+    });
+
+    this.rejectForm = this.fb.group({
+      rejectionRemarks: ['', [Validators.required]]
     });
   }
 
@@ -46,7 +61,7 @@ export class CreditCardManagementComponent implements OnInit {
 
   loadAllCreditCards(): void {
     this.loaderService.show();
-    this.creditCardService.getPendingApplications().subscribe(
+    this.creditCardService.getCustomerCreditCards().subscribe(
       (response: ResponseDto<any>) => {
         this.loaderService.hide();
         if (response.status === true && Array.isArray(response.response)) {
@@ -201,9 +216,105 @@ export class CreditCardManagementComponent implements OnInit {
     this.managementForm.reset();
   }
 
+  openApproveModal(card: any): void {
+    this.selectedCard = card;
+    this.approveForm.reset({
+      approvedLimit: card.desiredLimit || 5000,
+      approvalRemarks: ''
+    });
+    this.showApproveModal = true;
+  }
+
+  closeApproveModal(): void {
+    this.showApproveModal = false;
+    this.selectedCard = null;
+    this.approveForm.reset();
+  }
+
+  approveApplication(): void {
+    if (!this.approveForm.valid) {
+      this.notificationService.show('Please fill all required fields', 'error');
+      return;
+    }
+
+    if (!this.selectedCard) {
+      this.notificationService.show('No application selected', 'error');
+      return;
+    }
+
+    const approvedLimit = this.approveForm.get('approvedLimit')?.value;
+    const approvalRemarks = this.approveForm.get('approvalRemarks')?.value || '';
+
+    this.loaderService.show();
+    this.creditCardService.approveCreditCard(this.selectedCard.applicationId, approvedLimit, approvalRemarks).subscribe(
+      (response: ResponseDto<any>) => {
+        this.loaderService.hide();
+        if (response.status === true) {
+          this.notificationService.show('Credit card application approved successfully!', 'success');
+          this.closeApproveModal();
+          this.loadAllCreditCards();
+        } else {
+          this.notificationService.show('Failed to approve credit card application', 'error');
+        }
+      },
+      (error) => {
+        this.loaderService.hide();
+        this.notificationService.show('An error occurred while approving the application', 'error');
+        console.error('Error:', error);
+      }
+    );
+  }
+
+  openRejectModal(card: any): void {
+    this.selectedCard = card;
+    this.rejectForm.reset({
+      rejectionRemarks: ''
+    });
+    this.showRejectModal = true;
+  }
+
+  closeRejectModal(): void {
+    this.showRejectModal = false;
+    this.selectedCard = null;
+    this.rejectForm.reset();
+  }
+
+  rejectApplication(): void {
+    if (!this.rejectForm.valid) {
+      this.notificationService.show('Please provide rejection remarks', 'error');
+      return;
+    }
+
+    if (!this.selectedCard) {
+      this.notificationService.show('No application selected', 'error');
+      return;
+    }
+
+    const rejectionRemarks = this.rejectForm.get('rejectionRemarks')?.value;
+
+    this.loaderService.show();
+    this.creditCardService.rejectCreditCard(this.selectedCard.applicationId, rejectionRemarks).subscribe(
+      (response: ResponseDto<any>) => {
+        this.loaderService.hide();
+        if (response.status === true) {
+          this.notificationService.show('Credit card application rejected successfully!', 'success');
+          this.closeRejectModal();
+          this.loadAllCreditCards();
+        } else {
+          this.notificationService.show('Failed to reject credit card application', 'error');
+        }
+      },
+      (error) => {
+        this.loaderService.hide();
+        this.notificationService.show('An error occurred while rejecting the application', 'error');
+        console.error('Error:', error);
+      }
+    );
+  }
+
   searchCards(): void {
     this.currentPage = 1;
-    this.applyFilters();
+
   }
 
   filterByStatus(status: string): void {

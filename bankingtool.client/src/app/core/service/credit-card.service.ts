@@ -19,32 +19,28 @@ export class CreditCardService {
   }
 
   getApplicationStatus(applicationId: number): Observable<any> {
-    return this.httpService.get(`CreditCardApplication/GetApplicationStatus?applicationId=${applicationId}`);
+    return this.httpService.get(`CreditCard/GetApplicationStatus?applicationId=${applicationId}`);
   }
 
   getCustomerApplications(accountId: number): Observable<any> {
-    return this.httpService.get(`CreditCardApplication/GetApplicationHistory?accountId=${accountId}`);
+    return this.httpService.get(`CreditCard/GetApplicationHistory?accountId=${accountId}`);
   }
 
-  getPendingApplications(): Observable<any> {
-    return this.httpService.get('CreditCardApplication/GetPendingApplications');
+  getCustomerCreditCards(): Observable<any> {
+    return this.httpService.get('CreditCard/GetCustomerCreditCards');
   }
 
   approveCreditCard(applicationId: number, approvedLimit: number, approvalRemarks: string = ''): Observable<any> {
-    return this.httpService.post(`CreditCardApplication/ApproveApplication?applicationId=${applicationId}&approvedLimit=${approvedLimit}&approvalRemarks=${approvalRemarks}`, {});
+    return this.httpService.post(`CreditCard/ApproveApplication?applicationId=${applicationId}&approvedLimit=${approvedLimit}&approvalRemarks=${approvalRemarks}`, {});
   }
 
   rejectCreditCard(applicationId: number, rejectionRemarks: string = ''): Observable<any> {
-    return this.httpService.post(`CreditCardApplication/RejectApplication?applicationId=${applicationId}&rejectionRemarks=${rejectionRemarks}`, {});
+    return this.httpService.post(`CreditCard/RejectApplication?applicationId=${applicationId}&rejectionRemarks=${rejectionRemarks}`, {});
   }
 
   // Credit Card Management Methods
   getCardDetails(creditCardId: number): Observable<any> {
     return this.httpService.get(`CreditCard/GetCardDetails?creditCardId=${creditCardId}`);
-  }
-
-  getCustomerCreditCards(): Observable<any> {
-    return this.httpService.get(`CreditCard/GetCustomerCreditCards`);
   }
 
   updateCardLimit(creditCardId: number, newLimit: number): Observable<any> {
@@ -87,8 +83,8 @@ export class CreditCardService {
     return this.httpService.get(`CreditCard/GetTransactionsByDateRange?creditCardId=${creditCardId}&fromDate=${fromDate}&toDate=${toDate}`);
   }
 
-  getRecentTransactions(creditCardId: number, count: number = 10): Observable<any> {
-    return this.httpService.get(`CreditCard/GetRecentTransactions?creditCardId=${creditCardId}&count=${count}`);
+  getRecentTransactions(): Observable<any> {
+    return this.httpService.get(`CreditCard/GetRecentTransactions`);
   }
 
   reverseTransaction(transactionId: number, reason: string = ''): Observable<any> {
@@ -108,6 +104,34 @@ export class CreditCardService {
     return this.httpService.get(`CreditCard/GetOverdueStatements?creditCardId=${creditCardId}`);
   }
 
+  generateStatement(creditCardId: number, billingCycleEndDate: Date): Observable<any> {
+    return this.httpService.post(`CreditCard/GenerateStatement?creditCardId=${creditCardId}&billingCycleEndDate=${billingCycleEndDate.toISOString()}`, {});
+  }
+
+  getStatementDetails(statementId: number): Observable<any> {
+    return this.httpService.get(`CreditCard/GetStatementDetails?statementId=${statementId}`);
+  }
+
+  getStatementWithDetails(statementId: number): Observable<any> {
+    return this.httpService.get(`CreditCard/GetStatementWithDetails?statementId=${statementId}`);
+  }
+
+  getStatementsByStatus(creditCardId: number, status: string): Observable<any> {
+    return this.httpService.get(`CreditCard/GetStatementsByStatus?creditCardId=${creditCardId}&status=${encodeURIComponent(status)}`);
+  }
+
+  markStatementAsPaid(statementId: number): Observable<any> {
+    return this.httpService.post(`CreditCard/MarkStatementAsPaid?statementId=${statementId}`, {});
+  }
+
+  markStatementAsPartiallyPaid(statementId: number): Observable<any> {
+    return this.httpService.post(`CreditCard/MarkStatementAsPartiallyPaid?statementId=${statementId}`, {});
+  }
+
+  markStatementAsOverdue(statementId: number): Observable<any> {
+    return this.httpService.post(`CreditCard/MarkStatementAsOverdue?statementId=${statementId}`, {});
+  }
+
   // Dashboard Methods
   getDashboardData(accountId: number): Observable<any> {
     return this.httpService.get(`CreditCard/GetDashboardData?accountId=${accountId}`);
@@ -122,8 +146,28 @@ export class CreditCardService {
   }
 
   // Fee Methods
-  getCardFees(creditCardId: number): Observable<any> {
-    return this.httpService.get(`CreditCard/GetCardFees?creditCardId=${creditCardId}`);
+  getCardFees(creditCardId: number, pageNumber: number = 1, pageSize: number = 10): Observable<any> {
+    return this.httpService.get(`CreditCard/GetCardFees?creditCardId=${creditCardId}&pageNumber=${pageNumber}&pageSize=${pageSize}`);
+  }
+
+  getFeesByType(creditCardId: number, feeType: string): Observable<any> {
+    return this.httpService.get(`CreditCard/GetFeesByType?creditCardId=${creditCardId}&feeType=${encodeURIComponent(feeType)}`);
+  }
+
+  getBillingCycleFees(creditCardId: number, cycleStartDate: Date, cycleEndDate: Date): Observable<any> {
+    return this.httpService.get(`CreditCard/GetBillingCycleFees?creditCardId=${creditCardId}&cycleStartDate=${cycleStartDate.toISOString()}&cycleEndDate=${cycleEndDate.toISOString()}`);
+  }
+
+  calculateTotalFees(creditCardId: number, fromDate: Date, toDate: Date): Observable<any> {
+    return this.httpService.get(`CreditCard/CalculateTotalFees?creditCardId=${creditCardId}&fromDate=${fromDate.toISOString()}&toDate=${toDate.toISOString()}`);
+  }
+
+  reverseFee(feeId: number, reason: string = ''): Observable<any> {
+    return this.httpService.post(`CreditCard/ReverseFee?feeId=${feeId}&reason=${encodeURIComponent(reason)}`, {});
+  }
+
+  waiveFee(feeId: number, reason: string = ''): Observable<any> {
+    return this.httpService.post(`CreditCard/WaiveFee?feeId=${feeId}&reason=${encodeURIComponent(reason)}`, {});
   }
 
   getPendingCharges(creditCardId: number): Observable<any> {

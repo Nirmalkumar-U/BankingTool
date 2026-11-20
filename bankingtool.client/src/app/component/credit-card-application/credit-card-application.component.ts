@@ -20,7 +20,7 @@ export class CreditCardApplicationComponent implements OnInit {
   applicationForm: FormGroup;
   isSubmitted: boolean = false;
   isLoading: boolean = false;
-  cardTypes: string[] = ['Visa', 'Mastercard', 'AmericanExpress', 'Discover'];
+  cardTypes: string[] = ['Visa', 'Mastercard','Rupay', 'AmericanExpress', 'Discover'];
   accounts: any[] = [];
   customerId: number = 0;
 
@@ -29,7 +29,6 @@ export class CreditCardApplicationComponent implements OnInit {
     private creditCardService: CreditCardService,
     private bankAccountService: BankAccountService,
     private notificationService: NotificationService,
-    private loaderService: LoaderService,
     private authService: AuthService,
     private router: Router,
     private localStorageService: LocalStorageService
@@ -37,8 +36,7 @@ export class CreditCardApplicationComponent implements OnInit {
     this.applicationForm = this.fb.group({
       account: ['', [Validators.required]],
       cardType: ['Visa', [Validators.required]],
-      desiredLimit: [5000, [Validators.required, Validators.min(1000), Validators.max(100000)]],
-      incomeDocuments: ['', []]
+      desiredLimit: [5000, [Validators.required, Validators.min(1000), Validators.max(1000000)]],
     });
   }
 
@@ -48,10 +46,8 @@ export class CreditCardApplicationComponent implements OnInit {
   }
 
   loadCustomerAccounts(): void {
-    this.loaderService.show();
     this.bankAccountService.getCustomerAccountsForCreditCard().subscribe(
       (response: ResponseDto<any>) => {
-        this.loaderService.hide();
         if (response.status === true && response.dropDownList && response.dropDownList.length > 0) {
           const accountDropdown = response.dropDownList.find((x: any) => x.name === 'Account');
           if (accountDropdown && accountDropdown.dropDown) {
@@ -68,7 +64,6 @@ export class CreditCardApplicationComponent implements OnInit {
         }
       },
       (error) => {
-        this.loaderService.hide();
         this.notificationService.show('Failed to load accounts', 'error');
         console.error('Error loading accounts:', error);
       }
@@ -88,8 +83,6 @@ export class CreditCardApplicationComponent implements OnInit {
       return;
     }
 
-    this.loaderService.show();
-
     const values = this.applicationForm.value;
 
     // Convert desiredLimit to number if it's a string
@@ -103,7 +96,6 @@ export class CreditCardApplicationComponent implements OnInit {
       desiredLimit
     ).subscribe(
       (response: ResponseDto<any>) => {
-        this.loaderService.hide();
         if (response.status === true) {
           this.isSubmitted = true;
           this.notificationService.show('Credit card application submitted successfully!', 'success');
@@ -111,7 +103,7 @@ export class CreditCardApplicationComponent implements OnInit {
 
           // Redirect to dashboard after 2 seconds
           setTimeout(() => {
-            this.router.navigate(['/credit-card-dashboard']);
+            this.router.navigate(['/creditCardDashboard']);
           }, 2000);
         } else {
           const messageList: string[] = [];
@@ -130,7 +122,6 @@ export class CreditCardApplicationComponent implements OnInit {
         }
       },
       (error) => {
-        this.loaderService.hide();
         this.notificationService.show('An error occurred while submitting your application', 'error');
         console.error('Error:', error);
       }
@@ -143,22 +134,7 @@ export class CreditCardApplicationComponent implements OnInit {
       account: defaultAccountId,
       cardType: 'Visa',
       desiredLimit: 5000,
-      incomeDocuments: ''
     });
 
-  }
-
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const base64String = e.target.result;
-        this.applicationForm.patchValue({
-          incomeDocuments: base64String
-        });
-      };
-      reader.readAsDataURL(file);
-    }
   }
 }

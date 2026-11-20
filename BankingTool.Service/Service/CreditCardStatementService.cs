@@ -100,9 +100,25 @@ namespace BankingTool.Service.Service
 
                 if (statementId > 0)
                 {
+                    foreach (var transaction in transactions)
+                    {
+                        await _statementRepository.InsertStatementDetail(new CreditCardStatementDetail
+                        {
+                            StatementId = statementId,
+                            TransactionId = transaction.TransactionId,
+                            TransactionDate = transaction.TransactionDate,
+                            Description = transaction.Description,
+                            Amount = transaction.Amount,
+                            TransactionType = transaction.TransactionType.EnumToString()
+                        });
+                    }
+
                     response.Status = true;
                     response.Message = "Statement generated successfully";
-                    response.Response = MapToStatementDTO(statement);
+                    var statementDTO = MapToStatementDTO(statement);
+                    statementDTO.StatementId = statementId;
+                    statementDTO.StatementDetails = await GetStatementDetailDTOs(statementId);
+                    response.Response = statementDTO;
                     response.StatuCode = 201;
                 }
                 else
@@ -206,6 +222,14 @@ namespace BankingTool.Service.Service
 
                 var statementDetails = await _statementRepository.GetStatementDetails(statementId);
                 var statementDTO = MapToStatementDTO(statement);
+                statementDTO.StatementDetails = statementDetails.Select(detail => new StatementDetailDTO
+                {
+                    StatementDetailId = detail.StatementDetailId,
+                    TransactionDate = detail.TransactionDate,
+                    Description = detail.Description,
+                    Amount = detail.Amount,
+                    TransactionType = detail.TransactionType
+                }).ToList();
 
                 response.Status = true;
                 response.Message = "Statement retrieved successfully";
@@ -277,16 +301,10 @@ namespace BankingTool.Service.Service
                 }
 
                 var statement = await _statementRepository.GetCurrentStatement(creditCardId);
-                if (statement == null)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "No statement found for this card" });
-                    response.StatuCode = 404;
-                    return response;
-                }
 
                 response.Status = true;
                 response.Message = "Current statement retrieved successfully";
-                response.Response = MapToStatementDTO(statement);
+                response.Response = statement == null ? null : MapToStatementDTO(statement);
                 response.StatuCode = 200;
             }
             catch (Exception ex)
@@ -532,6 +550,19 @@ namespace BankingTool.Service.Service
             return response;
         }
 
+        private async Task<List<StatementDetailDTO>> GetStatementDetailDTOs(int statementId)
+        {
+            var details = await _statementRepository.GetStatementDetails(statementId);
+            return details.Select(detail => new StatementDetailDTO
+            {
+                StatementDetailId = detail.StatementDetailId,
+                TransactionDate = detail.TransactionDate,
+                Description = detail.Description,
+                Amount = detail.Amount,
+                TransactionType = detail.TransactionType
+            }).ToList();
+        }
+
         private StatementDTO MapToStatementDTO(CreditCardStatement statement)
         {
             return new StatementDTO
@@ -539,12 +570,16 @@ namespace BankingTool.Service.Service
                 StatementId = statement.StatementId,
                 BillingCycleStartDate = statement.BillingCycleStartDate,
                 BillingCycleEndDate = statement.BillingCycleEndDate,
+                StatementDate = statement.StatementDate,
                 TotalCharges = statement.TotalCharges,
                 TotalPayments = statement.TotalPayments,
+                Interest = statement.Interest,
+                Fees = statement.Fees,
+                PreviousBalance = statement.PreviousBalance,
                 CardBalance = statement.CardBalance,
                 MinimumDueAmount = statement.MinimumDueAmount,
                 DueDate = statement.DueDate,
-                StatementStatus = statement.StatementStatus.ToString()
+                StatementStatus = statement.StatementStatus.EnumToString()
             };
         }
     }

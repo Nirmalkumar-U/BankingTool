@@ -16,16 +16,6 @@ namespace BankingTool.Service.IService
         Task<ResponseDto<CreditCardApplicationResponseDTO>> ApplyCreditCard(CreditCardApplicationRequestDTO request);
 
         /// <summary>
-        /// Approves a credit card application
-        /// </summary>
-        Task<ResponseDto<bool>> ApproveCreditCard(int applicationId, decimal approvedLimit, string approvalRemarks);
-
-        /// <summary>
-        /// Rejects a credit card application
-        /// </summary>
-        Task<ResponseDto<bool>> RejectCreditCard(int applicationId, string rejectionRemarks);
-
-        /// <summary>
         /// Updates the credit limit for a card
         /// </summary>
         Task<ResponseDto<bool>> UpdateCardLimit(int creditCardId, decimal newLimit);
@@ -54,20 +44,5 @@ namespace BankingTool.Service.IService
         /// Gets all active credit cards for a customer
         /// </summary>
         Task<ResponseDto<List<CreditCardDTO>>> GetCustomerCreditCards();
-
-        /// <summary>
-        /// Gets application status by application ID
-        /// </summary>
-        Task<ResponseDto<CreditCardApplicationResponseDTO>> GetApplicationStatus(int applicationId);
-
-        /// <summary>
-        /// Gets all applications for a customer
-        /// </summary>
-        Task<ResponseDto<List<CreditCardApplicationResponseDTO>>> GetCustomerApplications(int customerId);
-
-        /// <summary>
-        /// Gets all pending applications (for admin/officer)
-        /// </summary>
-        Task<ResponseDto<List<CreditCardApplicationResponseDTO>>> GetPendingApplications();
     }
 }

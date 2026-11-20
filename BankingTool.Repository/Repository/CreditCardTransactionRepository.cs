@@ -1,6 +1,8 @@
 using BankingTool.Model;
+using BankingTool.Model.Dto.ResponseDto.CreditCard;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace BankingTool.Repository.Repository
 {
@@ -64,6 +66,8 @@ namespace BankingTool.Repository.Repository
         {
             transaction.CreatedDate = DateTime.UtcNow;
             transaction.ModifiedDate = DateTime.UtcNow;
+            transaction.CreatedBy = dataContext.UserName;
+            transaction.ModifiedBy = dataContext.UserName;
             dataContext.CreditCardTransaction.Add(transaction);
             await dataContext.SaveChangesAsync();
             return transaction.TransactionId;
@@ -91,9 +95,9 @@ namespace BankingTool.Repository.Repository
         public async Task<decimal> CalculateTotalCharges(int creditCardId, DateTime startDate, DateTime endDate)
         {
             return await dataContext.CreditCardTransaction
-                .Where(x => x.CreditCardId == creditCardId 
-                    && x.TransactionDate >= startDate 
-                    && x.TransactionDate <= endDate 
+                .Where(x => x.CreditCardId == creditCardId
+                    && x.TransactionDate >= startDate
+                    && x.TransactionDate <= endDate
                     && x.TransactionType == TransactionType.Purchase
                     && x.TransactionStatus == TransactionStatus.Completed)
                 .SumAsync(x => x.Amount);
@@ -102,30 +106,39 @@ namespace BankingTool.Repository.Repository
         public async Task<decimal> CalculateTotalPayments(int creditCardId, DateTime startDate, DateTime endDate)
         {
             return await dataContext.CreditCardTransaction
-                .Where(x => x.CreditCardId == creditCardId 
-                    && x.TransactionDate >= startDate 
-                    && x.TransactionDate <= endDate 
+                .Where(x => x.CreditCardId == creditCardId
+                    && x.TransactionDate >= startDate
+                    && x.TransactionDate <= endDate
                     && x.TransactionType == TransactionType.Payment
                     && x.TransactionStatus == TransactionStatus.Completed)
                 .SumAsync(x => x.Amount);
         }
 
-        public async Task<List<CreditCardTransaction>> GetAllTransactions()
+        public async Task<List<TransactionDTO>> GetRecentTransactions()
         {
-            return await dataContext.CreditCardTransaction
-                .AsNoTracking()
-                .OrderByDescending(x => x.TransactionDate)
-                .ToListAsync();
-        }
-
-        public async Task<List<CreditCardTransaction>> GetRecentTransactions(int creditCardId, int count)
-        {
-            return await dataContext.CreditCardTransaction
-                .AsNoTracking()
-                .Where(x => x.CreditCardId == creditCardId)
-                .OrderByDescending(x => x.TransactionDate)
-                .Take(count)
-                .ToListAsync();
+            return await (from cc in dataContext.CreditCard
+                          join a in dataContext.Account on cc.AccountId equals a.AccountId
+                          join b in dataContext.Bank on a.BankId equals b.BankId
+                          join c in dataContext.Customer on a.CustomerId equals c.CustomerId
+                          join cct in dataContext.CreditCardTransaction on cc.CreditCardId equals cct.CreditCardId
+                          where c.CustomerId == dataContext.CustomerId
+                          orderby cct.TransactionDate descending
+                          select new TransactionDTO
+                          {
+                              TransactionId = cct.TransactionId,
+                              TransactionDate = cct.TransactionDate,
+                              TransactionType = cct.TransactionType.EnumToString(),
+                              Amount = cct.Amount,
+                              Description = cct.Description,
+                              MerchantName = cct.MerchantName,
+                              TransactionStatus = cct.TransactionStatus.EnumToString(),
+                              ReferenceNumber = cct.ReferenceNumber,
+                              CreditCardId = cc.CreditCardId,
+                              CreditCardNumber = cc.CardNumber,
+                              AccountId = a.AccountId,
+                              CardDetail = b.BankAbbrivation + " | " + cc.CardNumber.Substring(cc.CardNumber.Length - 4),
+                              CardholderName = cc.CardHolderName
+                          }).ToListAsync();
         }
 
         public async Task<bool> DeleteTransaction(int transactionId)

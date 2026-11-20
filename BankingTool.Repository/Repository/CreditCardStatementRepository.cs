@@ -102,9 +102,9 @@ namespace BankingTool.Repository.Repository
                 TotalPayments = 0,
                 Interest = 0,
                 Fees = 0,
-                PreviousBalance = card.CurrentBalance,
-                CardBalance = card.CurrentBalance,
-                MinimumDueAmount = card.CurrentBalance * 0.05m,
+                PreviousBalance = card.LimitUsed,
+                CardBalance = card.LimitUsed,
+                MinimumDueAmount = card.LimitUsed * 0.05m,
                 DueDate = billingCycleEndDate.AddDays(20),
                 StatementStatus = StatementStatus.Generated,
                 CreatedDate = DateTime.UtcNow,
@@ -150,6 +150,18 @@ namespace BankingTool.Repository.Repository
                 .Where(x => x.StatementId == statementId)
                 .OrderByDescending(x => x.TransactionDate)
                 .ToListAsync();
+        }
+
+        public async Task<int> InsertStatementDetail(CreditCardStatementDetail statementDetail)
+        {
+            statementDetail.CreatedDate = DateTime.UtcNow;
+            statementDetail.ModifiedDate = DateTime.UtcNow;
+            statementDetail.CreatedBy = dataContext.UserName;
+            statementDetail.ModifiedBy = dataContext.UserName;
+
+            dataContext.CreditCardStatementDetail.Add(statementDetail);
+            await dataContext.SaveChangesAsync();
+            return statementDetail.StatementDetailId;
         }
     }
 }

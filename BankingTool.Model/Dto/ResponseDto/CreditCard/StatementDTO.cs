@@ -15,5 +15,6 @@ namespace BankingTool.Model.Dto.ResponseDto.CreditCard
         public decimal MinimumDueAmount { get; set; }
         public DateTime DueDate { get; set; }
         public string StatementStatus { get; set; }
+        public List<StatementDetailDTO> StatementDetails { get; set; } = new List<StatementDetailDTO>(); 
     }
 }

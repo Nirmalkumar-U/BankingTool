@@ -1,6 +1,6 @@
 using BankingTool.Model;
+using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.RequestDto.CreditCard;
-using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto.CreditCard;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
@@ -11,13 +11,9 @@ namespace BankingTool.Service.Service
     /// Service for handling credit card operations including applications, approvals, and card management
     /// </summary>
     public class CreditCardService(
-        ICreditCardRepository creditCardRepository,
-        ICreditCardApplicationRepository creditCardApplicationRepository,
-        ICreditCardCryptographyService cryptographyService) : ICreditCardService
+        ICreditCardRepository creditCardRepository) : ICreditCardService
     {
         private readonly ICreditCardRepository _creditCardRepository = creditCardRepository;
-        private readonly ICreditCardApplicationRepository _creditCardApplicationRepository = creditCardApplicationRepository;
-        private readonly ICreditCardCryptographyService _cryptographyService = cryptographyService;
 
         public async Task<ResponseDto<CreditCardApplicationResponseDTO>> ApplyCreditCard(CreditCardApplicationRequestDTO request)
         {
@@ -37,40 +33,42 @@ namespace BankingTool.Service.Service
                     response.StatuCode = 400;
                     return response;
                 }
-
-                var application = new CreditCardApplication
+                // create a new credit card entity
+                var creditCard = new CreditCard
                 {
                     AccountId = request.AccountId,
                     CardType = request.CardType,
-                    DesiredLimit = request.DesiredLimit,
-                    Status = CreditCardApplicationStatus.Pending,
-                    ApplicationDate = DateTime.UtcNow,
-                    CreatedDate = DateTime.UtcNow,
-                    ModifiedDate = DateTime.UtcNow
+                    CreditLimit = request.DesiredLimit,
+                    CardStatus = CreditCardStatus.Active,
+                    CreatedDate = DateTime.Now,
+                    ModifiedDate = DateTime.Now,
+                    ApplicationDate = DateTime.Now,
+                    CardNumber = GenerateCardNumber(),
+                    ExpiryDate = DateTime.Now.AddYears(5),
+                    ApprovedDate = DateTime.Now,
+                    CVV = GenerateCVV(),
+                    ApprovedLimit = request.DesiredLimit,
+                    AvailableCredit = request.DesiredLimit,
+                    DecisionRemarks = "Approved by system",
+                    IsDeleted = false,
+                    LimitUsed = 0,
+                    IssueDate = DateTime.Now,
+                    RequestedLimit = request.DesiredLimit,
                 };
 
-                int applicationId = 0;
-                try
-                {
+                var creditCardId = await _creditCardRepository.InsertCreditCard(creditCard);
 
-                    applicationId = await _creditCardApplicationRepository.InsertApplication(application);
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-
-                if (applicationId > 0)
+                if (creditCardId > 0)
                 {
                     response.Status = true;
                     response.Message = "Credit card application submitted successfully";
                     response.Response = new CreditCardApplicationResponseDTO
                     {
-                        ApplicationId = applicationId,
-                        Status = application.Status.ToString(),
-                        ApplicationDate = application.ApplicationDate,
-                        ApprovedDate = application.ApprovedDate,
-                        ApprovedLimit = application.ApprovedLimit
+                        ApplicationId = creditCardId,
+                        Status = creditCard.CardStatus.ToString(),
+                        ApplicationDate = creditCard.ApplicationDate,
+                        ApprovedDate = creditCard.ApprovedDate,
+                        ApprovedLimit = creditCard.ApprovedLimit
                     };
                     response.StatuCode = 201;
                 }
@@ -83,137 +81,6 @@ namespace BankingTool.Service.Service
             catch (Exception ex)
             {
                 response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while applying for credit card: {ex.Message}" });
-                response.StatuCode = 500;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseDto<bool>> ApproveCreditCard(int applicationId, decimal approvedLimit, string approvalRemarks)
-        {
-            var response = new ResponseDto<bool>
-            {
-                StatuCode = 200,
-                Status = false,
-                Errors = [],
-                ValidationErrors = []
-            };
-
-            try
-            {
-                if (applicationId <= 0 || approvedLimit <= 0)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid application ID or approved limit" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                var application = await _creditCardApplicationRepository.GetApplicationById(applicationId);
-                if (application == null)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Credit card application not found" });
-                    response.StatuCode = 404;
-                    return response;
-                }
-
-                if (application.Status != CreditCardApplicationStatus.Pending && application.Status != CreditCardApplicationStatus.UnderReview)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Application cannot be approved in its current status" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                // Update application
-                application.Status = CreditCardApplicationStatus.Approved;
-                application.ApprovedLimit = approvedLimit;
-                application.ApprovedDate = DateTime.UtcNow;
-                application.DecisionRemarks = approvalRemarks;
-                application.ModifiedDate = DateTime.UtcNow;
-
-                var updated = await _creditCardApplicationRepository.UpdateApplication(application);
-
-                if (updated)
-                {
-                    // Create actual credit card
-                    var creditCard = CreateCreditCardFromApplication(application);
-                    await _creditCardRepository.InsertCreditCard(creditCard);
-
-                    response.Status = true;
-                    response.Message = "Credit card application approved successfully";
-                    response.Response = true;
-                    response.StatuCode = 200;
-                }
-                else
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Failed to approve credit card application" });
-                    response.StatuCode = 500;
-                }
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while approving credit card: {ex.Message}" });
-                response.StatuCode = 500;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseDto<bool>> RejectCreditCard(int applicationId, string rejectionRemarks)
-        {
-            var response = new ResponseDto<bool>
-            {
-                StatuCode = 200,
-                Status = false,
-                Errors = [],
-                ValidationErrors = []
-            };
-
-            try
-            {
-                if (applicationId <= 0)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid application ID" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                var application = await _creditCardApplicationRepository.GetApplicationById(applicationId);
-                if (application == null)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Credit card application not found" });
-                    response.StatuCode = 404;
-                    return response;
-                }
-
-                if (application.Status != CreditCardApplicationStatus.Pending && application.Status != CreditCardApplicationStatus.UnderReview)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Application cannot be rejected in its current status" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                application.Status = CreditCardApplicationStatus.Rejected;
-                application.DecisionRemarks = rejectionRemarks;
-                application.ModifiedDate = DateTime.UtcNow;
-
-                var updated = await _creditCardApplicationRepository.UpdateApplication(application);
-
-                if (updated)
-                {
-                    response.Status = true;
-                    response.Message = "Credit card application rejected successfully";
-                    response.Response = true;
-                    response.StatuCode = 200;
-                }
-                else
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Failed to reject credit card application" });
-                    response.StatuCode = 500;
-                }
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while rejecting credit card: {ex.Message}" });
                 response.StatuCode = 500;
             }
 
@@ -250,7 +117,7 @@ namespace BankingTool.Service.Service
                 }
                 else
                 {
-                    response.Errors.Add(new Errors { ErrorMessage = "Failed to update credit limit" });
+                    response.Errors.Add(new Errors { ErrorMessage = "Failed to update credit limit due to limit constraints" });
                     response.StatuCode = 500;
                 }
             }
@@ -290,7 +157,7 @@ namespace BankingTool.Service.Service
                     return response;
                 }
 
-                if (creditCard.CurrentBalance > 0)
+                if (creditCard.LimitUsed > 0)
                 {
                     response.Errors.Add(new Errors { ErrorMessage = "Cannot close card with outstanding balance" });
                     response.StatuCode = 400;
@@ -476,180 +343,34 @@ namespace BankingTool.Service.Service
             return response;
         }
 
-        public async Task<ResponseDto<CreditCardApplicationResponseDTO>> GetApplicationStatus(int applicationId)
-        {
-            var response = new ResponseDto<CreditCardApplicationResponseDTO>
-            {
-                StatuCode = 200,
-                Status = false,
-                Errors = [],
-                ValidationErrors = []
-            };
-
-            try
-            {
-                if (applicationId <= 0)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid application ID" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                var application = await _creditCardApplicationRepository.GetApplicationById(applicationId);
-                if (application == null)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Application not found" });
-                    response.StatuCode = 404;
-                    return response;
-                }
-
-                response.Status = true;
-                response.Message = "Application status retrieved successfully";
-                response.Response = MapToCreditCardApplicationResponseDTO(application);
-                response.StatuCode = 200;
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while retrieving application status: {ex.Message}" });
-                response.StatuCode = 500;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseDto<List<CreditCardApplicationResponseDTO>>> GetCustomerApplications(int customerId)
-        {
-            var response = new ResponseDto<List<CreditCardApplicationResponseDTO>>
-            {
-                StatuCode = 200,
-                Status = false,
-                Errors = [],
-                ValidationErrors = [],
-                Response = []
-            };
-
-            try
-            {
-                if (customerId <= 0)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid customer ID" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                var applications = await _creditCardApplicationRepository.GetApplicationsByCustomerId(customerId);
-
-                response.Status = true;
-                response.Message = $"Retrieved {applications.Count} applications";
-                response.Response = applications.Select(MapToCreditCardApplicationResponseDTO).ToList();
-                response.StatuCode = 200;
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while retrieving customer applications: {ex.Message}" });
-                response.StatuCode = 500;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseDto<List<CreditCardApplicationResponseDTO>>> GetPendingApplications()
-        {
-            var response = new ResponseDto<List<CreditCardApplicationResponseDTO>>
-            {
-                StatuCode = 200,
-                Status = false,
-                Errors = [],
-                ValidationErrors = [],
-                Response = []
-            };
-
-            try
-            {
-                var applications = await _creditCardApplicationRepository.GetApplicationsByStatus(CreditCardApplicationStatus.Pending);
-
-                response.Status = true;
-                response.Message = $"Retrieved {applications.Count} pending applications";
-                response.Response = applications.Select(MapToCreditCardApplicationResponseDTO).ToList();
-                response.StatuCode = 200;
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while retrieving pending applications: {ex.Message}" });
-                response.StatuCode = 500;
-            }
-
-            return response;
-        }
-
-        private CreditCard CreateCreditCardFromApplication(CreditCardApplication application)
-        {
-            // Generate a fake card number (in production, use actual card generation service)
-            var cardNumber = GenerateCardNumber();
-            var cvv = GenerateCVV();
-            var expiryDate = DateTime.UtcNow.AddYears(5);
-
-            return new CreditCard
-            {
-                AccountId = application.AccountId,
-                CardNumber = _cryptographyService.EncryptCardNumber(cardNumber),
-                CVV = _cryptographyService.EncryptCVV(cvv),
-                CardHolderName = "CARDHOLDER", // This should come from customer profile
-                CardType = application.CardType,
-                Status = CreditCardStatus.Active,
-                IssueDate = DateTime.UtcNow,
-                ExpiryDate = expiryDate,
-                CreditLimit = application.ApprovedLimit ?? 0,
-                CurrentBalance = 0,
-                AvailableCredit = application.ApprovedLimit ?? 0,
-                CreatedDate = DateTime.UtcNow,
-                ModifiedDate = DateTime.UtcNow
-            };
-        }
-
         private CreditCardDTO MapToCreditCardDTO(CreditCard creditCard)
         {
-            string maskedCardNumber = "****";
-            string maskedExpiryDate = "**/**";
-
-            try
-            {
-                var decryptedCardNumber = _cryptographyService.DecryptCardNumber(creditCard.CardNumber);
-                maskedCardNumber = _cryptographyService.MaskCardNumber(decryptedCardNumber);
-
-                var decryptedExpiryDate = _cryptographyService.DecryptExpiryDate(creditCard.ExpiryDate.ToString("MM/yy"));
-                maskedExpiryDate = _cryptographyService.MaskExpiryDate(decryptedExpiryDate);
-            }
-            catch
-            {
-                // If decryption fails, return masked values
-            }
-
+            var cardNumber = new CreditCardNumber(creditCard.CardNumber);
             return new CreditCardDTO
             {
                 CreditCardId = creditCard.CreditCardId,
-                MaskedCardNumber = maskedCardNumber,
+                AccountId = creditCard.AccountId,
+                AccountNumber = creditCard.Account?.AccountNumber,
+                AccountAbbreviation = creditCard.Account?.Bank?.BankAbbrivation,
+                AccountDetail = creditCard.Account?.Bank != null
+                    ? $"{creditCard.Account.Bank.BankAbbrivation} | {creditCard.CardNumber[^4..]}"
+                    : creditCard.CardNumber[^4..],
+                CardNumber = cardNumber,
                 CardHolderName = creditCard.CardHolderName,
                 CardType = creditCard.CardType,
-                Status = creditCard.Status.ToString(),
-                CreditLimit = creditCard.CreditLimit,
-                CurrentBalance = creditCard.CurrentBalance,
-                AvailableCredit = creditCard.AvailableCredit,
-                MaskedExpiryDate = maskedExpiryDate
+                Status = creditCard.CardStatus.EnumToString(),
+                CreditLimit = creditCard.CreditLimit ?? 0,
+                BalanceCredit = creditCard.CreditLimit ?? 0 - creditCard.LimitUsed,
+                AvailableCredit = creditCard.AvailableCredit ?? 0,
+                ApplicationDate = creditCard.ApplicationDate,
+                ApprovedDate = creditCard.ApprovedDate,
+                ApprovedLimit = creditCard.ApprovedLimit,
+                CurrentLimit = creditCard.CreditLimit,
+                ExpiryDate = creditCard.ExpiryDate,
+                LimitUsed = creditCard.LimitUsed
             };
         }
 
-        private CreditCardApplicationResponseDTO MapToCreditCardApplicationResponseDTO(CreditCardApplication application)
-        {
-            return new CreditCardApplicationResponseDTO
-            {
-                ApplicationId = application.ApplicationId,
-                Status = application.Status.ToString(),
-                ApplicationDate = application.ApplicationDate,
-                ApprovedDate = application.ApprovedDate,
-                ApprovedLimit = application.ApprovedLimit
-            };
-        }
 
         private string GenerateCardNumber()
         {

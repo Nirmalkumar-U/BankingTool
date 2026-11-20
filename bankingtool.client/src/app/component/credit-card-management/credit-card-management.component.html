@@ -18,7 +18,7 @@
                 <input type="text" class="form-control" [(ngModel)]="searchText" 
                        placeholder="Cardholder name or card number" (keyup)="searchCards()">
                 <button class="btn btn-outline-secondary" type="button" (click)="searchCards()">
-                  <i class="fas fa-search"></i>
+                  <i class="bi bi-search"></i>
                 </button>
               </div>
             </div>
@@ -31,7 +31,7 @@
             </div>
             <div class="col-md-4 d-flex align-items-end">
               <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
-                <i class="fas fa-times"></i> Reset Filters
+                <i class="bi bi-x-lg"></i> Reset Filters
               </button>
             </div>
           </div>
@@ -91,8 +91,10 @@
                   <th>Cardholder</th>
                   <th>Card Number</th>
                   <th>Type</th>
-                  <th>Limit</th>
-                  <th>Current Balance</th>
+                  <th>Current Limit</th>
+                  <th>Limit Used</th>
+                  <th>Balance Credit</th>
+                  <th>Available Limit</th>
                   <th>Status</th>
                   <th>Expiry Date</th>
                   <th>Actions</th>
@@ -101,17 +103,19 @@
               <tbody>
                 <tr *ngIf="filteredCreditCards.length === 0">
                   <td colspan="8" class="text-center py-4 text-muted">
-                    <i class="fas fa-inbox"></i> No credit cards found
+                    <i class="bi bi-inbox"></i> No credit cards found
                   </td>
                 </tr>
                 <tr *ngFor="let card of filteredCreditCards">
                   <td class="font-weight-bold">{{ card.cardHolderName }}</td>
-                  <td>{{ card.maskedCardNumber }}</td>
+                  <td>{{ card.cardNumber.maskedCardNumber }}</td>
                   <td>
                     <span class="badge bg-primary">{{ card.cardType }}</span>
                   </td>
-                  <td>{{ formatCurrency(card.creditLimit) }}</td>
-                  <td [class.text-danger]="card.currentBalance > 0">{{ formatCurrency(card.currentBalance) }}</td>
+                  <td>{{ formatCurrency(card.currentLimit) }}</td>
+                  <td>{{ formatCurrency(card.limitUsed) }}</td>
+                  <td>{{ formatCurrency(card.balanceCredit) }}</td>
+                  <td>{{ formatCurrency(card.availableCredit) }}</td>
                   <td>
                     <span [class]="getStatusBadgeClass(card.status)">
                       {{ card.status }}
@@ -120,29 +124,41 @@
                   <td>{{ card.expiryDate | date: 'MM/yyyy' }}</td>
                   <td>
                     <div class="btn-group btn-group-sm" role="group">
-                      <button type="button" class="btn btn-sm btn-outline-primary" 
+                      <button type="button" class="btn btn-sm btn-outline-success"
+                              (click)="openApproveModal(card)"
+                              *ngIf="card.status === 'Pending'"
+                              title="Approve application">
+                        <i class="bi bi-check-lg"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-danger"
+                              (click)="openRejectModal(card)"
+                              *ngIf="card.status === 'Pending'"
+                              title="Reject application">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-primary"
                               (click)="openLimitManagementModal(card)"
                               [disabled]="!canModifyCard(card.status)"
                               title="Update card limit">
-                        <i class="fas fa-edit"></i>
+                        <i class="bi bi-pencil-square"></i>
                       </button>
-                      <button type="button" class="btn btn-sm btn-outline-warning" 
+                      <button type="button" class="btn btn-sm btn-outline-warning"
                               (click)="blockCard(card)"
                               *ngIf="card.status === 'Active'"
                               title="Block card">
-                        <i class="fas fa-lock"></i>
+                        <i class="bi bi-lock-fill"></i>
                       </button>
-                      <button type="button" class="btn btn-sm btn-outline-info" 
+                      <button type="button" class="btn btn-sm btn-outline-info"
                               (click)="unblockCard(card)"
                               *ngIf="card.status === 'Blocked'"
                               title="Unblock card">
-                        <i class="fas fa-unlock"></i>
+                        <i class="bi bi-unlock"></i>
                       </button>
-                      <button type="button" class="btn btn-sm btn-outline-danger" 
+                      <button type="button" class="btn btn-sm btn-outline-danger"
                               (click)="closeCard(card)"
                               [disabled]="card.status === 'Closed'"
                               title="Close card">
-                        <i class="fas fa-times-circle"></i>
+                        <i class="bi bi-x-circle"></i>
                       </button>
                     </div>
                   </td>
@@ -189,9 +205,9 @@
           <div class="modal-body">
             <div *ngIf="selectedCard" class="mb-3">
               <p><strong>Cardholder:</strong> {{ selectedCard.cardHolderName }}</p>
-              <p><strong>Card Number:</strong> {{ selectedCard.maskedCardNumber }}</p>
-              <p><strong>Current Limit:</strong> {{ formatCurrency(selectedCard.creditLimit) }}</p>
-              <p><strong>Current Balance:</strong> {{ formatCurrency(selectedCard.currentBalance) }}</p>
+              <p><strong>Card Number:</strong> {{ selectedCard.cardNumber.maskedCardNumber }}</p>
+              <p><strong>Current Limit:</strong> {{ formatCurrency(selectedCard.currentLimit) }}</p>
+              <p><!--<strong>Current Balance:</strong> {{ formatCurrency(selectedCard.currentBalance) }}--></p>
             </div>
 
             <div class="mb-3">
@@ -203,7 +219,7 @@
                 <input id="cardLimit" type="number" class="form-control" formControlName="cardLimit" 
                        placeholder="0.00" step="100" min="1000" [disabled]="isLoading">
               </div>
-              <small class="text-muted d-block mt-1">Minimum: $1,000 | Maximum: $100,000</small>
+              <small class="text-muted d-block mt-1">Minimum: $1,000 | Maximum: $1,000,000</small>
             </div>
 
             <div class="mb-3">
@@ -230,4 +246,106 @@
 
   <!-- Modal Backdrop -->
   <div class="modal-backdrop fade" [class.show]="showManagementModal" [style.display]="showManagementModal ? 'block' : 'none'"></div>
-</div>
+
+  <!-- Approve Application Modal -->
+  <div class="modal fade" id="approveModal" tabindex="-1" [class.show]="showApproveModal" 
+       [style.display]="showApproveModal ? 'block' : 'none'" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Approve Credit Card Application</h5>
+          <button type="button" class="btn-close" (click)="closeApproveModal()"></button>
+        </div>
+        <form [formGroup]="approveForm">
+          <div class="modal-body">
+            <div *ngIf="selectedCard" class="mb-3">
+              <p><strong>Applicant:</strong> {{ selectedCard.cardHolderName }}</p>
+              <p><strong>Card Type:</strong> {{ selectedCard.cardType }}</p>
+              <p><strong>Desired Limit:</strong> {{ formatCurrency(selectedCard.desiredLimit) }}</p>
+              <p><strong>Application Date:</strong> {{ selectedCard.applicationDate | date: 'short' }}</p>
+            </div>
+
+            <div class="mb-3">
+              <label for="approvedLimit" class="form-label">
+                Approved Credit Limit <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input id="approvedLimit" type="number" class="form-control" formControlName="approvedLimit" 
+                       placeholder="0.00" step="100" min="1000" max="100000" [disabled]="isLoading">
+              </div>
+              <small class="text-muted d-block mt-1">Minimum: $1,000 | Maximum: $100,000</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="approvalRemarks" class="form-label">
+                Approval Remarks
+              </label>
+              <textarea id="approvalRemarks" class="form-control" formControlName="approvalRemarks" rows="3" 
+                        placeholder="Enter any additional remarks (optional)" [disabled]="isLoading"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeApproveModal()" [disabled]="isLoading">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-success" (click)="approveApplication()" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Approving...' : 'Approve Application' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Application Modal -->
+  <div class="modal fade" id="rejectModal" tabindex="-1" [class.show]="showRejectModal" 
+       [style.display]="showRejectModal ? 'block' : 'none'" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reject Credit Card Application</h5>
+          <button type="button" class="btn-close" (click)="closeRejectModal()"></button>
+        </div>
+        <form [formGroup]="rejectForm">
+          <div class="modal-body">
+            <div *ngIf="selectedCard" class="mb-3">
+              <p><strong>Applicant:</strong> {{ selectedCard.cardHolderName }}</p>
+              <p><strong>Card Type:</strong> {{ selectedCard.cardType }}</p>
+              <p><strong>Desired Limit:</strong> {{ formatCurrency(selectedCard.desiredLimit) }}</p>
+              <p><strong>Application Date:</strong> {{ selectedCard.applicationDate | date: 'short' }}</p>
+            </div>
+
+            <div class="alert alert-warning" role="alert">
+              <i class="bi bi-exclamation-triangle-fill"></i> 
+              This action will reject the application. Please provide a reason.
+            </div>
+
+            <div class="mb-3">
+              <label for="rejectionRemarks" class="form-label">
+                Rejection Reason <span class="text-danger">*</span>
+              </label>
+              <textarea id="rejectionRemarks" class="form-control" formControlName="rejectionRemarks" rows="4" 
+                        placeholder="Explain the reason for rejecting this application" [disabled]="isLoading"></textarea>
+              <small class="text-muted d-block mt-1">This will be communicated to the applicant</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeRejectModal()" [disabled]="isLoading">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-danger" (click)="rejectApplication()" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Rejecting...' : 'Reject Application' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade" [class.show]="showApproveModal" [style.display]="showApproveModal ? 'block' : 'none'"></div>
+  <div class="modal-backdrop fade" [class.show]="showRejectModal" [style.display]="showRejectModal ? 'block' : 'none'"></div>
+

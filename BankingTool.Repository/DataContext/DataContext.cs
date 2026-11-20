@@ -68,7 +68,6 @@ namespace BankingTool.Repository
 
         // Credit Card Feature
         public DbSet<CreditCard> CreditCard { get; set; }
-        public DbSet<CreditCardApplication> CreditCardApplication { get; set; }
         public DbSet<CreditCardTransaction> CreditCardTransaction { get; set; }
         public DbSet<CreditCardStatement> CreditCardStatement { get; set; }
         public DbSet<CreditCardStatementDetail> CreditCardStatementDetail { get; set; }
@@ -116,7 +115,6 @@ namespace BankingTool.Repository
             modelBuilder.ApplyConfiguration(new BudgetItemConfiguration());
 
             // Credit Card Configurations
-            modelBuilder.ApplyConfiguration(new CreditCardApplicationConfiguration());
             modelBuilder.ApplyConfiguration(new CreditCardConfiguration());
             modelBuilder.ApplyConfiguration(new CreditCardTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CreditCardStatementConfiguration());

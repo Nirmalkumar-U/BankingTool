@@ -6,10 +6,10 @@
     </div>
     <div class="col-md-4 text-end">
       <button class="btn btn-secondary" (click)="exportTransactions()" [disabled]="isLoading">
-        <i class="fas fa-download"></i> Export
+        <i class="bi bi-download"></i>
       </button>
       <button class="btn btn-primary" (click)="loadTransactions(1)" [disabled]="isLoading">
-        <i class="fas fa-sync"></i> Refresh
+        <i class="bi bi-arrow-clockwise"></i>
       </button>
     </div>
   </div>
@@ -82,7 +82,7 @@
           <tbody>
             <tr *ngIf="filteredTransactions.length === 0">
               <td colspan="7" class="text-center py-4 text-muted">
-                <i class="fas fa-inbox"></i> No transactions found
+                <i class="bi bi-inbox"></i>
               </td>
             </tr>
             <tr *ngFor="let transaction of filteredTransactions" (click)="viewTransactionDetails(transaction)">
@@ -106,13 +106,13 @@
                 <div class="btn-group btn-group-sm" role="group">
                   <button type="button" class="btn btn-sm btn-outline-info" 
                           (click)="viewTransactionDetails(transaction); $event.stopPropagation()">
-                    <i class="fas fa-eye"></i>
+                    <i class="bi bi-eye"></i>
                   </button>
                   <button type="button" class="btn btn-sm btn-outline-warning" 
                           *ngIf="transaction.transactionStatus === 'Completed'"
                           (click)="reverseTransaction(transaction.creditCardTransactionId, $event)"
                           title="Reverse this transaction">
-                    <i class="fas fa-undo"></i>
+                    <i class="bi bi-arrow-counterclockwise"></i>
                   </button>
                 </div>
               </td>

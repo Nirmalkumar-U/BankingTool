@@ -17,6 +17,7 @@ namespace BankingTool.Model
         public virtual Customer Customer { get; set; } 
         public virtual Bank Bank { get; set; } 
         public virtual ICollection<Card> Card { get; set; }
+        public virtual ICollection<CreditCard> CreditCard { get; set; }
         public virtual ICollection<BudgetTransactionDetail> BudgetTransactionDetail { get; set; }
     }
 }

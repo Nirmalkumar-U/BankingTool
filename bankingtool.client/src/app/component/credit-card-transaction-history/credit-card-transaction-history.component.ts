@@ -49,14 +49,20 @@ export class CreditCardTransactionHistoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.creditCardId = params['cardId'] || 0;
-      if (this.creditCardId > 0) {
-        this.loadTransactions(1);
-      } else {
-        this.notificationService.show('Invalid card ID', 'error');
-        this.router.navigate(['/credit-card-dashboard']);
-      }
+    this.activatedRoute.paramMap.subscribe(paramMap => {
+      const pathCardId = Number(paramMap.get('cardId') || 0);
+
+      this.activatedRoute.queryParamMap.subscribe(queryParamMap => {
+        const queryCardId = Number(queryParamMap.get('cardId') || 0);
+        this.creditCardId = pathCardId > 0 ? pathCardId : queryCardId;
+
+        if (this.creditCardId > 0) {
+          this.loadTransactions(1);
+        } else {
+          this.notificationService.show('Invalid card ID', 'error');
+          this.router.navigate(['/creditCardDashboard']);
+        }
+      });
     });
   }
 

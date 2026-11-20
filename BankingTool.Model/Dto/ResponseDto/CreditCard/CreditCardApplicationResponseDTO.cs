@@ -1,3 +1,5 @@
+using BankingTool.Model.Dto.BaseDto;
+
 namespace BankingTool.Model.Dto.ResponseDto.CreditCard
 {
     public class CreditCardApplicationResponseDTO
@@ -5,7 +7,8 @@ namespace BankingTool.Model.Dto.ResponseDto.CreditCard
         public int ApplicationId { get; set; }
         public string Status { get; set; }
         public string CardHolderName { get; set; }
-        public string CardNumber { get; set; } // implecit string need to implement
+        public string CardType { get; set; }
+        public CreditCardNumber CardNumber { get; set; } 
         public DateTime ApplicationDate { get; set; }
         public DateTime? ApprovedDate { get; set; }
         public DateTime? ExpiryDate { get; set; }

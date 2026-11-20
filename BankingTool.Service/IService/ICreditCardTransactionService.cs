@@ -13,7 +13,7 @@ namespace BankingTool.Service.IService
         /// Records a new transaction (purchase or fee)
         /// </summary>
         Task<ResponseDto<TransactionDTO>> RecordTransaction(int creditCardId, TransactionType transactionType, decimal amount, 
-            string description, string merchantName, string referenceNumber);
+            string description, string merchantName);
 
         /// <summary>
         /// Processes a payment on the credit card
@@ -48,7 +48,7 @@ namespace BankingTool.Service.IService
         /// <summary>
         /// Gets recent transactions (last N transactions)
         /// </summary>
-        Task<ResponseDto<List<TransactionDTO>>> GetRecentTransactions(int creditCardId, int count = 10);
+        Task<ResponseDto<List<TransactionDTO>>> GetRecentTransactions();
 
         /// <summary>
         /// Gets transaction details by ID

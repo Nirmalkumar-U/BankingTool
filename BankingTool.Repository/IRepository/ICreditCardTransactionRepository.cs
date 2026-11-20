@@ -1,4 +1,5 @@
 using BankingTool.Model;
+using BankingTool.Model.Dto.ResponseDto.CreditCard;
 
 namespace BankingTool.Repository.IRepository
 {
@@ -60,14 +61,9 @@ namespace BankingTool.Repository.IRepository
         Task<decimal> CalculateTotalPayments(int creditCardId, DateTime startDate, DateTime endDate);
 
         /// <summary>
-        /// Gets all transactions (admin only)
-        /// </summary>
-        Task<List<CreditCardTransaction>> GetAllTransactions();
-
-        /// <summary>
         /// Gets recent transactions for a card
         /// </summary>
-        Task<List<CreditCardTransaction>> GetRecentTransactions(int creditCardId, int count);
+        Task<List<TransactionDTO>> GetRecentTransactions();
 
         /// <summary>
         /// Deletes a transaction

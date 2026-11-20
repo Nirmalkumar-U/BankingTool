@@ -27,4 +27,12 @@
         public const string CustomerId = nameof(CustomerId);
         public const string ExpiresAt = nameof(ExpiresAt);
     }
+
+    public static class CommonFunctions
+    {
+        public static string ToMaskCardNumber(this string cardNumber)
+        {
+            return "************" + cardNumber[..^2];
+        }
+    }
 }

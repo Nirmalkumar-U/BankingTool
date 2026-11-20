@@ -19,6 +19,7 @@ export class CreditCardDashboardComponent implements OnInit {
   accountId: number = 0;
   isLoading: boolean = false;
   totalBalance: number = 0;
+  currentLimit: number = 0;
   totalAvailableCredit: number = 0;
 
   constructor(
@@ -27,7 +28,6 @@ export class CreditCardDashboardComponent implements OnInit {
     private loaderService: LoaderService,
     private notificationService: NotificationService,
     private router: Router,
-    private localStorageService: LocalStorageService
   ) { }
 
   ngOnInit(): void {
@@ -40,11 +40,21 @@ export class CreditCardDashboardComponent implements OnInit {
       (response: ResponseDto<any>) => {
         this.loaderService.hide();
         if (response.status === true && Array.isArray(response.response)) {
-          this.creditCards = response.response;
+          this.creditCards = response.response.map((card: any) => ({
+            ...card,
+            maskedCardNumber: card.cardNumber?.maskedCardNumber || card.maskedCardNumber || '**** **** **** ****',
+            accountDetail: card.accountDetail || `${card.accountAbbreviation || 'Account'} | ${String(card.cardNumber?.maskedCardNumber || card.maskedCardNumber || '').slice(-4)}`
+          }));
           this.calculateTotals();
 
           if (this.creditCards.length > 0) {
-            this.loadRecentTransactions(this.creditCards[0].creditCardId);
+            this.loadRecentTransactions();
+          } else {
+            this.recentTransactions = [];
+          };
+
+          if (this.creditCards.length > 0) {
+            this.loadRecentTransactions();
           }
         } else {
           this.creditCards = [];
@@ -59,8 +69,8 @@ export class CreditCardDashboardComponent implements OnInit {
     );
   }
 
-  loadRecentTransactions(creditCardId: number): void {
-    this.creditCardService.getRecentTransactions(creditCardId, 5).subscribe(
+  loadRecentTransactions(): void {
+    this.creditCardService.getRecentTransactions().subscribe(
       (response: ResponseDto<any>) => {
         if (response.status === true && Array.isArray(response.response)) {
           this.recentTransactions = response.response;
@@ -74,28 +84,46 @@ export class CreditCardDashboardComponent implements OnInit {
 
   calculateTotals(): void {
     this.totalBalance = 0;
+    this.currentLimit = 0;
     this.totalAvailableCredit = 0;
 
     this.creditCards.forEach(card => {
-      this.totalBalance += card.currentBalance || 0;
-      this.totalAvailableCredit += card.availableCredit || 0;
+      this.totalBalance += Number(card.limitUsed || 0);
+      this.currentLimit += Number(card.availableCredit || 0);
+      this.totalAvailableCredit += Number(card.currentLimit || card.creditLimit || 0);
     });
   }
 
+  getCardUtilization(card: any): number {
+    const totalLimit = Number(card.currentLimit || card.creditLimit || 0);
+    const limitUsed = Number(card.limitUsed || 0);
+    return totalLimit > 0 ? Math.min((limitUsed / totalLimit) * 100, 100) : 0;
+  }
+
   navigateToApply(): void {
-    this.router.navigate(['/credit-card-application']);
+    this.router.navigate(['/creditCardApplication']);
   }
 
   navigateToTransactions(creditCardId: number): void {
-    this.router.navigate(['/transactions'], { queryParams: { cardId: creditCardId } });
+    if (!creditCardId || creditCardId <= 0) {
+      this.notificationService.show('Invalid credit card ID', 'error');
+      return;
+    }
+
+    this.router.navigate(['/creditCardTransactions', creditCardId]);
   }
 
   navigateToPayment(creditCardId: number): void {
-    this.router.navigate(['/credit-card-payment'], { queryParams: { cardId: creditCardId } });
+    this.router.navigate(['/creditCardPayment'], { queryParams: { cardId: creditCardId } });
   }
 
   navigateToStatement(creditCardId: number): void {
-    this.router.navigate(['/credit-card-statement'], { queryParams: { cardId: creditCardId } });
+    if (!creditCardId || creditCardId <= 0) {
+      this.notificationService.show('Invalid credit card ID', 'error');
+      return;
+    }
+
+    this.router.navigate(['/creditCardStatement', creditCardId]);
   }
 
   blockCard(creditCardId: number, event: Event): void {

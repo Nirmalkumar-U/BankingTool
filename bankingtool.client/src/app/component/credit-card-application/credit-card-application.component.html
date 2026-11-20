@@ -30,16 +30,9 @@
               <div class="input-group">
                 <span class="input-group-text">$</span>
                 <input id="desiredLimit" type="number" class="form-control" formControlName="desiredLimit" 
-                       [disabled]="isLoading" placeholder="5000" min="1000" max="100000" />
+                       [disabled]="isLoading" placeholder="5000" min="1000" max="1000000" />
               </div>
               <small class="text-muted d-block mt-1">Between $1,000 and $100,000</small>
-            </div>
-
-            <div class="mb-3">
-              <label for="incomeDocuments" class="form-label">Upload Income Documents</label>
-              <input id="incomeDocuments" type="file" class="form-control" formControlName="incomeDocuments" 
-                     [disabled]="isLoading" accept=".pdf,.jpg,.png" (change)="onFileSelected($event)" />
-              <small class="text-muted d-block mt-1">Optional: Upload recent pay stubs, tax returns, or bank statements to speed up approval</small>
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
@@ -66,7 +59,7 @@
           <button type="button" class="btn btn-primary w-100" (click)="resetForm(); isSubmitted = false">
             Apply for Another Card
           </button>
-          <button type="button" class="btn btn-outline-primary w-100 mt-2" routerLink="/credit-card-dashboard">
+          <button type="button" class="btn btn-outline-primary w-100 mt-2" routerLink="/creditCardDashboard">
             Go to Dashboard
           </button>
         </div>

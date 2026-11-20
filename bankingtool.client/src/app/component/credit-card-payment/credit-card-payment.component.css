@@ -239,6 +239,100 @@
   border-radius: 4px;
 }
 
+.payment-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid #dee2e6;
+  background: #f8fafc;
+}
+
+.payment-mode-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  padding: 1rem 1.25rem;
+  color: #64748b;
+  text-align: left;
+}
+
+.payment-mode-tab i {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9eef6;
+  color: #475569;
+  font-size: 1rem;
+}
+
+.payment-mode-tab span {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-mode-tab strong {
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.payment-mode-tab small {
+  margin-top: 0.15rem;
+}
+
+.payment-mode-tab.active {
+  border-bottom-color: #0d6efd;
+  background: #ffffff;
+  color: #0d6efd;
+}
+
+.payment-mode-tab.active i {
+  background: #0d6efd;
+  color: #ffffff;
+}
+
+.merchant-credit-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.merchant-credit-summary div {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 0.9rem;
+}
+
+.merchant-credit-summary small {
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.merchant-credit-summary strong {
+  color: #1e293b;
+  font-size: 1.05rem;
+}
+
+.merchant-confirmation-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
 .table {
   margin-bottom: 0;
 }
@@ -264,6 +358,37 @@
 textarea.form-control {
   resize: vertical;
   font-family: inherit;
+}
+
+@media (max-width: 767.98px) {
+  .payment-mode-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-credit-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.g-3 {
+  --bs-gutter-x: 1rem;
+  --bs-gutter-y: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.row.g-3 {
+  row-gap: 1rem;
+}
+
+.row.g-3 > [class*="col-"] {
+  margin-bottom: 0;
+}
+
+.justify-content-md-end {
+  justify-content: flex-end;
 }
 
 .d-grid {

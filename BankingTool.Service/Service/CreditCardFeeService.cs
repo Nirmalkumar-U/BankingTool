@@ -239,7 +239,7 @@ namespace BankingTool.Service.Service
                 await _transactionRepository.InsertTransaction(reverseTransaction);
 
                 // Update card balance
-                creditCard.CurrentBalance -= fee.Amount;
+                creditCard.LimitUsed -= fee.Amount;
                 creditCard.AvailableCredit += fee.Amount;
                 creditCard.ModifiedDate = DateTime.UtcNow;
 
@@ -315,7 +315,7 @@ namespace BankingTool.Service.Service
                 await _transactionRepository.InsertTransaction(waiverTransaction);
 
                 // Update card balance
-                creditCard.CurrentBalance -= fee.Amount;
+                creditCard.LimitUsed -= fee.Amount;
                 creditCard.AvailableCredit += fee.Amount;
                 creditCard.ModifiedDate = DateTime.UtcNow;
 
@@ -399,7 +399,7 @@ namespace BankingTool.Service.Service
                     await _transactionRepository.InsertTransaction(feeTransaction);
 
                     // Update card balance
-                    creditCard.CurrentBalance += feeAmount;
+                    creditCard.LimitUsed += feeAmount;
                     creditCard.AvailableCredit -= feeAmount;
                     creditCard.ModifiedDate = DateTime.UtcNow;
 

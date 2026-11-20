@@ -1,5 +1,4 @@
 using BankingTool.Model;
-using BankingTool.Model.Dto.Response;
 using BankingTool.Model.Dto.ResponseDto.CreditCard;
 using BankingTool.Repository.IRepository;
 using BankingTool.Service.IService;
@@ -16,8 +15,8 @@ namespace BankingTool.Service.Service
         private readonly ICreditCardTransactionRepository _transactionRepository = transactionRepository;
         private readonly ICreditCardRepository _creditCardRepository = creditCardRepository;
 
-        public async Task<ResponseDto<TransactionDTO>> RecordTransaction(int creditCardId, TransactionType transactionType, 
-            decimal amount, string description, string merchantName, string referenceNumber)
+        public async Task<ResponseDto<TransactionDTO>> RecordTransaction(int creditCardId, TransactionType transactionType,
+            decimal amount, string description, string merchantName)
         {
             var response = new ResponseDto<TransactionDTO>
             {
@@ -45,7 +44,7 @@ namespace BankingTool.Service.Service
                 }
 
                 // Validate card status
-                if (creditCard.Status != CreditCardStatus.Active)
+                if (creditCard.CardStatus != CreditCardStatus.Active)
                 {
                     response.Errors.Add(new Errors { ErrorMessage = "Credit card is not active" });
                     response.StatuCode = 400;
@@ -53,12 +52,15 @@ namespace BankingTool.Service.Service
                 }
 
                 // For purchases, validate available credit
-                if (transactionType == TransactionType.Purchase && amount > creditCard.AvailableCredit)
+                if (transactionType == TransactionType.Purchase && amount > creditCard.CreditLimit)
                 {
                     response.Errors.Add(new Errors { ErrorMessage = "Insufficient available credit" });
                     response.StatuCode = 400;
                     return response;
                 }
+
+                // referenceNumber need to be generate randomly 5 digit number
+                var referenceNumber = GenerateReferenceNumber();
 
                 var transaction = new CreditCardTransaction
                 {
@@ -100,6 +102,11 @@ namespace BankingTool.Service.Service
 
             return response;
         }
+        private static string GenerateReferenceNumber()
+        {
+            var random = new Random();
+            return random.Next(10000, 99999).ToString(); // Generates a random 5-digit number
+        }
 
         public async Task<ResponseDto<TransactionDTO>> ProcessPayment(int creditCardId, decimal paymentAmount, string description)
         {
@@ -128,7 +135,7 @@ namespace BankingTool.Service.Service
                     return response;
                 }
 
-                if (paymentAmount > creditCard.CurrentBalance)
+                if (paymentAmount > creditCard.LimitUsed)
                 {
                     response.Errors.Add(new Errors { ErrorMessage = "Payment amount exceeds current balance" });
                     response.StatuCode = 400;
@@ -153,8 +160,8 @@ namespace BankingTool.Service.Service
                 if (transactionId > 0)
                 {
                     // Update card balance
-                    creditCard.CurrentBalance -= paymentAmount;
-                    creditCard.AvailableCredit += paymentAmount;
+                    creditCard.LimitUsed -= paymentAmount;
+                    creditCard.CreditLimit += paymentAmount;
                     creditCard.ModifiedDate = DateTime.UtcNow;
 
                     await _creditCardRepository.UpdateCreditCard(creditCard);
@@ -229,14 +236,14 @@ namespace BankingTool.Service.Service
                     // For purchases, refund the amount back to credit
                     if (transaction.TransactionType == TransactionType.Purchase)
                     {
-                        creditCard.CurrentBalance -= transaction.Amount;
-                        creditCard.AvailableCredit += transaction.Amount;
+                        creditCard.LimitUsed -= transaction.Amount;
+                        creditCard.CreditLimit += transaction.Amount;
                     }
                     // For payments, reverse the credit
                     else if (transaction.TransactionType == TransactionType.Payment)
                     {
-                        creditCard.CurrentBalance += transaction.Amount;
-                        creditCard.AvailableCredit -= transaction.Amount;
+                        creditCard.LimitUsed += transaction.Amount;
+                        creditCard.CreditLimit -= transaction.Amount;
                     }
 
                     creditCard.ModifiedDate = DateTime.UtcNow;
@@ -399,7 +406,7 @@ namespace BankingTool.Service.Service
 
                 response.Status = true;
                 response.Message = "Available credit calculated successfully";
-                response.Response = creditCard.AvailableCredit;
+                response.Response = creditCard.CreditLimit ?? 0;
                 response.StatuCode = 200;
             }
             catch (Exception ex)
@@ -411,7 +418,7 @@ namespace BankingTool.Service.Service
             return response;
         }
 
-        public async Task<ResponseDto<List<TransactionDTO>>> GetRecentTransactions(int creditCardId, int count = 10)
+        public async Task<ResponseDto<List<TransactionDTO>>> GetRecentTransactions()
         {
             var response = new ResponseDto<List<TransactionDTO>>
             {
@@ -424,18 +431,11 @@ namespace BankingTool.Service.Service
 
             try
             {
-                if (creditCardId <= 0 || count < 1)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid parameters" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                var transactions = await _transactionRepository.GetRecentTransactions(creditCardId, count);
+                var transactions = await _transactionRepository.GetRecentTransactions();
 
                 response.Status = true;
                 response.Message = $"Retrieved {transactions.Count} recent transactions";
-                response.Response = transactions.Select(MapToTransactionDTO).ToList();
+                response.Response = transactions;
                 response.StatuCode = 200;
             }
             catch (Exception ex)
@@ -492,13 +492,13 @@ namespace BankingTool.Service.Service
         {
             if (transactionType == TransactionType.Purchase)
             {
-                creditCard.CurrentBalance += amount;
-                creditCard.AvailableCredit -= amount;
+                creditCard.LimitUsed += amount;
+                creditCard.CreditLimit -= amount;
             }
             else if (transactionType == TransactionType.Fee || transactionType == TransactionType.Interest)
             {
-                creditCard.CurrentBalance += amount;
-                creditCard.AvailableCredit -= amount;
+                creditCard.LimitUsed += amount;
+                creditCard.CreditLimit -= amount;
             }
 
             creditCard.ModifiedDate = DateTime.UtcNow;
