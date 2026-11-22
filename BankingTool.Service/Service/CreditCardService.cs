@@ -7,13 +7,11 @@ using BankingTool.Service.IService;
 
 namespace BankingTool.Service.Service
 {
-    /// <summary>
-    /// Service for handling credit card operations including applications, approvals, and card management
-    /// </summary>
     public class CreditCardService(
-        ICreditCardRepository creditCardRepository) : ICreditCardService
+        ICreditCardRepository creditCardRepository, ICreditCardTransactionRepository transactionRepository) : ICreditCardService
     {
         private readonly ICreditCardRepository _creditCardRepository = creditCardRepository;
+        private readonly ICreditCardTransactionRepository _transactionRepository = transactionRepository;
 
         public async Task<ResponseDto<CreditCardApplicationResponseDTO>> ApplyCreditCard(CreditCardApplicationRequestDTO request)
         {
@@ -164,7 +162,7 @@ namespace BankingTool.Service.Service
                     return response;
                 }
 
-                var updated = await _creditCardRepository.CloseCreditCard(creditCardId, closureReason);
+                var updated = await _creditCardRepository.UpdateCreditCardStatus(creditCardId, CreditCardStatus.Closed);
 
                 if (updated)
                 {
@@ -207,7 +205,7 @@ namespace BankingTool.Service.Service
                     return response;
                 }
 
-                var updated = await _creditCardRepository.BlockCreditCard(creditCardId, blockReason);
+                var updated = await _creditCardRepository.UpdateCreditCardStatus(creditCardId, CreditCardStatus.Blocked);
 
                 if (updated)
                 {
@@ -250,7 +248,7 @@ namespace BankingTool.Service.Service
                     return response;
                 }
 
-                var updated = await _creditCardRepository.UnblockCreditCard(creditCardId);
+                var updated = await _creditCardRepository.UpdateCreditCardStatus(creditCardId, CreditCardStatus.Active);
 
                 if (updated)
                 {
@@ -315,6 +313,40 @@ namespace BankingTool.Service.Service
             return response;
         }
 
+        public async Task<ResponseDto<CreditCardDashboardInitialLoadResponse>> GetCreditCardDashboardInitialLoad()
+        {
+            var response = new ResponseDto<CreditCardDashboardInitialLoadResponse>
+            {
+                StatuCode = 200,
+                Status = false,
+                Errors = [],
+                ValidationErrors = [],
+            };
+
+            try
+            {
+                var creditCards = await _creditCardRepository.GetActiveCreditCardsByCustomerId();
+
+                var transactions = await _transactionRepository.GetAllTransactionsOfCustomer();
+
+                response.Status = true;
+                response.Message = $"Retrieved {creditCards.Count} active credit cards";
+                response.Response = new CreditCardDashboardInitialLoadResponse
+                {
+                    CreditCards = [.. creditCards.Select(MapToCreditCardDTO)],
+                    Transactions = transactions
+                };
+                response.StatuCode = 200;
+            }
+            catch (Exception ex)
+            {
+                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while retrieving customer credit cards: {ex.Message}" });
+                response.StatuCode = 500;
+            }
+
+            return response;
+        }
+
         public async Task<ResponseDto<List<CreditCardDTO>>> GetCustomerCreditCards()
         {
             var response = new ResponseDto<List<CreditCardDTO>>
@@ -329,9 +361,10 @@ namespace BankingTool.Service.Service
             try
             {
                 var creditCards = await _creditCardRepository.GetActiveCreditCardsByCustomerId();
+
                 response.Status = true;
                 response.Message = $"Retrieved {creditCards.Count} active credit cards";
-                response.Response = creditCards.Select(MapToCreditCardDTO).ToList();
+                response.Response = [.. creditCards.Select(MapToCreditCardDTO)];
                 response.StatuCode = 200;
             }
             catch (Exception ex)

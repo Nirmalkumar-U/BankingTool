@@ -46,5 +46,6 @@ namespace BankingTool.Repository.IRepository
         Task<List<DashBoardAccountList>> GetDashBoardInitialLoad();
         Task<Card> GetLastCard(CardTypeEnum cardType);
         Task<List<DropDownDto>> GetAllAccountList();
+        bool SaveBudget(List<BudgetTransactionDto> budgetTransactionDetail);
     }
 }

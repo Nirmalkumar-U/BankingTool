@@ -13,7 +13,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class CreditCardManagementComponent implements OnInit {
   creditCards: any[] = [];
   filteredCreditCards: any[] = [];
-  isLoading: boolean = false;
   searchText: string = '';
 
   selectedCard: any = null;
@@ -314,7 +313,7 @@ export class CreditCardManagementComponent implements OnInit {
 
   searchCards(): void {
     this.currentPage = 1;
-
+    this.applyFilters();
   }
 
   filterByStatus(status: string): void {

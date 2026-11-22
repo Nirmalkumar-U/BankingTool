@@ -38,6 +38,5 @@ namespace BankingTool.Model
         // Navigation Properties
         public virtual ICollection<CreditCardTransaction> Transactions { get; set; } = new List<CreditCardTransaction>();
         public virtual ICollection<CreditCardStatement> Statements { get; set; } = new List<CreditCardStatement>();
-        public virtual ICollection<CreditCardFee> Fees { get; set; } = new List<CreditCardFee>();
     }
 }

@@ -149,34 +149,6 @@ export class CreditCardTransactionHistoryComponent implements OnInit {
     this.selectedTransaction = null;
   }
 
-  reverseTransaction(transactionId: number, event: Event): void {
-    event.stopPropagation();
-
-    if (!confirm('Are you sure you want to reverse this transaction?')) {
-      return;
-    }
-
-    const reason = prompt('Please enter the reason for reversing this transaction:');
-    if (reason !== null && reason.trim() !== '') {
-      this.loaderService.show();
-      this.creditCardService.reverseTransaction(transactionId, reason).subscribe(
-        (response: ResponseDto<any>) => {
-          this.loaderService.hide();
-          if (response.status === true) {
-            this.notificationService.show('Transaction reversed successfully', 'success');
-            this.loadTransactions(this.currentPage);
-          } else {
-            this.notificationService.show('Failed to reverse transaction', 'error');
-          }
-        },
-        (error) => {
-          this.loaderService.hide();
-          this.notificationService.show('An error occurred while reversing the transaction', 'error');
-        }
-      );
-    }
-  }
-
   exportTransactions(): void {
     // TODO: Implement CSV export
     this.notificationService.show('Export feature coming soon', 'info');

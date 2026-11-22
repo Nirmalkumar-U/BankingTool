@@ -60,15 +60,6 @@ namespace BankingTool.Repository.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<CreditCardStatement>> GetOverdueStatements(int creditCardId)
-        {
-            return await dataContext.CreditCardStatement
-                .AsNoTracking()
-                .Where(x => x.CreditCardId == creditCardId && x.DueDate < DateTime.UtcNow && x.StatementStatus != StatementStatus.Paid)
-                .OrderByDescending(x => x.DueDate)
-                .ToListAsync();
-        }
-
         public async Task<int> InsertStatement(CreditCardStatement statement)
         {
             statement.CreatedDate = DateTime.UtcNow;
@@ -98,14 +89,8 @@ namespace BankingTool.Repository.Repository
                 BillingCycleStartDate = billingCycleStartDate,
                 BillingCycleEndDate = billingCycleEndDate,
                 StatementDate = DateTime.UtcNow,
-                TotalCharges = 0,
                 TotalPayments = 0,
-                Interest = 0,
                 Fees = 0,
-                PreviousBalance = card.LimitUsed,
-                CardBalance = card.LimitUsed,
-                MinimumDueAmount = card.LimitUsed * 0.05m,
-                DueDate = billingCycleEndDate.AddDays(20),
                 StatementStatus = StatementStatus.Generated,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow
@@ -121,16 +106,6 @@ namespace BankingTool.Repository.Repository
             return await dataContext.CreditCardStatement
                 .AsNoTracking()
                 .OrderByDescending(x => x.StatementDate)
-                .ToListAsync();
-        }
-
-        public async Task<List<CreditCardStatement>> GetUpcomingDueStatements(int daysFromNow)
-        {
-            var targetDate = DateTime.UtcNow.AddDays(daysFromNow);
-            return await dataContext.CreditCardStatement
-                .AsNoTracking()
-                .Where(x => x.DueDate >= DateTime.UtcNow && x.DueDate <= targetDate && x.StatementStatus != StatementStatus.Paid)
-                .OrderBy(x => x.DueDate)
                 .ToListAsync();
         }
 

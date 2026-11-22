@@ -108,12 +108,6 @@
                           (click)="viewTransactionDetails(transaction); $event.stopPropagation()">
                     <i class="bi bi-eye"></i>
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-warning" 
-                          *ngIf="transaction.transactionStatus === 'Completed'"
-                          (click)="reverseTransaction(transaction.creditCardTransactionId, $event)"
-                          title="Reverse this transaction">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                  </button>
                 </div>
               </td>
             </tr>

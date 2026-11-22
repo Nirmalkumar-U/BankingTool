@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BudgetService } from '../../core/service/budget.service';
+import { DropDownDto } from '../../dto/internal-dto/drop-down-dto';
+import { formatDateForInput, isNullOrEmpty } from '../../core/commonFunction/common-function';
 import { CreditCardService } from '../../core/service/credit-card.service';
 import { LoaderService } from '../../core/service/loader.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
@@ -17,7 +20,6 @@ export class CreditCardPaymentComponent implements OnInit {
   paymentForm: FormGroup;
   merchantPaymentForm: FormGroup;
   paymentMode: 'card' | 'merchant' = 'card';
-  isLoading: boolean = false;
   isSubmitted: boolean = false;
   cardDetails: any;
   currentBalance: number = 0;
@@ -28,6 +30,7 @@ export class CreditCardPaymentComponent implements OnInit {
   isMerchantConfirmation: boolean = false;
   showConfirmation: boolean = false;
   confirmationData: any = null;
+  budgetAccountList: DropDownDto[] = [];
 
   constructor(
     private creditCardService: CreditCardService,
@@ -35,13 +38,16 @@ export class CreditCardPaymentComponent implements OnInit {
     private loaderService: LoaderService,
     private notificationService: NotificationService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private budgetService: BudgetService
   ) {
     this.paymentForm = this.fb.group({
       creditCardId: [0, [Validators.required, Validators.min(1)]],
       paymentAmount: ['', [Validators.required, Validators.min(0.01)]],
       paymentMethod: ['Savings Account', [Validators.required]],
       description: ['Payment towards credit card balance'],
+      transactionDate: [new Date().toISOString().substring(0, 10), [Validators.required]],
+      fees: [0, [Validators.min(0)]],
       confirmationChecked: [false, [Validators.requiredTrue]]
     });
 
@@ -51,15 +57,50 @@ export class CreditCardPaymentComponent implements OnInit {
       paymentAmount: ['', [Validators.required, Validators.min(0.01)]],
       paymentType: ['Purchase', [Validators.required]],
       description: ['', [Validators.required]],
+      transactionDate: [formatDateForInput(new Date()), [Validators.required]],
+      budgetAccount: this.fb.array([])
     });
   }
 
   ngOnInit(): void {
+    this.loadBudgetAccounts();
     this.activatedRoute.queryParams.subscribe(params => {
       const cardIdParam = params['cardId'];
       this.creditCardId = cardIdParam ? Number(cardIdParam) : 0;
       this.loadCustomerCards();
     });
+  }
+
+  loadBudgetAccounts(): void {
+    this.budgetService.getBudgetDropdownList().subscribe(
+      (response: ResponseDto<any>) => {
+        if (response.status === true && Array.isArray(response.dropDownList)) {
+          const budgetDropdown = response.dropDownList.find((x: any) => x.name === 'BudgetAccount' || x.name === 'FromBudgetAccount');
+          this.budgetAccountList = budgetDropdown?.dropDown || [];
+        } else {
+          this.budgetAccountList = [];
+        }
+      },
+      (error) => {
+        this.budgetAccountList = [];
+        console.error('Error loading budget accounts:', error);
+      }
+    );
+  }
+
+  get merchantBudgetAccounts(): FormArray {
+    return this.merchantPaymentForm.get('budgetAccount') as FormArray;
+  }
+
+  addBudgetAccount(): void {
+    this.merchantBudgetAccounts.push(this.fb.group({
+      budgetAccountId: ['', Validators.required],
+      budgetAmount: ['', Validators.required]
+    }));
+  }
+
+  removeBudgetAccount(index: number): void {
+    this.merchantBudgetAccounts.removeAt(index);
   }
 
   loadCustomerCards(): void {
@@ -88,16 +129,6 @@ export class CreditCardPaymentComponent implements OnInit {
             return;
           };
 
-          if (this.customerCards.length === 0) {
-            this.cardDetails = null;
-            this.currentBalance = 0;
-            this.minimumPayment = 0;
-            this.selectedCreditCardId = 0;
-            this.paymentForm.patchValue({ creditCardId: 0 });
-            this.notificationService.show('No credit cards available for payment', 'info');
-            return;
-          }
-
           const selectedId = this.creditCardId > 0
             ? this.customerCards.find(card => Number(card.creditCardId) === this.creditCardId)?.creditCardId ?? this.customerCards[0].creditCardId
             : this.customerCards[0].creditCardId;
@@ -105,7 +136,7 @@ export class CreditCardPaymentComponent implements OnInit {
           this.selectedCreditCardId = Number(selectedId);
           this.paymentForm.patchValue({ creditCardId: this.selectedCreditCardId });
           this.merchantPaymentForm.patchValue({ creditCardId: this.selectedCreditCardId });
-          this.loadCardDetails(this.selectedCreditCardId);
+          this.selectCustomerCard(this.selectedCreditCardId);
         } else {
           this.customerCards = [];
           this.cardDetails = null;
@@ -132,7 +163,7 @@ export class CreditCardPaymentComponent implements OnInit {
     this.merchantPaymentForm.patchValue({ creditCardId: selectedId });
 
     if (selectedId > 0) {
-      this.loadCardDetails(selectedId);
+      this.selectCustomerCard(selectedId);
     } else {
       this.cardDetails = null;
       this.currentBalance = 0;
@@ -142,42 +173,36 @@ export class CreditCardPaymentComponent implements OnInit {
     }
   }
 
-  loadCardDetails(creditCardId: number = this.creditCardId): void {
+  selectCustomerCard(creditCardId: number): void {
     if (!creditCardId || creditCardId <= 0) {
+      return;
+    }
+
+    const selectedCard = this.customerCards.find(card => Number(card.creditCardId) === Number(creditCardId));
+    if (!selectedCard) {
+      this.cardDetails = null;
+      this.currentBalance = 0;
+      this.minimumPayment = 0;
+      this.notificationService.show('Selected credit card was not found', 'error');
       return;
     }
 
     this.creditCardId = creditCardId;
     this.selectedCreditCardId = creditCardId;
-    this.paymentForm.patchValue({ creditCardId: creditCardId });
-    this.loaderService.show();
-    this.creditCardService.getCardDetails(creditCardId).subscribe(
-      (response: ResponseDto<any>) => {
-        this.loaderService.hide();
-        if (response.status === true && response.response) {
-          this.cardDetails = {
-            ...response.response,
-            maskedCardNumber: response.response.cardNumber?.maskedCardNumber || response.response.maskedCardNumber || '****'
-          };
-          this.currentBalance = Number(response.response.limitUsed || 0);
-          this.minimumPayment = Math.ceil((this.currentBalance * 0.02) * 100) / 100;
-          this.paymentForm.patchValue({
-            creditCardId: creditCardId,
-            paymentAmount: '',
-            paymentMethod: 'Savings Account',
-            description: 'Payment towards credit card balance',
-            confirmationChecked: false
-          });
-        } else {
-          this.notificationService.show('Failed to load card details', 'error');
-        }
-      },
-      (error) => {
-        this.loaderService.hide();
-        this.notificationService.show('Failed to load card details', 'error');
-        console.error('Error:', error);
-      }
-    );
+    this.cardDetails = {
+      ...selectedCard,
+      maskedCardNumber: selectedCard.cardNumber?.maskedCardNumber || selectedCard.maskedCardNumber || '****'
+    };
+    this.currentBalance = Number(selectedCard.limitUsed || 0);
+    this.minimumPayment = Math.ceil((this.currentBalance * 0.02) * 100) / 100;
+
+    this.paymentForm.patchValue({
+      creditCardId: creditCardId,
+      paymentAmount: '',
+      paymentMethod: 'Savings Account',
+      description: 'Payment towards credit card balance',
+      confirmationChecked: false
+    });
   }
 
   resetForm(): void {
@@ -229,7 +254,16 @@ export class CreditCardPaymentComponent implements OnInit {
       return;
     }
 
-    this.creditCardService.processPayment(selectedCardId, paymentAmount, description).subscribe(
+    const transactionDate = new Date(this.paymentForm.get('transactionDate')?.value || new Date());
+    const fees = Number(this.paymentForm.get('fees')?.value || 0);
+
+    this.creditCardService.processPayment({
+      creditCardId: selectedCardId,
+      paymentAmount,
+      description,
+      transactionDate,
+      fees
+    }).subscribe(
       (response: ResponseDto<any>) => {
         this.loaderService.hide();
         if (response.status === true) {
@@ -279,7 +313,7 @@ export class CreditCardPaymentComponent implements OnInit {
         paymentAmount: '',
         paymentType: 'Purchase',
         description: '',
-        referenceNumber: ''
+        transactionDate: formatDateForInput(new Date())
       });
     }
   }
@@ -291,7 +325,7 @@ export class CreditCardPaymentComponent implements OnInit {
     this.paymentForm.patchValue({ creditCardId: selectedId });
 
     if (selectedId > 0) {
-      this.loadCardDetails(selectedId);
+      this.selectCustomerCard(selectedId);
     }
   }
 
@@ -321,9 +355,9 @@ export class CreditCardPaymentComponent implements OnInit {
       paymentAmount: amount,
       paymentType: this.merchantPaymentForm.get('paymentType')?.value,
       description: this.merchantPaymentForm.get('description')?.value,
-      referenceNumber: this.merchantPaymentForm.get('referenceNumber')?.value || '-',
+
       availableCredit,
-      availableAfterPayment: availableCredit - amount
+      availableAfterPayment: Math.max(Number(this.cardDetails?.creditLimit || 0) - amount, 0)
     };
 
     this.isMerchantConfirmation = true;
@@ -341,10 +375,21 @@ export class CreditCardPaymentComponent implements OnInit {
     const amount = Number(this.merchantPaymentForm.get('paymentAmount')?.value || 0);
     const description = this.merchantPaymentForm.get('description')?.value;
     const merchantName = this.merchantPaymentForm.get('merchantName')?.value;
-    const referenceNumber = this.merchantPaymentForm.get('referenceNumber')?.value || '';
-    const paymentType = this.merchantPaymentForm.get('paymentType')?.value || '';
+    const paymentType = this.merchantPaymentForm.get('paymentType')?.value || 'Purchase';
+    const transactionDate = new Date(this.merchantPaymentForm.get('transactionDate')?.value || new Date());
+    const budgetAccounts = this.merchantBudgetAccounts.value
+      .filter((x: any) => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount))
+      .map((x: any) => ({ id: x.budgetAccountId, amount: Number(x.budgetAmount) }));
 
-    this.creditCardService.recordTransaction(cardId, paymentType, amount, description, merchantName, referenceNumber).subscribe(
+    this.creditCardService.recordTransaction({
+      creditCardId: cardId,
+      transactionType: paymentType,
+      amount,
+      description,
+      merchantName,
+      budgetAccounts,
+      transactionDate
+    }).subscribe(
       (response: ResponseDto<any>) => {
         this.loaderService.hide();
 

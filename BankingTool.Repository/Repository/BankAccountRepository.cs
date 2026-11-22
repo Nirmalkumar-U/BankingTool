@@ -378,6 +378,28 @@ namespace BankingTool.Repository.Repository
                 return false;
             }
         }
+        public bool SaveBudget(List<BudgetTransactionDto> budgetTransactionDetail)
+        {
+            var sqlTransaction = dataContext.Database.BeginTransaction();
+
+            try
+            {
+                foreach (var budgetAccount in budgetTransactionDetail)
+                {
+                    UpdateBudgetAccount(budgetAccount.BudgetAccount);
+                    var budgetTransactionId = InsertBudgetTransaction(budgetAccount.BudgetTransaction);
+                    budgetAccount.BudgetTransactionDetail.BudgetTransactionId = budgetTransactionId.Value;
+                    InsertBudgetTransactionDetail(budgetAccount.BudgetTransactionDetail);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                sqlTransaction.Rollback();
+                return false;
+            }
+        }
         public async Task<Account> GetAccount(int AccountId)
         {
             return await dataContext.Account.FirstOrDefaultAsync(x => x.AccountId == AccountId);
@@ -417,6 +439,21 @@ namespace BankingTool.Repository.Repository
                     Balance = x.Balance,
                     AccountId = x.BudgetAccountId
                 }).ToListAsync();
+            
+            var creditCardList = await (from cc in dataContext.CreditCard
+                                        join a in dataContext.Account on cc.AccountId equals a.AccountId
+                                        join b in dataContext.Bank on a.BankId equals b.BankId
+                                        where a.CustomerId == dataContext.CustomerId// && a.IsDeleted != false
+                                        select new DashBoardAccountList
+                                        {
+                                            BankName = b.BankAbbrivation + " | " + cc.CardType,
+                                            AccountNumber = cc.CardNumber,
+                                            AccountType = "Credit Card",
+                                            Balance = cc.LimitUsed,
+                                            AccountId = cc.CreditCardId 
+                                        }).ToListAsync();
+
+            //accountDetailList.Any(a => a.AccountId == z.AccountId)
             var walletAccountList = await dataContext.WalletAccount
                 .Where(z => z.CustomerId == dataContext.CustomerId && z.WalletStatus == "Active")
                 .Select(x => new DashBoardAccountList
@@ -427,7 +464,7 @@ namespace BankingTool.Repository.Repository
                     Balance = x.Balance,
                     AccountId = x.WalletAccountId
                 }).ToListAsync();
-            return [.. accountDetailList, .. budgetAccountList, .. walletAccountList];
+            return [.. accountDetailList, ..creditCardList,.. budgetAccountList, .. walletAccountList];
         }
         #region Private
         public int? InsertAccount(Account account)

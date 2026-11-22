@@ -1,8 +1,8 @@
 using BankingTool.Model;
+using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.ResponseDto.CreditCard;
 using BankingTool.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace BankingTool.Repository.Repository
 {
@@ -39,7 +39,7 @@ namespace BankingTool.Repository.Repository
         {
             return await dataContext.CreditCardTransaction
                 .AsNoTracking()
-                .Where(x => x.CreditCardId == creditCardId && x.TransactionDate >= fromDate && x.TransactionDate <= toDate)
+                .Where(x => x.CreditCardId == creditCardId && x.TransactionDate >= fromDate && x.TransactionDate.Date <= toDate.Date)
                 .OrderByDescending(x => x.TransactionDate)
                 .ToListAsync();
         }
@@ -73,20 +73,112 @@ namespace BankingTool.Repository.Repository
             return transaction.TransactionId;
         }
 
-        public async Task<bool> UpdateTransaction(CreditCardTransaction transaction)
+        public async Task<(bool Success, int TransactionId)> SaveCreditCardTransaction(CreditCardTransaction transaction, CreditCard creditCard, List<BudgetTransactionDto> budgetTransactions)
         {
-            transaction.ModifiedDate = DateTime.UtcNow;
-            dataContext.CreditCardTransaction.Update(transaction);
-            return await dataContext.SaveChangesAsync() > 0;
+            using var sqlTransaction = await dataContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                transaction.CreatedDate = DateTime.UtcNow;
+                transaction.ModifiedDate = DateTime.UtcNow;
+                transaction.CreatedBy = dataContext.UserName;
+                transaction.ModifiedBy = dataContext.UserName;
+
+                creditCard.ModifiedDate = DateTime.UtcNow;
+                creditCard.ModifiedBy = dataContext.UserName;
+
+                dataContext.CreditCardTransaction.Add(transaction);
+                dataContext.CreditCard.Update(creditCard);
+
+                foreach (var budget in budgetTransactions)
+                {
+                    budget.BudgetAccount.ModifiedDate = DateTime.Now;
+                    budget.BudgetAccount.ModifiedBy = dataContext.UserName;
+                    dataContext.BudgetAccount.Update(budget.BudgetAccount);
+                    budget.BudgetTransaction.CreatedBy = dataContext.UserName;
+                    budget.BudgetTransaction.CreatedDate = DateTime.Now;
+                    dataContext.BudgetTransaction.Add(budget.BudgetTransaction);
+                }
+
+                await dataContext.SaveChangesAsync();
+
+                foreach (var budget in budgetTransactions)
+                {
+                    budget.BudgetTransactionDetail.BudgetTransactionId = budget.BudgetTransaction.BudgetTransactionId;
+                    dataContext.BudgetTransactionDetail.Add(budget.BudgetTransactionDetail);
+                }
+
+                if (budgetTransactions.Count > 0)
+                    await dataContext.SaveChangesAsync();
+
+                await sqlTransaction.CommitAsync();
+                return (true, transaction.TransactionId);
+            }
+            catch
+            {
+                await sqlTransaction.RollbackAsync();
+                return (false, 0);
+            }
         }
 
-        public async Task<bool> ReverseTransaction(int transactionId, string reason)
+        public async Task<bool> ProcessPaymentWithStatement(CreditCardTransaction transaction, CreditCard creditCard, CreditCardStatement statement, List<CreditCardTransaction> transactions)
         {
-            var transaction = await dataContext.CreditCardTransaction.FirstOrDefaultAsync(x => x.TransactionId == transactionId);
-            if (transaction == null) return false;
+            using var sqlTransaction = await dataContext.Database.BeginTransactionAsync();
 
-            transaction.TransactionStatus = TransactionStatus.Reversed;
-            transaction.Description = $"{transaction.Description} - Reversed: {reason}";
+            try
+            {
+                transaction.CreatedDate = DateTime.UtcNow;
+                transaction.ModifiedDate = DateTime.UtcNow;
+                transaction.CreatedBy = dataContext.UserName;
+                transaction.ModifiedBy = dataContext.UserName;
+
+                creditCard.ModifiedDate = DateTime.UtcNow;
+                creditCard.ModifiedBy = dataContext.UserName;
+
+                statement.CreatedDate = DateTime.UtcNow;
+                statement.ModifiedDate = DateTime.UtcNow;
+                statement.CreatedBy = dataContext.UserName;
+                statement.ModifiedBy = dataContext.UserName;
+
+                dataContext.CreditCardTransaction.Add(transaction);
+                dataContext.CreditCard.Update(creditCard);
+                await dataContext.SaveChangesAsync();
+
+                dataContext.CreditCardStatement.Add(statement);
+                await dataContext.SaveChangesAsync();
+
+                foreach (var trans in transactions)
+                {
+                    dataContext.CreditCardStatementDetail.Add(new CreditCardStatementDetail
+                    {
+                        StatementId = statement.StatementId,
+                        TransactionId = trans.TransactionId,
+                        TransactionDate = trans.TransactionDate,
+                        Description = trans.Description,
+                        Amount = trans.Amount,
+                        TransactionType = trans.TransactionType.EnumToString(),
+                        CreatedDate = DateTime.UtcNow,
+                        ModifiedDate = DateTime.UtcNow,
+                        CreatedBy = dataContext.UserName,
+                        ModifiedBy = dataContext.UserName
+                    });
+                }
+
+                if (transactions.Count > 0)
+                    await dataContext.SaveChangesAsync();
+
+                await sqlTransaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await sqlTransaction.RollbackAsync();
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateTransaction(CreditCardTransaction transaction)
+        {
             transaction.ModifiedDate = DateTime.UtcNow;
             dataContext.CreditCardTransaction.Update(transaction);
             return await dataContext.SaveChangesAsync() > 0;
@@ -114,7 +206,7 @@ namespace BankingTool.Repository.Repository
                 .SumAsync(x => x.Amount);
         }
 
-        public async Task<List<TransactionDTO>> GetRecentTransactions()
+        public async Task<List<TransactionDTO>> GetAllTransactionsOfCustomer()
         {
             return await (from cc in dataContext.CreditCard
                           join a in dataContext.Account on cc.AccountId equals a.AccountId

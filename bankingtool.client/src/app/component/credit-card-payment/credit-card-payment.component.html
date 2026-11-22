@@ -50,7 +50,7 @@
                   Credit Card <span class="text-danger">*</span>
                 </label>
                 <select id="merchantCardSelect" class="form-select" formControlName="creditCardId"
-                        (change)="onMerchantCardSelectionChange()" [disabled]="isLoading || customerCards.length === 0">
+                        (change)="onMerchantCardSelectionChange()" [disabled]="customerCards.length === 0">
                   <option [ngValue]="0">Select a credit card</option>
                   <option *ngFor="let card of customerCards" [ngValue]="card.creditCardId">
                     {{ card.maskedCardNumber || card.cardNumber?.maskedCardNumber }} - {{ card.cardType }}
@@ -86,6 +86,44 @@
                 </select>
               </div>
 
+              <div class="col-md-6">
+                <label for="merchantTransactionDate" class="form-label">
+                  Transaction Date <span class="text-danger">*</span>
+                </label>
+                <input id="merchantTransactionDate" type="date" class="form-control"
+                       formControlName="transactionDate">
+              </div>
+
+              <div class="col-md-12" *ngIf="budgetAccountList.length > 0">
+                <label class="form-label">Budget Allocation (Optional)</label>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Budget Account</th>
+                      <th>Budget Amount</th>
+                      <th style="width: 70px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="budgetAccount">
+                    <tr *ngFor="let budget of merchantBudgetAccounts.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <select class="form-select" formControlName="budgetAccountId">
+                          <option [ngValue]="''">Select</option>
+                          <option *ngFor="let item of budgetAccountList" [ngValue]="item.key">{{ item.value }}</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input type="number" min="0.01" step="0.01" class="form-control" formControlName="budgetAmount">
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-danger btn-sm" (click)="removeBudgetAccount(i)">Remove</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="addBudgetAccount()">Add Budget Account</button>
+              </div>
+
               <div class="col-md-12">
                 <label for="merchantDescription" class="form-label">
                   Description <span class="text-danger">*</span>
@@ -112,10 +150,10 @@
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
               <button type="button" class="btn btn-secondary"
-                      (click)="setPaymentMode('merchant')" [disabled]="isLoading">
+                      (click)="setPaymentMode('merchant')">
                 Reset
               </button>
-              <button type="button" class="btn btn-primary" (click)="showMerchantPaymentConfirmation()" [disabled]="isLoading">
+              <button type="button" class="btn btn-primary" (click)="showMerchantPaymentConfirmation()">
                 Review Merchant Payment
               </button>
             </div>
@@ -129,7 +167,7 @@
               <label for="creditCardSelect" class="form-label">
                 Select Credit Card <span class="text-danger">*</span>
               </label>
-              <select id="creditCardSelect" class="form-select" formControlName="creditCardId" (change)="onCardSelectionChange()" [disabled]="isLoading || customerCards.length === 0">
+              <select id="creditCardSelect" class="form-select" formControlName="creditCardId" (change)="onCardSelectionChange()" [disabled]="customerCards.length === 0">
                 <option [ngValue]="0">Select a credit card</option>
                 <option *ngFor="let card of customerCards" [ngValue]="card.creditCardId">
                   {{ card.maskedCardNumber || card.cardNumber?.maskedCardNumber }} - {{ card.cardType }} ({{ card.status }})
@@ -202,7 +240,7 @@
                 <div class="input-group">
                   <span class="input-group-text">$</span>
                   <input id="paymentAmount" type="number" class="form-control" formControlName="paymentAmount"
-                         placeholder="0.00" step="0.01" min="0.01" [disabled]="isLoading">
+                         placeholder="0.00" step="0.01" min="0.01">
                 </div>
                 <div *ngIf="currentBalance > 0" class="progress mt-2" style="height: 6px;">
                   <div class="progress-bar" role="progressbar"
@@ -219,23 +257,37 @@
                 <label for="paymentMethod" class="form-label">
                   Payment Method <span class="text-danger">*</span>
                 </label>
-                <select id="paymentMethod" class="form-select" formControlName="paymentMethod" [disabled]="isLoading">
+                <select id="paymentMethod" class="form-select" formControlName="paymentMethod">
                   <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
                 </select>
                 <small class="text-muted d-block mt-1">Select the account from which payment will be deducted</small>
               </div>
 
               <!-- Description -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="transactionDate" class="form-label">Transaction Date</label>
+                  <input id="transactionDate" type="date" class="form-control" formControlName="transactionDate">
+                </div>
+                <div class="col-md-6">
+                  <label for="paymentFees" class="form-label">Fees</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input id="paymentFees" type="number" class="form-control" formControlName="fees" min="0" step="0.01">
+                  </div>
+                </div>
+              </div>
+
               <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
-                <textarea id="description" class="form-control" formControlName="description" rows="2" [disabled]="isLoading"></textarea>
+                <textarea id="description" class="form-control" formControlName="description" rows="2"></textarea>
               </div>
 
               <!-- Confirmation Checkbox -->
               <div class="mb-4">
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="confirmationChecked" 
-                         formControlName="confirmationChecked" [disabled]="isLoading">
+                         formControlName="confirmationChecked">
                   <label class="form-check-label" for="confirmationChecked">
                     I confirm that the payment amount and method are correct
                   </label>
@@ -247,12 +299,12 @@
 
               <!-- Action Buttons -->
               <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isLoading">
+                <button type="button" class="btn btn-secondary" (click)="resetForm()">
                   Reset
                 </button>
-                <button type="button" class="btn btn-primary" (click)="showPaymentConfirmation()" [disabled]="isLoading">
-                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                  {{ isLoading ? 'Processing...' : 'Continue' }}
+                <button type="button" class="btn btn-primary" (click)="showPaymentConfirmation()">
+                  
+                  Continue
                 </button>
               </div>
             </div>
@@ -262,18 +314,6 @@
         <div class="card-body" *ngIf="!isSubmitted && !cardDetails && customerCards.length === 0">
           <div class="alert alert-info mb-0">
             <i class="fas fa-info-circle"></i> No credit cards are available for payment.
-          </div>
-        </div>
-
-        <!-- Payment Successful Message -->
-        <div class="card-body" *ngIf="isSubmitted">
-          <div class="alert alert-success" role="alert">
-            <div class="text-center">
-              <i class="fas fa-check-circle" style="font-size: 3rem; color: #198754; margin-bottom: 1rem;"></i>
-              <h4 class="alert-heading">Payment Successful!</h4>
-              <p>Your payment has been processed successfully.</p>
-              <p class="mb-0">Redirecting to dashboard...</p>
-            </div>
           </div>
         </div>
       </div>
@@ -340,7 +380,7 @@
                 <td>{{ confirmationData.cardHolder }}</td>
               </tr>
               <tr>
-                <td><strong>Current Balance:</strong></td>
+                <td><strong>Amount Used:</strong></td>
                 <td [class.text-danger]="confirmationData.currentBalance > 0">
                   {{ formatCurrency(confirmationData.currentBalance) }}
                 </td>
@@ -352,7 +392,7 @@
                 </td>
               </tr>
               <tr style="border-top: 2px solid #dee2e6;">
-                <td><strong>Balance After Payment:</strong></td>
+                <td><strong>Remaining payment After Payment:</strong></td>
                 <td class="font-weight-bold" [class.text-success]="confirmationData.balanceAfterPayment <= 0">
                   {{ formatCurrency(confirmationData.balanceAfterPayment) }}
                 </td>
@@ -373,18 +413,18 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="cancelPayment()" [disabled]="isLoading">
+          <button type="button" class="btn btn-secondary" (click)="cancelPayment()">
             Cancel
           </button>
           <button *ngIf="isMerchantConfirmation" type="button" class="btn btn-primary"
-                  (click)="confirmMerchantPayment()" [disabled]="isLoading">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ isLoading ? 'Processing...' : 'Confirm Merchant Payment' }}
+                  (click)="confirmMerchantPayment()">
+            
+            Confirm Merchant Payment
           </button>
           <button *ngIf="!isMerchantConfirmation" type="button" class="btn btn-primary"
-                  (click)="confirmAndProcessPayment()" [disabled]="isLoading">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ isLoading ? 'Processing...' : 'Confirm Payment' }}
+                  (click)="confirmAndProcessPayment()">
+            
+            Confirm Payment
           </button>
         </div>
       </div>

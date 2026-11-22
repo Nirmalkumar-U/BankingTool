@@ -119,7 +119,7 @@ namespace BankingTool.Service.Service
                         TransactionType = isDebit ? TransactionTypeEnum.Debit.EnumToString() : TransactionTypeEnum.Credit.EnumToString(),
                         StageBalance = budgetAccount.Balance,
                         TransactionRole = isDebit ? TransactionRoleEnum.Sender.EnumToString() : TransactionRoleEnum.Receiver.EnumToString(),
-                        AccountId = accountId == null ? 1 : account.AccountId,
+                        AccountId = accountId == null ? null : account.AccountId,
                         BudgetAccountId = budgetAccount.BudgetAccountId
                     };
 

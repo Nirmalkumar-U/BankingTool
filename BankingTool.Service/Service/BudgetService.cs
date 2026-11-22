@@ -258,7 +258,6 @@ namespace BankingTool.Service.Service
                 TransactionType = TransactionTypeEnum.Debit.EnumToString(),
                 StageBalance = fromBudgetAccount.Balance,
                 TransactionRole = TransactionRoleEnum.Sender.EnumToString(),
-                AccountId = 1,
                 BudgetAccountId = fromAccountId
             };
 
@@ -299,7 +298,6 @@ namespace BankingTool.Service.Service
                     TransactionType = TransactionTypeEnum.Credit.EnumToString(),
                     StageBalance = toBudgerAccount.Balance,
                     TransactionRole = TransactionRoleEnum.Receiver.EnumToString(),
-                    AccountId = 1,
                     BudgetAccountId = toAccount.Id
                 };
                 BudgetTransactionDto budgetTransactions = new BudgetTransactionDto()

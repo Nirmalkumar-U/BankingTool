@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CreditCardService } from '../../core/service/credit-card.service';
-import { AuthService } from '../../core/service/auth.service';
 import { LoaderService } from '../../core/service/loader.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { ResponseDto } from '../../dto/internal-dto/response-dto';
-import { LocalStorageService } from '../../core/local-storage.service';
-import { ClaimKey } from '../../constant/constant';
 
 @Component({
   selector: 'app-credit-card-dashboard',
@@ -16,15 +13,12 @@ import { ClaimKey } from '../../constant/constant';
 export class CreditCardDashboardComponent implements OnInit {
   creditCards: any[] = [];
   recentTransactions: any[] = [];
-  accountId: number = 0;
-  isLoading: boolean = false;
   totalBalance: number = 0;
   currentLimit: number = 0;
   totalAvailableCredit: number = 0;
 
   constructor(
     private creditCardService: CreditCardService,
-    private authService: AuthService,
     private loaderService: LoaderService,
     private notificationService: NotificationService,
     private router: Router,
@@ -36,48 +30,41 @@ export class CreditCardDashboardComponent implements OnInit {
 
   loadCreditCards(): void {
     this.loaderService.show();
-    this.creditCardService.getCustomerCreditCards().subscribe(
+    this.creditCardService.getCreditCardDashboardInitialLoad().subscribe(
       (response: ResponseDto<any>) => {
         this.loaderService.hide();
-        if (response.status === true && Array.isArray(response.response)) {
-          this.creditCards = response.response.map((card: any) => ({
+        if (response.status === true && response.response) {
+          const cards = Array.isArray(response.response.creditCards)
+            ? response.response.creditCards
+            : [];
+
+          this.creditCards = cards.map((card: any) => ({
             ...card,
             maskedCardNumber: card.cardNumber?.maskedCardNumber || card.maskedCardNumber || '**** **** **** ****',
             accountDetail: card.accountDetail || `${card.accountAbbreviation || 'Account'} | ${String(card.cardNumber?.maskedCardNumber || card.maskedCardNumber || '').slice(-4)}`
           }));
+
+          this.recentTransactions = Array.isArray(response.response.transactions)
+            ? response.response.transactions
+            : [];
+
           this.calculateTotals();
 
-          if (this.creditCards.length > 0) {
-            this.loadRecentTransactions();
-          } else {
-            this.recentTransactions = [];
-          };
-
-          if (this.creditCards.length > 0) {
-            this.loadRecentTransactions();
+          if (this.creditCards.length === 0) {
+            this.notificationService.show('No active credit cards found', 'info');
           }
         } else {
           this.creditCards = [];
+          this.recentTransactions = [];
           this.notificationService.show('No active credit cards found', 'info');
         }
       },
       (error) => {
         this.loaderService.hide();
-        this.notificationService.show('Failed to load credit cards', 'error');
+        this.creditCards = [];
+        this.recentTransactions = [];
+        this.notificationService.show('Failed to load credit card dashboard', 'error');
         console.error('Error:', error);
-      }
-    );
-  }
-
-  loadRecentTransactions(): void {
-    this.creditCardService.getRecentTransactions().subscribe(
-      (response: ResponseDto<any>) => {
-        if (response.status === true && Array.isArray(response.response)) {
-          this.recentTransactions = response.response;
-        }
-      },
-      (error) => {
-        console.error('Error loading transactions:', error);
       }
     );
   }
@@ -148,10 +135,6 @@ export class CreditCardDashboardComponent implements OnInit {
         }
       );
     }
-  }
-
-  viewCardDetails(creditCardId: number): void {
-    this.router.navigate(['/credit-card-details'], { queryParams: { cardId: creditCardId } });
   }
 
   getCardStatusBadgeClass(status: string): string {

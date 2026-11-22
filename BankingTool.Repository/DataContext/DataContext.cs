@@ -71,7 +71,6 @@ namespace BankingTool.Repository
         public DbSet<CreditCardTransaction> CreditCardTransaction { get; set; }
         public DbSet<CreditCardStatement> CreditCardStatement { get; set; }
         public DbSet<CreditCardStatementDetail> CreditCardStatementDetail { get; set; }
-        public DbSet<CreditCardFee> CreditCardFee { get; set; }
 
         // SP
         public DbSet<GetActionsByUserIdDto> GetActionsByUserIdDto { get; set; }
@@ -119,7 +118,6 @@ namespace BankingTool.Repository
             modelBuilder.ApplyConfiguration(new CreditCardTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CreditCardStatementConfiguration());
             modelBuilder.ApplyConfiguration(new CreditCardStatementDetailConfiguration());
-            modelBuilder.ApplyConfiguration(new CreditCardFeeConfiguration());
 
             //SPs
             modelBuilder.Entity<GetActionsByUserIdDto>(e => e.HasNoKey());

@@ -15,6 +15,7 @@ export class HomeComponent {
   accountList: DashBoardAccountList[] = [];
   totalBalance: number = 0;
   totalBudgetBalance: number = 0;
+  totalCreditCardUsed: number = 0;
   totalAccounts: number = 0;
   totalSavingsAccounts: number = 0;
   showBalances: boolean = false;
@@ -35,6 +36,7 @@ export class HomeComponent {
     this.accountList = initialData.response.dashBoardAccountList;
     this.totalBalance = initialData.response.totalBalance;
     this.totalBudgetBalance = initialData.response.totalBudgetBalance;
+    this.totalCreditCardUsed = initialData.response.totalCreditCardUsed;
     this.totalAccounts = this.accountList.length;
     this.totalSavingsAccounts = this.accountList.filter(account => account.accountType.toLowerCase() === 'saving account').length;
   }
@@ -47,6 +49,20 @@ export class HomeComponent {
 
     if (accountType == 'Budget Account')
       this.router.navigate([AppRoute.budgetTransactionList(accountId)]);
+
+    if (accountType == 'Credit Card')
+      this.router.navigate(['/creditCardTransactions', accountId]);
+  }
+
+  isCreditCard(accountType: string): boolean {
+    return accountType?.toLowerCase() === 'credit card';
+  }
+
+  getCardNumber(cardNumber: string): string {
+    if (!cardNumber) return '****';
+    const normalized = cardNumber.replace(/\D/g, '');
+    if (normalized.length < 4) return cardNumber;
+    return `**** **** **** ${normalized.slice(-4)}`;
   }
   toggleBalances() {
     this.showBalances = !this.showBalances; 

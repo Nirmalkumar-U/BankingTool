@@ -38,6 +38,17 @@
         </div>
       </div>
     </div>
+    <div class="col-md-6 col-xl-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-info-soft">
+          <i class="bi bi-bank2"></i>
+        </div>
+        <div>
+          <div class="stat-label">Credit Card Balance Used</div>
+          <div class="stat-value">{{ showBalances ? (totalCreditCardUsed | currency) : '******' }}</div>
+        </div>
+      </div>
+    </div>
 
     <div class="col-md-6 col-xl-3">
       <div class="stat-card">
@@ -46,22 +57,12 @@
         </div>
         <div>
           <div class="stat-label">Net Difference</div>
-          <div class="stat-value">{{ showBalances ? ((totalBalance - totalBudgetBalance) | currency) : '******' }}</div>
+          <div class="stat-value">{{ showBalances ? ((totalBalance - totalCreditCardUsed - totalBudgetBalance) | currency) : '******' }}</div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="stat-card">
-        <div class="stat-icon bg-info-soft">
-          <i class="bi bi-bank2"></i>
-        </div>
-        <div>
-          <div class="stat-label">Savings Accounts</div>
-          <div class="stat-value">{{ totalSavingsAccounts }}</div>
-        </div>
-      </div>
-    </div>
+
   </div>
 
   <div class="row g-4" *ngIf="accountList.length > 0; else emptyState">
@@ -71,27 +72,29 @@
           <div class="bank-name truncate-text" title="{{ acc.bankName }}">
             <i class="bi bi-bank2 me-2"></i>{{ acc.bankName }}
           </div>
-          <span class="account-type-badge">{{ acc.accountType }}</span>
+          <span class="account-type-badge" [class.credit-card-badge]="isCreditCard(acc.accountType)">{{ acc.accountType }}</span>
         </div>
 
         <div class="card-body">
           <div class="account-summary-row">
-            <span class="summary-label">Available Balance</span>
+            <span class="summary-label">{{ isCreditCard(acc.accountType) ? 'Amount Used' : 'Available Balance' }}</span>
             <span class="summary-balance">{{ showBalances ? (acc.balance | currency) : '******' }}</span>
           </div>
 
           <div class="detail-row">
             <div class="detail-label">
-              <i class="bi bi-credit-card me-2"></i>
-              Account No
+              <i class="bi me-2" [class.bi-credit-card-2-front]="isCreditCard(acc.accountType)" [class.bi-hash]="!isCreditCard(acc.accountType)"></i>
+              {{ isCreditCard(acc.accountType) ? 'Card Number' : 'Account No' }}
             </div>
-            <div class="detail-value truncate-text" [title]="acc.accountNumber">{{ acc.accountNumber }}</div>
+            <div class="detail-value truncate-text" [title]="acc.accountNumber">
+              {{ isCreditCard(acc.accountType) ? getCardNumber(acc.accountNumber) : acc.accountNumber }}
+            </div>
           </div>
 
           <div class="detail-row">
             <div class="detail-label">
-              <i class="bi bi-wallet2 me-2"></i>
-              Account Type
+              <i class="bi me-2" [class.bi-credit-card-fill]="isCreditCard(acc.accountType)" [class.bi-wallet2]="!isCreditCard(acc.accountType)"></i>
+              {{ isCreditCard(acc.accountType) ? 'Card Type' : 'Account Type' }}
             </div>
             <div class="detail-value text-capitalize">{{ acc.accountType }}</div>
           </div>
@@ -99,7 +102,8 @@
 
         <div class="card-footer d-flex justify-content-between align-items-center">
           <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="redirectTransactionList(acc.accountType, acc.accountId)">
-            <i class="bi bi-eye me-1"></i> View
+            <i class="bi me-1" [class.bi-clock-history]="isCreditCard(acc.accountType)" [class.bi-eye]="!isCreditCard(acc.accountType)"></i>
+            {{ isCreditCard(acc.accountType) ? 'Transactions' : 'View' }}
           </button>
           <button *ngIf="acc.accountType == 'Saving Account'" (click)="redirectTransferAmount()" class="btn btn-sm btn-primary rounded-pill">
             <i class="bi bi-arrow-left-right me-1"></i> Transfer

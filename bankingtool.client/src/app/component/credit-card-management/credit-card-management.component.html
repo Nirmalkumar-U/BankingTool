@@ -217,7 +217,7 @@
               <div class="input-group">
                 <span class="input-group-text">$</span>
                 <input id="cardLimit" type="number" class="form-control" formControlName="cardLimit" 
-                       placeholder="0.00" step="100" min="1000" [disabled]="isLoading">
+                       placeholder="0.00" step="100" min="1000">
               </div>
               <small class="text-muted d-block mt-1">Minimum: $1,000 | Maximum: $1,000,000</small>
             </div>
@@ -227,16 +227,16 @@
                 Reason for Update <span class="text-danger">*</span>
               </label>
               <textarea id="reason" class="form-control" formControlName="reason" rows="3" 
-                        placeholder="Explain the reason for this limit change" [disabled]="isLoading"></textarea>
+                        placeholder="Explain the reason for this limit change"></textarea>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeManagementModal()" [disabled]="isLoading">
+            <button type="button" class="btn btn-secondary" (click)="closeManagementModal()">
               Cancel
             </button>
-            <button type="button" class="btn btn-primary" (click)="updateCardLimit(selectedCard)" [disabled]="isLoading">
-              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isLoading ? 'Updating...' : 'Update Limit' }}
+            <button type="button" class="btn btn-primary" (click)="updateCardLimit(selectedCard)">
+              
+              Update Limit
             </button>
           </div>
         </form>
@@ -272,7 +272,7 @@
               <div class="input-group">
                 <span class="input-group-text">$</span>
                 <input id="approvedLimit" type="number" class="form-control" formControlName="approvedLimit" 
-                       placeholder="0.00" step="100" min="1000" max="100000" [disabled]="isLoading">
+                       placeholder="0.00" step="100" min="1000" max="100000">
               </div>
               <small class="text-muted d-block mt-1">Minimum: $1,000 | Maximum: $100,000</small>
             </div>
@@ -282,16 +282,16 @@
                 Approval Remarks
               </label>
               <textarea id="approvalRemarks" class="form-control" formControlName="approvalRemarks" rows="3" 
-                        placeholder="Enter any additional remarks (optional)" [disabled]="isLoading"></textarea>
+                        placeholder="Enter any additional remarks (optional)"></textarea>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeApproveModal()" [disabled]="isLoading">
+            <button type="button" class="btn btn-secondary" (click)="closeApproveModal()">
               Cancel
             </button>
-            <button type="button" class="btn btn-success" (click)="approveApplication()" [disabled]="isLoading">
-              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isLoading ? 'Approving...' : 'Approve Application' }}
+            <button type="button" class="btn btn-success" (click)="approveApplication()">
+              
+              Approve Application
             </button>
           </div>
         </form>
@@ -327,17 +327,17 @@
                 Rejection Reason <span class="text-danger">*</span>
               </label>
               <textarea id="rejectionRemarks" class="form-control" formControlName="rejectionRemarks" rows="4" 
-                        placeholder="Explain the reason for rejecting this application" [disabled]="isLoading"></textarea>
+                        placeholder="Explain the reason for rejecting this application"></textarea>
               <small class="text-muted d-block mt-1">This will be communicated to the applicant</small>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeRejectModal()" [disabled]="isLoading">
+            <button type="button" class="btn btn-secondary" (click)="closeRejectModal()">
               Cancel
             </button>
-            <button type="button" class="btn btn-danger" (click)="rejectApplication()" [disabled]="isLoading">
-              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isLoading ? 'Rejecting...' : 'Reject Application' }}
+            <button type="button" class="btn btn-danger" (click)="rejectApplication()">
+              
+              Reject Application
             </button>
           </div>
         </form>
