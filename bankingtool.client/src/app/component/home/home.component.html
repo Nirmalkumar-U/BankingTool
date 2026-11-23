@@ -65,51 +65,86 @@
 
   </div>
 
-  <div class="row g-4" *ngIf="accountList.length > 0; else emptyState">
-    <div class="col-sm-12 col-md-6 col-lg-4" *ngFor="let acc of accountList">
-      <div class="account-card h-100">
-        <div class="card-header">
-          <div class="bank-name truncate-text" title="{{ acc.bankName }}">
-            <i class="bi bi-bank2 me-2"></i>{{ acc.bankName }}
-          </div>
-          <span class="account-type-badge" [class.credit-card-badge]="isCreditCard(acc.accountType)">{{ acc.accountType }}</span>
-        </div>
-
-        <div class="card-body">
-          <div class="account-summary-row">
-            <span class="summary-label">{{ isCreditCard(acc.accountType) ? 'Amount Used' : 'Available Balance' }}</span>
-            <span class="summary-balance">{{ showBalances ? (acc.balance | currency) : '******' }}</span>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-label">
-              <i class="bi me-2" [class.bi-credit-card-2-front]="isCreditCard(acc.accountType)" [class.bi-hash]="!isCreditCard(acc.accountType)"></i>
-              {{ isCreditCard(acc.accountType) ? 'Card Number' : 'Account No' }}
-            </div>
-            <div class="detail-value truncate-text" [title]="acc.accountNumber">
-              {{ isCreditCard(acc.accountType) ? getCardNumber(acc.accountNumber) : acc.accountNumber }}
-            </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-label">
-              <i class="bi me-2" [class.bi-credit-card-fill]="isCreditCard(acc.accountType)" [class.bi-wallet2]="!isCreditCard(acc.accountType)"></i>
-              {{ isCreditCard(acc.accountType) ? 'Card Type' : 'Account Type' }}
-            </div>
-            <div class="detail-value text-capitalize">{{ acc.accountType }}</div>
-          </div>
-        </div>
-
-        <div class="card-footer d-flex justify-content-between align-items-center">
-          <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="redirectTransactionList(acc.accountType, acc.accountId)">
-            <i class="bi me-1" [class.bi-clock-history]="isCreditCard(acc.accountType)" [class.bi-eye]="!isCreditCard(acc.accountType)"></i>
-            {{ isCreditCard(acc.accountType) ? 'Transactions' : 'View' }}
-          </button>
-          <button *ngIf="acc.accountType == 'Saving Account'" (click)="redirectTransferAmount()" class="btn btn-sm btn-primary rounded-pill">
-            <i class="bi bi-arrow-left-right me-1"></i> Transfer
-          </button>
-        </div>
+  <div class="account-list-section" *ngIf="accountList.length > 0; else emptyState">
+    <div class="account-toolbar">
+      <div class="account-filters" role="tablist" aria-label="Account types">
+        <button type="button" class="filter-chip" *ngFor="let filter of accountFilters"
+          [class.active]="activeFilter === filter" (click)="setFilter(filter)">
+          {{ filter === 'All' ? 'All Accounts' : filter }}
+          <span class="filter-count">{{ getFilterCount(filter) }}</span>
+        </button>
       </div>
+
+      <div class="account-search">
+        <i class="bi bi-search"></i>
+        <input type="search" class="form-control" [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange()" placeholder="Search bank, account or type">
+      </div>
+    </div>
+
+    <div class="account-table-wrap">
+      <table class="account-table">
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>Type</th>
+            <th>Reference</th>
+            <th class="text-end">Balance</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let acc of pagedAccounts">
+            <td data-label="Account">
+              <div class="account-name-cell">
+                <span class="account-icon" [class.credit]="isCreditCard(acc.accountType)">
+                  <i class="bi" [ngClass]="getAccountIcon(acc.accountType)"></i>
+                </span>
+                <span>
+                  <strong>{{ acc.bankName }}</strong>
+                  <small>{{ getAmountLabel(acc.accountType) }}</small>
+                </span>
+              </div>
+            </td>
+            <td data-label="Type"><span class="account-type-badge">{{ acc.accountType }}</span></td>
+            <td data-label="Reference">
+              <span class="reference-number">
+                {{ isCreditCard(acc.accountType) ? getCardNumber(acc.accountNumber) : acc.accountNumber }}
+              </span>
+            </td>
+            <td data-label="Balance" class="text-end">
+              <strong class="table-balance">{{ showBalances ? (acc.balance | currency) : '******' }}</strong>
+            </td>
+            <td data-label="Action" class="text-end">
+              <div class="table-actions">
+                <button class="btn btn-sm btn-outline-primary" (click)="redirectTransactionList(acc.accountType, acc.accountId)">
+                  {{ getAccountAction(acc.accountType) }}
+                </button>
+                <button *ngIf="acc.accountType == 'Saving Account'" (click)="redirectTransferAmount()" class="btn btn-sm btn-primary">
+                  Transfer
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredAccounts.length === 0">
+            <td colspan="5" class="no-results">No accounts match your search.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="account-pagination" *ngIf="totalPages > 1">
+      <span>Showing {{ pagedAccounts.length }} of {{ filteredAccounts.length }} accounts</span>
+      <nav aria-label="Account pages">
+        <button type="button" class="page-button" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button type="button" class="page-button" *ngFor="let page of getPageNumbers()"
+          [class.active]="page === currentPage" (click)="changePage(page)">{{ page }}</button>
+        <button type="button" class="page-button" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </nav>
     </div>
   </div>
 

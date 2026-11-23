@@ -110,20 +110,113 @@ small.text-muted {
   color: #6c757d;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 0 15px;
+.credit-card-action-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0.25rem 0;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  font-weight: 700;
+  color: #5a6b87;
+  margin-bottom: 0.4rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2a3d;
+}
+
+.card-panel {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 1.25rem 1.3rem;
+}
+
+.application-panel {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.application-panel .card-body {
+  padding: 0;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4c5a6f;
+}
+
+.form-control,
+.form-select {
+  background: #f8fafc;
+  border: 1px solid #dfe7f4;
+  border-radius: 12px;
+  min-height: 46px;
+  color: #1f2937;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #80b5ff;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+}
+
+.btn {
+  min-height: 46px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  border: none;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+}
+
+.btn-secondary {
+  background: #edf2ff;
+  color: #1d4ed8;
+  border: 1px solid rgba(29, 78, 216, 0.2);
+}
+
+.alert {
+  border-radius: 12px;
+}
+
+@media (max-width: 767.98px) {
+  .page-header {
+    align-items: flex-start;
   }
 
-  .card-header h3 {
-    font-size: 1.25rem;
+  .page-header h1 {
+    font-size: 1.6rem;
   }
 
   .d-md-flex {
     flex-direction: column;
   }
 
-  .btn {
-    margin-bottom: 0.5rem;
+  .d-md-flex .btn {
+    width: 100%;
   }
 }

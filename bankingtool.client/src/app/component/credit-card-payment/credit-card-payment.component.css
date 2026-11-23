@@ -411,3 +411,102 @@ h5 {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
+
+.credit-card-action-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0.25rem 0;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  font-weight: 700;
+  color: #5a6b87;
+  margin-bottom: 0.4rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2a3d;
+}
+
+.card-panel {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.payment-mode-heading {
+  padding: 1.25rem 1.3rem 0;
+}
+
+.payment-mode-heading h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1e2b3d;
+}
+
+.payment-card {
+  margin-top: 0;
+}
+
+.payment-card > .card-body {
+  padding: 1.25rem 1.3rem;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4c5a6f;
+}
+
+.form-control,
+.form-select {
+  background: #f8fafc;
+  border: 1px solid #dfe7f4;
+  border-radius: 12px;
+  min-height: 46px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #80b5ff;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+}
+
+.btn {
+  min-height: 46px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  border: none;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+}
+
+@media (max-width: 767.98px) {
+  .page-header h1 {
+    font-size: 1.6rem;
+  }
+}

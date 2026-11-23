@@ -1,10 +1,14 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-          <h3 class="mb-0">Apply for Credit Card</h3>
+<div class="dashboard-content">
+  <div class="container">
+    <div class="credit-card-action-page">
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">Credit card services</span>
+          <h1>Apply for Credit Card</h1>
         </div>
+      </div>
+
+      <div class="card-panel application-panel">
         <div class="card-body" *ngIf="!isSubmitted">
           <form [formGroup]="applicationForm">
             <div class="mb-3">

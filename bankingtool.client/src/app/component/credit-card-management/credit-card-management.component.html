@@ -1,10 +1,17 @@
-<div class="container-fluid mt-4">
-  <div class="row mb-4">
-    <div class="col-md-12">
-      <h2 class="mb-0">Credit Card Management</h2>
-      <small class="text-muted">Administrative tools for managing customer credit cards</small>
-    </div>
-  </div>
+<div class="dashboard-content">
+  <div class="container">
+    <div class="credit-card-management-page">
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">Credit card services</span>
+          <h1>Credit Card Management</h1>
+        </div>
+      </div>
+
+      <div class="card-panel filter-panel">
+        <div class="panel-header">
+          <h3>Filters</h3>
+        </div>
 
   <!-- Filter & Search -->
   <div class="row mb-4">
@@ -40,7 +47,10 @@
     </div>
   </div>
 
+      </div>
+
   <!-- Statistics Cards -->
+  <div class="statistics-panel">
   <div class="row mb-4">
     <div class="col-md-3">
       <div class="card stat-card">
@@ -76,7 +86,10 @@
     </div>
   </div>
 
+  </div>
+
   <!-- Credit Cards Table -->
+  <div class="card-panel table-panel">
   <div class="row">
     <div class="col-md-12">
       <div class="card">
@@ -192,6 +205,8 @@
     </div>
   </div>
 
+  </div>
+
   <!-- Update Card Limit Modal -->
   <div class="modal fade" id="managementModal" tabindex="-1" [class.show]="showManagementModal" 
        [style.display]="showManagementModal ? 'block' : 'none'" role="dialog">
@@ -246,6 +261,8 @@
 
   <!-- Modal Backdrop -->
   <div class="modal-backdrop fade" [class.show]="showManagementModal" [style.display]="showManagementModal ? 'block' : 'none'"></div>
+
+  </div>
 
   <!-- Approve Application Modal -->
   <div class="modal fade" id="approveModal" tabindex="-1" [class.show]="showApproveModal" 
@@ -348,4 +365,6 @@
   <!-- Modal Backdrop -->
   <div class="modal-backdrop fade" [class.show]="showApproveModal" [style.display]="showApproveModal ? 'block' : 'none'"></div>
   <div class="modal-backdrop fade" [class.show]="showRejectModal" [style.display]="showRejectModal ? 'block' : 'none'"></div>
+    </div>
+  </div>
 
