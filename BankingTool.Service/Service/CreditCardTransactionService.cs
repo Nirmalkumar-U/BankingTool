@@ -1,6 +1,7 @@
 using BankingTool.Model;
 using BankingTool.Model.Dto.BaseDto;
 using BankingTool.Model.Dto.InternalDto;
+using BankingTool.Model.Dto.RequestDto.CreditCard;
 using BankingTool.Model.Dto.ResponseDto.CreditCard;
 using BankingTool.Model.Enums;
 using BankingTool.Model.Model;
@@ -23,10 +24,10 @@ namespace BankingTool.Service.Service
         private readonly IBankAccountRepository _bankAccountRepository = bankAccountRepository;
 
 
-        public async Task<ResponseDto<TransactionDTO>> RecordTransaction(int creditCardId, TransactionType transactionType,
-            decimal amount, string description, string merchantName, List<BudgetAccountDto> budgetAccounts, DateTime transactionDate)
+        public async Task<ResponseDto<bool>> RecordTransaction(int creditCardId, TransactionType transactionType,
+            decimal amount, string description, string merchantName, List<RecordCreditCardTransactionRequestBudgetAccount> budgetAccounts, DateTime transactionDate)
         {
-            var response = new ResponseDto<TransactionDTO>
+            var response = new ResponseDto<bool>
             {
                 StatuCode = 200,
                 Status = false,
@@ -36,12 +37,6 @@ namespace BankingTool.Service.Service
 
             try
             {
-                if (creditCardId <= 0 || amount <= 0)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid credit card ID or amount" });
-                    response.StatuCode = 400;
-                    return response;
-                }
 
                 var creditCard = await _creditCardRepository.GetCreditCardById(creditCardId);
                 if (creditCard == null)
@@ -66,10 +61,15 @@ namespace BankingTool.Service.Service
                     response.StatuCode = 400;
                     return response;
                 }
-                var validationResult = ValidateBudgetAccount(budgetAccounts, amount);
+                List<BudgetAccountDto> validateBudgetAccount = [.. budgetAccounts.Select(x => new BudgetAccountDto
+                {
+                    Id = x.Id,
+                    Amount = x.Amount
+                })];
+                var validationResult = ValidateBudgetAccount(validateBudgetAccount, amount);
                 if (validationResult != null)
                 {
-                    return new ResponseDto<TransactionDTO>
+                    return new ResponseDto<bool>
                     {
                         Status = false,
                         ValidationErrors = validationResult,
@@ -105,7 +105,7 @@ namespace BankingTool.Service.Service
                         BudgetTransaction lastBudgetAccountTransaction = await _budgetRepository.GetLastBudgetTransaction(bAccount.Id);
                         if (lastBudgetAccountTransaction != null && lastBudgetAccountTransaction?.TransactionTime.Date > transactionDate.Date)
                         {
-                            return new ResponseDto<TransactionDTO>
+                            return new ResponseDto<bool>
                             {
                                 Status = false,
                                 ValidationErrors = [],
@@ -152,8 +152,7 @@ namespace BankingTool.Service.Service
                 {
                     response.Status = true;
                     response.Message = "Transaction recorded successfully";
-                    response.Response = MapToTransactionDTO(transaction);
-                    response.Response.TransactionId = saveResult.TransactionId;
+                    response.Response = true;
                     response.StatuCode = 201;
                 }
                 else
@@ -176,9 +175,9 @@ namespace BankingTool.Service.Service
             return random.Next(10000, 99999).ToString(); // Generates a random 5-digit number
         }
 
-        public async Task<ResponseDto<TransactionDTO>> ProcessPayment(int creditCardId, decimal paymentAmount, string description, DateTime transactionDate, decimal fees)
+        public async Task<ResponseDto<bool>> ProcessPayment(int creditCardId, decimal paymentAmount, string description, DateTime transactionDate, decimal fees)
         {
-            var response = new ResponseDto<TransactionDTO>
+            var response = new ResponseDto<bool>
             {
                 StatuCode = 200,
                 Status = false,
@@ -188,13 +187,6 @@ namespace BankingTool.Service.Service
 
             try
             {
-                if (creditCardId <= 0 || paymentAmount <= 0)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid credit card ID or payment amount" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
                 var creditCard = await _creditCardRepository.GetCreditCardById(creditCardId);
                 if (creditCard == null)
                 {
@@ -259,7 +251,7 @@ namespace BankingTool.Service.Service
 
                 response.Status = true;
                 response.Message = "Payment processed and statement generated successfully";
-                response.Response = MapToTransactionDTO(transaction);
+                response.Response = true;
                 response.StatuCode = 200;
             }
             catch (Exception ex)
@@ -271,72 +263,56 @@ namespace BankingTool.Service.Service
             return response;
         }
 
-        public async Task<ResponseDto<List<TransactionDTO>>> GetTransactionHistory(int creditCardId, int pageNumber = 1, int pageSize = 10)
+        public async Task<ResponseDto<TransactionResponseListObject>> GetTransactionHistory(int creditCardId)
         {
-            var response = new ResponseDto<List<TransactionDTO>>
+            var response = new ResponseDto<TransactionResponseListObject>
             {
                 StatuCode = 200,
                 Status = false,
                 Errors = [],
-                ValidationErrors = [],
-                Response = []
+                ValidationErrors = []
             };
 
             try
             {
-                if (creditCardId <= 0 || pageNumber < 1 || pageSize < 1)
+                if (creditCardId <= 0)
                 {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid parameters" });
+                    response.Errors.Add(new Errors { ErrorMessage = "Provided creditCardId is invalid" });
                     response.StatuCode = 400;
                     return response;
                 }
 
-                var transactions = await _transactionRepository.GetTransactionsByCardIdWithPagination(creditCardId, pageNumber, pageSize);
+                var transactions = await _transactionRepository.GetTransactionsByCardId(creditCardId);
 
                 response.Status = true;
                 response.Message = $"Retrieved {transactions.Count} transactions";
-                response.Response = transactions.Select(MapToTransactionDTO).ToList();
+                response.Response = new TransactionResponseListObject
+                {
+                    Response = [.. transactions.Select(transaction => new TransactionResponse
+                    {
+                        Transaction = new TransactionResponseTransaction
+                        {
+                            Id = transaction.TransactionId,
+                            TransactionDate = transaction.TransactionDate,
+                            TransactionType = transaction.TransactionType.EnumToString(),
+                            Amount = transaction.Amount,
+                            Description = transaction.Description,
+                            MerchantName = transaction.MerchantName,
+                            TransactionStatus = transaction.TransactionStatus.EnumToString(),
+                            ReferenceNumber = transaction.ReferenceNumber
+                        },
+                        CreditCard = new TransactionResponseCreditCard
+                        {
+                            Id = transaction.CreditCardId,
+                        },
+                        Account = null
+                    })]
+                };
                 response.StatuCode = 200;
             }
             catch (Exception ex)
             {
                 response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while retrieving transaction history: {ex.Message}" });
-                response.StatuCode = 500;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseDto<List<TransactionDTO>>> GetTransactionsByDateRange(int creditCardId, DateTime fromDate, DateTime toDate)
-        {
-            var response = new ResponseDto<List<TransactionDTO>>
-            {
-                StatuCode = 200,
-                Status = false,
-                Errors = [],
-                ValidationErrors = [],
-                Response = []
-            };
-
-            try
-            {
-                if (creditCardId <= 0 || fromDate > toDate)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid parameters" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                var transactions = await _transactionRepository.GetTransactionsByDateRange(creditCardId, fromDate, toDate);
-
-                response.Status = true;
-                response.Message = $"Retrieved {transactions.Count} transactions";
-                response.Response = transactions.Select(MapToTransactionDTO).ToList();
-                response.StatuCode = 200;
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while retrieving transactions: {ex.Message}" });
                 response.StatuCode = 500;
             }
 
@@ -357,21 +333,6 @@ namespace BankingTool.Service.Service
             }
 
             creditCard.ModifiedDate = DateTime.Now;
-        }
-
-        private TransactionDTO MapToTransactionDTO(CreditCardTransaction transaction)
-        {
-            return new TransactionDTO
-            {
-                TransactionId = transaction.TransactionId,
-                TransactionDate = transaction.TransactionDate,
-                TransactionType = transaction.TransactionType.ToString(),
-                Amount = transaction.Amount,
-                Description = transaction.Description,
-                MerchantName = transaction.MerchantName,
-                TransactionStatus = transaction.TransactionStatus.ToString(),
-                ReferenceNumber = transaction.ReferenceNumber
-            };
         }
         private static List<ValidationResults> ValidateBudgetAccount(List<BudgetAccountDto> budgetAccounts, decimal amount)
         {

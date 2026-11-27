@@ -82,11 +82,11 @@
           <tbody>
             <tr *ngIf="filteredTransactions.length === 0">
               <td colspan="7" class="text-center py-4 text-muted">
-                <i class="bi bi-inbox"></i>
+                <i class="bi bi-inbox me-2"></i>No matching transactions
               </td>
             </tr>
             <tr *ngFor="let transaction of filteredTransactions" (click)="viewTransactionDetails(transaction)">
-              <td>{{ transaction.transactionDate | date: 'MM/dd/yyyy HH:mm' }}</td>
+              <td>{{ formatTransactionDate(transaction.transactionDate) }}</td>
               <td>{{ transaction.description }}</td>
               <td>
                 <span [class]="getTransactionTypeClass(transaction.transactionType)">
@@ -150,7 +150,7 @@
         <div class="modal-body" *ngIf="selectedTransaction">
           <div class="row">
             <div class="col-md-6">
-              <p><strong>Date:</strong> {{ selectedTransaction.transactionDate | date: 'MM/dd/yyyy HH:mm' }}</p>
+              <p><strong>Date:</strong> {{ formatTransactionDate(selectedTransaction.transactionDate) }}</p>
               <p><strong>Type:</strong> <span [class]="getTransactionTypeClass(selectedTransaction.transactionType)">
                 {{ selectedTransaction.transactionType }}</span></p>
               <p><strong>Amount:</strong> <strong>{{ formatCurrency(selectedTransaction.amount) }}</strong></p>

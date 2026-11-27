@@ -3,6 +3,7 @@ using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.RequestDto.BulkTransaction;
 using BankingTool.Model.Dto.RequestDto.Calender;
+using BankingTool.Model.Dto.RequestDto.CreditCard;
 using BankingTool.Model.Dto.RequestDto.Note;
 using BankingTool.Model.Dto.RequestDto.User;
 using BankingTool.Model.Dto.RequestDto.Wallet;
@@ -322,9 +323,24 @@ namespace BankingTool.Api.Validators
                     r.MinLength = 1;
                     r.MaxLength = 100;
                 }),
-            //RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(x=>x.Request.ToBudgetAccount, x => x.Id).Required(),
-            //RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(x=>x.Request.ToBudgetAccount, x => x.Amount).Required(),
-            //RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(x=>x.Request.ToBudgetAccount, x => x.Amount).WithNumericRules(r => r.GreaterThan = 0),
+
+            // Example: validate every item in a collection.
+            RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(
+                    x => x.Request.ToBudgetAccount,
+                    x => x.Id)
+                .Required(),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.ForCollectionItem(
+                    x => x.Request.ToBudgetAccount,
+                    x => x.Amount)
+                .Required()
+                .WithNumericRules(r => r.GreaterThan = 0),
+            RuleBuilder<SaveBudgetTransactionRequestObject>.For(x => x.Request.ToBudgetAccount)
+                .WithCollectionRules(r => {
+                    r.CollectionMinCount = 1;
+                    r.CollectionMaxCount = 20;
+                    r.NoNullItems = true;
+                    r.NoDuplicates = true;
+                }),
         };
         public static List<ValidationRule> GetToBudgetDropdownListAndBalanceOfBudgetAccountRequestRules = new()
         {
@@ -438,23 +454,123 @@ namespace BankingTool.Api.Validators
         };
         #endregion Wallet
         #region BulkTransaction
-        //Add validation rules for BulkTransactionRequestObject and its nested properties as needed
         public static List<ValidationRule> BulkTransactionRequestRules = new()
         {
             RuleBuilder<BulkTransactionRequestObject>.For(x => x.Request).Required(),
-            RuleBuilder<BulkTransactionRequestObject>.For(x => x.Request).WithCollectionRules(r => {
-                r.CollectionMinCount = 1;
-            }),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.BudgetAccount).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.TransactionCategory).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.FromAccountId).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.ToAccountId).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionDate).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionTag).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Amount).Required(),
-            //RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Description).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.For(x => x.Request)
+                .WithCollectionRules(r => {
+                    r.CollectionMinCount = 1;
+                    r.CollectionMaxCount = 10;
+                    r.NoNullItems = true;
+                }),
+
+            // Example: validate all 10 items and all selected fields in every item.
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.TransactionCategory)
+                .Required()
+                .WithCustomRule(r => {
+                    r.RuleKey = "IsValidTransactionCategory";
+                    r.ErrorMessage = "TransactionCategory is not valid.";
+                }),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction).Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.FromAccountId)
+                .Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Account.ToAccountId)
+                .Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionDate)
+                .Required()
+                .WithDateRules(r => r.MustBeBefore = DateTime.Now.AddDays(1)),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.TransactionTag)
+                .Required(),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Amount)
+                .Required()
+                .WithNumericRules(r => r.GreaterThan = 0),
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.Transaction.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 150;
+                }),
+
+            // Example: validate a nested collection inside every bulk transaction item.
+            RuleBuilder<BulkTransactionRequestObject>.ForCollectionItem(x => x.Request, x => x.BudgetAccount)
+                .WithCollectionRules(r => {
+                    r.CollectionMaxCount = 8;
+                    r.NoNullItems = true;
+                }),
+        };
+
+        public static List<ValidationRule> CreditCardApplicationRequestRules = new()
+        {
+            RuleBuilder<CreditCardApplicationRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<CreditCardApplicationRequestObject>.For(x => x.Request.Account).Required(),
+            RuleBuilder<CreditCardApplicationRequestObject>.For(x => x.Request.Transaction).Required(),
+            RuleBuilder<CreditCardApplicationRequestObject>.For(x => x.Request.Account.Id).Required(),
+            RuleBuilder<CreditCardApplicationRequestObject>.For(x => x.Request.Transaction.CardType).Required(),
+            RuleBuilder<CreditCardApplicationRequestObject>.For(x => x.Request.Transaction.DesiredLimit).Required()
+        };
+
+        public static List<ValidationRule> RecordCreditCardTransactionRequestRules = new()
+        {
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.CreditCard).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.Transaction).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.BudgetAccounts).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.CreditCard.Id).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.Transaction.TransactionType).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.Transaction.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.Transaction.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.Transaction.MerchantName)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.For(x => x.Request.Transaction.TransactionDate).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.ForCollectionItem(x => x.Request.BudgetAccounts, x => x.Id).Required(),
+            RuleBuilder<RecordCreditCardTransactionRequestObject>.ForCollectionItem(x => x.Request.BudgetAccounts, x => x.Amount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+        };
+
+        public static List<ValidationRule> ProcessCreditCardPaymentRequestRules = new()
+        {
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request).Required(),
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request.CreditCard).Required(),
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request.Transaction).Required(),
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request.CreditCard.Id).Required(),
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request.Transaction.PaymentAmount)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThan = 0;
+                }),
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request.Transaction.Description)
+                .Required()
+                .WithStringRules(r => {
+                    r.NotEmpty = true;
+                    r.MinLength = 1;
+                    r.MaxLength = 100;
+                }),
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request.Transaction.TransactionDate).Required(),
+            RuleBuilder<ProcessCreditCardPaymentRequestObject>.For(x => x.Request.Transaction.Fees)
+                .Required()
+                .WithNumericRules(r => {
+                    r.GreaterThanOrEqualTo = 0;
+                }),
         };
         #endregion BulkTransaction
     }

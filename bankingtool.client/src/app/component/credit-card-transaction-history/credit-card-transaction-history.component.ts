@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { CreditCardService } from '../../core/service/credit-card.service';
 import { LoaderService } from '../../core/service/loader.service';
-import { NotificationService } from '../../core/notificationService/notification-service';
 import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { } from '../../dto/response/credit-card/credit-card-response';
+import { TransactionResponse, TransactionResponseListObject } from '../../dto/response/credit-card/transaction-response';
 
 @Component({
   selector: 'app-credit-card-transaction',
@@ -72,16 +74,32 @@ export class CreditCardTransactionHistoryComponent implements OnInit {
     this.loaderService.show();
     this.currentPage = pageNumber;
 
-    this.creditCardService.getTransactionHistory(this.creditCardId, pageNumber, this.pageSize).subscribe(
-      (response: ResponseDto<any>) => {
+    this.creditCardService.getTransactionHistory(this.creditCardId).subscribe(
+      (response : ResponseDto<TransactionResponseListObject>) => {
         this.loaderService.hide();
-        if (response.status === true && Array.isArray(response.response)) {
-          this.transactions = response.response;
-          this.totalRecords = response.response?.length || 0;
+
+        const isSuccessful = response.status === true;
+
+        if (isSuccessful && response.response.response.length > 0) {
+          this.transactions = response.response.response.map((item: TransactionResponse) => {
+            const rawTransaction = item.transaction;
+            const rawCreditCard = item.creditCard;
+            const rawAccount = item.account;
+            const transactionDate = rawTransaction.transactionDate;
+
+            return {
+              ...rawTransaction
+            };
+          });
+
+          this.totalRecords = response.response.response.length;
           this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
           this.applyFilters();
         } else {
           this.transactions = [];
+          this.filteredTransactions = [];
+          this.totalRecords = 0;
+          this.totalPages = 0;
           this.notificationService.show('No transactions found', 'info');
         }
       },
@@ -184,6 +202,55 @@ export class CreditCardTransactionHistoryComponent implements OnInit {
       default:
         return 'badge bg-info';
     }
+  }
+
+
+  formatTransactionDate(value: string | Date | null | undefined): string {
+    const date = this.normalizeTransactionDate(value);
+    if (!date) return '-';
+
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(date);
+  }
+
+  normalizeTransactionDate(value: string | Date | number | null | undefined): Date | null {
+    if (typeof value === 'string') {
+      const isoMatch = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/.exec(value);
+      if (isoMatch) {
+        const date = new Date(isoMatch[1]);
+        if (!Number.isNaN(date.getTime())) return date;
+      }
+    }
+
+    if (value === null || value === undefined || value === '') return null;
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (typeof value === 'number') {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    if (typeof value === 'string') {
+      const dotNetDateMatch = /^\/Date\((\d+)\)\/$/.exec(value);
+      if (dotNetDateMatch) {
+        const date = new Date(Number(dotNetDateMatch[1]));
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+
+      const normalizedValue = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(value)
+        ? value.replace(' ', 'T')
+        : value;
+      const date = new Date(normalizedValue);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    return null;
   }
 
   formatCurrency(value: number): string {

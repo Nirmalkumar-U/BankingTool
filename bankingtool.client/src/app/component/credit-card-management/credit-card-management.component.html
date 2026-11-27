@@ -137,18 +137,6 @@
                   <td>{{ card.expiryDate | date: 'MM/yyyy' }}</td>
                   <td>
                     <div class="btn-group btn-group-sm" role="group">
-                      <button type="button" class="btn btn-sm btn-outline-success"
-                              (click)="openApproveModal(card)"
-                              *ngIf="card.status === 'Pending'"
-                              title="Approve application">
-                        <i class="bi bi-check-lg"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-danger"
-                              (click)="openRejectModal(card)"
-                              *ngIf="card.status === 'Pending'"
-                              title="Reject application">
-                        <i class="bi bi-x-lg"></i>
-                      </button>
                       <button type="button" class="btn btn-sm btn-outline-primary"
                               (click)="openLimitManagementModal(card)"
                               [disabled]="!canModifyCard(card.status)"
@@ -264,107 +252,6 @@
 
   </div>
 
-  <!-- Approve Application Modal -->
-  <div class="modal fade" id="approveModal" tabindex="-1" [class.show]="showApproveModal" 
-       [style.display]="showApproveModal ? 'block' : 'none'" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Approve Credit Card Application</h5>
-          <button type="button" class="btn-close" (click)="closeApproveModal()"></button>
-        </div>
-        <form [formGroup]="approveForm">
-          <div class="modal-body">
-            <div *ngIf="selectedCard" class="mb-3">
-              <p><strong>Applicant:</strong> {{ selectedCard.cardHolderName }}</p>
-              <p><strong>Card Type:</strong> {{ selectedCard.cardType }}</p>
-              <p><strong>Desired Limit:</strong> {{ formatCurrency(selectedCard.desiredLimit) }}</p>
-              <p><strong>Application Date:</strong> {{ selectedCard.applicationDate | date: 'short' }}</p>
-            </div>
-
-            <div class="mb-3">
-              <label for="approvedLimit" class="form-label">
-                Approved Credit Limit <span class="text-danger">*</span>
-              </label>
-              <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input id="approvedLimit" type="number" class="form-control" formControlName="approvedLimit" 
-                       placeholder="0.00" step="100" min="1000" max="100000">
-              </div>
-              <small class="text-muted d-block mt-1">Minimum: $1,000 | Maximum: $100,000</small>
-            </div>
-
-            <div class="mb-3">
-              <label for="approvalRemarks" class="form-label">
-                Approval Remarks
-              </label>
-              <textarea id="approvalRemarks" class="form-control" formControlName="approvalRemarks" rows="3" 
-                        placeholder="Enter any additional remarks (optional)"></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeApproveModal()">
-              Cancel
-            </button>
-            <button type="button" class="btn btn-success" (click)="approveApplication()">
-              
-              Approve Application
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Reject Application Modal -->
-  <div class="modal fade" id="rejectModal" tabindex="-1" [class.show]="showRejectModal" 
-       [style.display]="showRejectModal ? 'block' : 'none'" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Reject Credit Card Application</h5>
-          <button type="button" class="btn-close" (click)="closeRejectModal()"></button>
-        </div>
-        <form [formGroup]="rejectForm">
-          <div class="modal-body">
-            <div *ngIf="selectedCard" class="mb-3">
-              <p><strong>Applicant:</strong> {{ selectedCard.cardHolderName }}</p>
-              <p><strong>Card Type:</strong> {{ selectedCard.cardType }}</p>
-              <p><strong>Desired Limit:</strong> {{ formatCurrency(selectedCard.desiredLimit) }}</p>
-              <p><strong>Application Date:</strong> {{ selectedCard.applicationDate | date: 'short' }}</p>
-            </div>
-
-            <div class="alert alert-warning" role="alert">
-              <i class="bi bi-exclamation-triangle-fill"></i> 
-              This action will reject the application. Please provide a reason.
-            </div>
-
-            <div class="mb-3">
-              <label for="rejectionRemarks" class="form-label">
-                Rejection Reason <span class="text-danger">*</span>
-              </label>
-              <textarea id="rejectionRemarks" class="form-control" formControlName="rejectionRemarks" rows="4" 
-                        placeholder="Explain the reason for rejecting this application"></textarea>
-              <small class="text-muted d-block mt-1">This will be communicated to the applicant</small>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeRejectModal()">
-              Cancel
-            </button>
-            <button type="button" class="btn btn-danger" (click)="rejectApplication()">
-              
-              Reject Application
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Backdrop -->
-  <div class="modal-backdrop fade" [class.show]="showApproveModal" [style.display]="showApproveModal ? 'block' : 'none'"></div>
-  <div class="modal-backdrop fade" [class.show]="showRejectModal" [style.display]="showRejectModal ? 'block' : 'none'"></div>
     </div>
   </div>
 

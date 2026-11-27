@@ -1,14 +1,25 @@
 using BankingTool.Model.Dto.BaseDto;
+using BankingTool.Model.Dto.RequestDtos;
 
 namespace BankingTool.Model.Dto.ResponseDto.CreditCard
 {
-    public class CreditCardDTO
+    public class CreditCardResponseObject
     {
-        public int CreditCardId { get; set; }
-        public int AccountId { get; set; }
-        public string AccountNumber { get; set; }
-        public string AccountAbbreviation { get; set; }
-        public string AccountDetail { get; set; }
+        public CreditCardResponse Response { get; set; }
+    }
+    public class CreditCardResponseListObject
+    {
+        public List<CreditCardResponse> Responses { get; set; }
+    }
+
+    public class CreditCardResponse
+    {
+        public CreditCardResponseCreditCard CreditCard { get; set; }
+        public CreditCardResponseAccount Account { get; set; }
+    }
+
+    public class CreditCardResponseCreditCard : RequestId
+    {
         public decimal CreditLimit { get; set; }
         public decimal BalanceCredit { get; set; }
         public decimal AvailableCredit { get; set; }
@@ -24,4 +35,12 @@ namespace BankingTool.Model.Dto.ResponseDto.CreditCard
         public decimal? LimitUsed { get; set; }
         public decimal? CurrentLimit { get; set; }
     }
+
+    public class CreditCardResponseAccount : RequestId
+    {
+        public string AccountNumber { get; set; }
+        public string AccountAbbreviation { get; set; }
+        public string AccountDetail { get; set; }
+    }
+
 }

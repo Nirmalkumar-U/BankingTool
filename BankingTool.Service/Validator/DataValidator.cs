@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Text.RegularExpressions;
 using BankingTool.Model.Dto.BaseDto;
+using BankingTool.Model.Enums;
 
 namespace BankingTool.Service.Validator
 {
@@ -12,7 +13,9 @@ namespace BankingTool.Service.Validator
         {
             ["IsPositiveInteger"] = val => val is int i && i > 0,
             ["NoSpecialCharacters"] = val => val is string s && Regex.IsMatch(s, @"^[a-zA-Z0-9\s]+$"),
-            ["FutureDateOnly"] = val => val is DateTime dt && dt > DateTime.Now
+            ["FutureDateOnly"] = val => val is DateTime dt && dt > DateTime.Now,
+            ["IsValidTransactionCategory"] = val => val is TransactionCategoryEnum category
+                && Enum.IsDefined(category)
         };
     }
 
@@ -186,41 +189,72 @@ namespace BankingTool.Service.Validator
 
         private static object GetPropertyValue(object obj, string propertyPath)
         {
-            var props = propertyPath.Split('.');
-            foreach (var prop in props)
+            if (obj == null || string.IsNullOrWhiteSpace(propertyPath))
+                return null;
+
+            foreach (var segment in propertyPath.Split('.'))
             {
-                if (obj == null) return null;
-                var type = obj.GetType();
-                var property = type.GetProperty(prop);
-                obj = property?.GetValue(obj, null);
+                if (obj == null)
+                    return null;
+
+                var propertyName = segment;
+                var bracketIndex = segment.IndexOf('[');
+
+                if (bracketIndex >= 0)
+                    propertyName = segment.Substring(0, bracketIndex);
+
+                if (!string.IsNullOrEmpty(propertyName))
+                {
+                    var property = obj.GetType().GetProperty(propertyName);
+                    if (property == null)
+                        return null;
+
+                    obj = property.GetValue(obj, null);
+                }
+
+                if (bracketIndex >= 0)
+                {
+                    foreach (Match match in Regex.Matches(segment, @"\[(\d+)\]"))
+                    {
+                        if (obj is not IList list)
+                            return null;
+
+                        if (!int.TryParse(match.Groups[1].Value, out var index) || index < 0 || index >= list.Count)
+                            return null;
+
+                        obj = list[index];
+                    }
+                }
             }
+
             return obj;
         }
+
         private static List<string> ExpandWildcardPaths(object obj, string path)
         {
-            var paths = new List<string>();
-
             if (!path.Contains("[*]"))
-            {
-                paths.Add(path);
-                return paths;
-            }
+                return [path];
 
-            var prefix = path.Substring(0, path.IndexOf("[*]"));
-            var suffix = path.Substring(path.IndexOf("[*]") + 3).TrimStart('.');
+            var wildcardIndex = path.IndexOf("[*]", StringComparison.Ordinal);
+            var prefix = path.Substring(0, wildcardIndex).TrimEnd('.');
+            var suffix = path.Substring(wildcardIndex + 3).TrimStart('.');
 
             var collection = GetPropertyValue(obj, prefix) as IEnumerable;
-            if (collection == null) return paths;
+            if (collection == null)
+                return [];
 
-            int i = 0;
+            var paths = new List<string>();
+            var index = 0;
+
             foreach (var _ in collection)
             {
-                string fullPath = $"{prefix}[{i}]";
-                if (!string.IsNullOrEmpty(suffix))
-                    fullPath += $".{suffix}";
+                var expandedPath = $"{prefix}[{index}]";
 
-                paths.Add(fullPath);
-                i++;
+                if (!string.IsNullOrEmpty(suffix))
+                    expandedPath += $".{suffix}";
+
+                paths.AddRange(ExpandWildcardPaths(obj, expandedPath));
+                index++;
             }
 
             return paths;

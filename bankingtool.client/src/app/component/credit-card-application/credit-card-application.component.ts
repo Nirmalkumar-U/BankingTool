@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { isNullOrEmpty } from '../../core/commonFunction/common-function';
-import { NotificationService } from '../../core/notificationService/notification-service';
-import { LoaderService } from '../../core/service/loader.service';
-import { CreditCardService } from '../../core/service/credit-card.service';
-import { AuthService } from '../../core/service/auth.service';
-import { ResponseDto } from '../../dto/internal-dto/response-dto';
-import { LocalStorageService } from '../../core/local-storage.service';
 import { ClaimKey } from '../../constant/constant';
+import { LocalStorageService } from '../../core/local-storage.service';
+import { NotificationService } from '../../core/notificationService/notification-service';
 import { BankAccountService } from '../../core/service/bank-account.service';
+import { CreditCardService } from '../../core/service/credit-card.service';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { CreateCreditCardApplicationRequestObject } from '../../dto/request/credit-card/credit-card-application-request';
 
 @Component({
   selector: 'app-credit-card-application',
@@ -29,7 +27,6 @@ export class CreditCardApplicationComponent implements OnInit {
     private creditCardService: CreditCardService,
     private bankAccountService: BankAccountService,
     private notificationService: NotificationService,
-    private authService: AuthService,
     private router: Router,
     private localStorageService: LocalStorageService
   ) {
@@ -90,18 +87,13 @@ export class CreditCardApplicationComponent implements OnInit {
       ? parseFloat(values.desiredLimit) 
       : values.desiredLimit;
 
-    this.creditCardService.applyCreditCard(
-      selectedAccountId,
-      values.cardType,
-      desiredLimit
-    ).subscribe(
+    var request = CreateCreditCardApplicationRequestObject(selectedAccountId,values.cardType,desiredLimit);
+
+    this.creditCardService.applyCreditCard(request).subscribe(
       (response: ResponseDto<any>) => {
         if (response.status === true) {
           this.isSubmitted = true;
           this.notificationService.show('Credit card application submitted successfully!', 'success');
-          //this.notificationService.show(`Your application ID is: ${response.data?.applicationId}`, 'info');
-
-          // Redirect to dashboard after 2 seconds
           setTimeout(() => {
             this.router.navigate(['/creditCardDashboard']);
           }, 2000);

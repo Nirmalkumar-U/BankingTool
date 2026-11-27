@@ -2,7 +2,7 @@
 {
     public class CreditCardDashboardInitialLoadResponse
     {
-        public List<CreditCardDTO> CreditCards { get; set; }
-        public List<TransactionDTO> Transactions { get; set; }
+        public List<CreditCardResponse> CreditCards { get; set; }
+        public List<TransactionResponse> Transactions { get; set; }
     }
 }

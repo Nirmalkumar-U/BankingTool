@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { CreditCardApplicationRequestObject } from '../../dto/request/credit-card/credit-card-application-request';
+import { ProcessCreditCardPaymentRequestObject } from '../../dto/request/credit-card/process-credit-card-payment-request';
+import { RecordCreditCardTransactionRequestObject } from '../../dto/request/credit-card/record-credit-card-transaction-request';
+import { CreditCardDashboardInitialLoadResponse } from '../../dto/response/credit-card/credit-card-dashboard-initial-load-response';
+import { CreditCardResponseListObject, CreditCardResponseObject,} from '../../dto/response/credit-card/credit-card-response';
+import { StatementResponseListObject, StatementResponseObject } from '../../dto/response/credit-card/statement-response';
+import { TransactionResponseListObject } from '../../dto/response/credit-card/transaction-response';
 import { HttpService } from '../http/http.service';
 
 @Injectable({
@@ -8,102 +16,55 @@ import { HttpService } from '../http/http.service';
 export class CreditCardService {
   constructor(private httpService: HttpService) { }
 
-  // Credit Card Application Methods
-  applyCreditCard(accountId: number, cardType: string, desiredLimit: number): Observable<any> {
-    const request = {
-      accountId: accountId,
-      cardType: cardType,
-      desiredLimit: desiredLimit
-    };
+  applyCreditCard(request: CreditCardApplicationRequestObject): Observable<ResponseDto<boolean>> {
     return this.httpService.post('CreditCard/ApplyCreditCard', request);
   }
 
-  getApplicationStatus(applicationId: number): Observable<any> {
-    return this.httpService.get(`CreditCard/GetApplicationStatus?applicationId=${applicationId}`);
-  }
-
-  getCustomerApplications(accountId: number): Observable<any> {
-    return this.httpService.get(`CreditCard/GetApplicationHistory?accountId=${accountId}`);
-  }
-
-  getCustomerCreditCards(): Observable<any> {
+  getCustomerCreditCards(): Observable<ResponseDto<CreditCardResponseListObject>> {
     return this.httpService.get('CreditCard/GetCustomerCreditCards');
   }
 
-  approveCreditCard(applicationId: number, approvedLimit: number, approvalRemarks: string = ''): Observable<any> {
-    return this.httpService.post(`CreditCard/ApproveApplication?applicationId=${applicationId}&approvedLimit=${approvedLimit}&approvalRemarks=${approvalRemarks}`, {});
-  }
-
-  rejectCreditCard(applicationId: number, rejectionRemarks: string = ''): Observable<any> {
-    return this.httpService.post(`CreditCard/RejectApplication?applicationId=${applicationId}&rejectionRemarks=${rejectionRemarks}`, {});
-  }
-
-  // Credit Card Management Methods
-  getCardDetails(creditCardId: number): Observable<any> {
+  getCardDetails(creditCardId: number): Observable<ResponseDto<CreditCardResponseObject>> {
     return this.httpService.get(`CreditCard/GetCardDetails?creditCardId=${creditCardId}`);
   }
 
-  updateCardLimit(creditCardId: number, newLimit: number): Observable<any> {
-    return this.httpService.post(`CreditCard/UpdateCardLimit?creditCardId=${creditCardId}&newLimit=${newLimit}`, {});
+  updateCardLimit(creditCardId: number, newLimit: number): Observable<ResponseDto<boolean>> {
+    return this.httpService.get(`CreditCard/UpdateCardLimit?creditCardId=${creditCardId}&newLimit=${newLimit}`);
   }
 
-  closeCreditCard(creditCardId: number, closureReason: string = ''): Observable<any> {
-    return this.httpService.post(`CreditCard/CloseCreditCard?creditCardId=${creditCardId}&closureReason=${closureReason}`, {});
+  closeCreditCard(creditCardId: number, closureReason: string = ''): Observable<ResponseDto<boolean>> {
+    return this.httpService.get(`CreditCard/CloseCreditCard?creditCardId=${creditCardId}&closureReason=${encodeURIComponent(closureReason)}`);
   }
 
-  blockCreditCard(creditCardId: number, blockReason: string = ''): Observable<any> {
-    return this.httpService.post(`CreditCard/BlockCreditCard?creditCardId=${creditCardId}&blockReason=${blockReason}`, {});
+  blockCreditCard(creditCardId: number, blockReason: string = ''): Observable<ResponseDto<boolean>> {
+    return this.httpService.get(`CreditCard/BlockCreditCard?creditCardId=${creditCardId}&blockReason=${encodeURIComponent(blockReason)}`);
   }
 
-  unblockCreditCard(creditCardId: number): Observable<any> {
-    return this.httpService.post(`CreditCard/UnblockCreditCard?creditCardId=${creditCardId}`, {});
+  unblockCreditCard(creditCardId: number): Observable<ResponseDto<boolean>> {
+    return this.httpService.get(`CreditCard/UnblockCreditCard?creditCardId=${creditCardId}`);
   }
 
-  getAvailableCredit(creditCardId: number): Observable<any> {
-    return this.httpService.get(`CreditCard/GetAvailableCredit?creditCardId=${creditCardId}`);
-  }
-
-  // Transaction Methods
-  recordTransaction(request: {
-    creditCardId: number;
-    transactionType: string;
-    amount: number;
-    description: string;
-    merchantName: string;
-    budgetAccounts: any[];
-    transactionDate: Date;
-  }): Observable<any> {
+  recordTransaction(request: RecordCreditCardTransactionRequestObject): Observable<ResponseDto<boolean>> {
     return this.httpService.post('CreditCard/RecordTransaction', request);
   }
 
-  processPayment(request: {
-    creditCardId: number;
-    paymentAmount: number;
-    description: string;
-    transactionDate: Date;
-    fees: number;
-  }): Observable<any> {
+  processPayment(request: ProcessCreditCardPaymentRequestObject): Observable<ResponseDto<boolean>> {
     return this.httpService.post('CreditCard/ProcessPayment', request);
   }
 
-  getTransactionHistory(creditCardId: number, pageNumber: number = 1, pageSize: number = 10): Observable<any> {
-    return this.httpService.get(`CreditCard/GetTransactionHistory?creditCardId=${creditCardId}&pageNumber=${pageNumber}&pageSize=${pageSize}`);
+  getTransactionHistory(creditCardId: number): Observable<ResponseDto<TransactionResponseListObject>> {
+    return this.httpService.get(`CreditCard/GetTransactionHistory?creditCardId=${creditCardId}`);
   }
 
-  getTransactionsByDateRange(creditCardId: number, fromDate: Date, toDate: Date): Observable<any> {
-    return this.httpService.get(`CreditCard/GetTransactionsByDateRange?creditCardId=${creditCardId}&fromDate=${fromDate}&toDate=${toDate}`);
-  }
-
-  getCreditCardDashboardInitialLoad(): Observable<any> {
+  getCreditCardDashboardInitialLoad(): Observable<ResponseDto<CreditCardDashboardInitialLoadResponse>> {
     return this.httpService.get('CreditCard/GetCreditCardDashboardInitialLoad');
   }
 
-  // Statement Methods
-  getStatementHistory(creditCardId: number): Observable<any> {
+  getStatementHistory(creditCardId: number): Observable<ResponseDto<StatementResponseListObject>> {
     return this.httpService.get(`CreditCard/GetStatementHistory?creditCardId=${creditCardId}`);
   }
 
-  getStatementWithDetails(statementId: number): Observable<any> {
+  getStatementWithDetails(statementId: number): Observable<ResponseDto<StatementResponseObject>> {
     return this.httpService.get(`CreditCard/GetStatementWithDetails?statementId=${statementId}`);
   }
 }

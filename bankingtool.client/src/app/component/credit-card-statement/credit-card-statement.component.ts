@@ -45,12 +45,15 @@ export class CreditCardStatementComponent implements OnInit {
 
   loadStatementHistory(): void {
     this.creditCardService.getStatementHistory(this.creditCardId).subscribe(
-      (response: ResponseDto<any>) => {
-        if (response.status === true && Array.isArray(response.response)) {
-          this.statementHistory = response.response;
+      (response) => {
+        if (response.status === true && Array.isArray(response.response?.responses)) {
+          this.statementHistory = response.response.responses.map(item => ({
+            ...item.statement,
+            statementId: item.statement.id
+          }));
           if (this.statementHistory.length > 0) {
             const selected = this.statementHistory[0];
-            this.onStatementSelectionChange(selected.statementId);
+            this.onStatementSelectionChange(selected.id);
           } else {
             this.statementHistory = [];
             this.selectedStatement = null;
@@ -71,11 +74,14 @@ export class CreditCardStatementComponent implements OnInit {
     this.selectedStatementId = Number(statementId || 0);
     if (this.selectedStatementId > 0) {
       this.creditCardService.getStatementWithDetails(this.selectedStatementId).subscribe(
-        (response: ResponseDto<any>) => {
-          if (response.status === true && response.response) {
-            this.selectedStatement = response.response;
-            this.statementDetails = Array.isArray(response.response.statementDetails)
-              ? response.response.statementDetails
+        (response) => {
+          if (response.status === true && response.response?.response) {
+            this.selectedStatement = {
+              ...response.response.response.statement,
+              statementId: response.response.response.statement.id
+            };
+            this.statementDetails = Array.isArray(response.response.response.statement.statementDetails)
+              ? response.response.response.statement.statementDetails
               : [];
             this.showStatementDetails = false;
           }

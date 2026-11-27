@@ -8,6 +8,9 @@ import { CreditCardService } from '../../core/service/credit-card.service';
 import { LoaderService } from '../../core/service/loader.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import { CreateRecordCreditCardTransactionRequestObject } from '../../dto/request/credit-card/record-credit-card-transaction-request';
+import { CreateProcessCreditCardPaymentRequestObject } from '../../dto/request/credit-card/process-credit-card-payment-request';
+import { CreditCardResponseListObject } from '../../dto/response/credit-card/credit-card-response';
 
 @Component({
   selector: 'app-credit-card-payment',
@@ -106,12 +109,15 @@ export class CreditCardPaymentComponent implements OnInit {
   loadCustomerCards(): void {
     this.loaderService.show();
     this.creditCardService.getCustomerCreditCards().subscribe(
-      (response: ResponseDto<any>) => {
+      (response:ResponseDto<CreditCardResponseListObject>) => {
         this.loaderService.hide();
-        if (response.status === true && Array.isArray(response.response)) {
-          this.customerCards = response.response.map(card => ({
-            ...card,
-            maskedCardNumber: card.cardNumber?.maskedCardNumber || card.maskedCardNumber || '****'
+        if (response.status === true && Array.isArray(response.response?.responses)) {
+          this.customerCards = response.response.responses.map(card => ({
+            creditCardId: card.creditCard.id,
+            ...card.creditCard,
+            accountId: card.account.id,
+            ...card.account,
+            maskedCardNumber: card.creditCard.cardNumber?.maskedCardNumber || '****'
           }));
 
           this.customerCards = this.customerCards.filter(card =>
@@ -257,13 +263,9 @@ export class CreditCardPaymentComponent implements OnInit {
     const transactionDate = new Date(this.paymentForm.get('transactionDate')?.value || new Date());
     const fees = Number(this.paymentForm.get('fees')?.value || 0);
 
-    this.creditCardService.processPayment({
-      creditCardId: selectedCardId,
-      paymentAmount,
-      description,
-      transactionDate,
-      fees
-    }).subscribe(
+    let request = CreateProcessCreditCardPaymentRequestObject(selectedCardId, paymentAmount, description, transactionDate, fees)
+
+    this.creditCardService.processPayment(request).subscribe(
       (response: ResponseDto<any>) => {
         this.loaderService.hide();
         if (response.status === true) {
@@ -381,15 +383,10 @@ export class CreditCardPaymentComponent implements OnInit {
       .filter((x: any) => !isNullOrEmpty(x.budgetAccountId) && !isNullOrEmpty(x.budgetAmount))
       .map((x: any) => ({ id: x.budgetAccountId, amount: Number(x.budgetAmount) }));
 
-    this.creditCardService.recordTransaction({
-      creditCardId: cardId,
-      transactionType: paymentType,
-      amount,
-      description,
-      merchantName,
-      budgetAccounts,
-      transactionDate
-    }).subscribe(
+      var request = CreateRecordCreditCardTransactionRequestObject(cardId,amount,description,transactionDate,
+              merchantName,paymentType, budgetAccounts)
+
+    this.creditCardService.recordTransaction(request).subscribe(
       (response: ResponseDto<any>) => {
         this.loaderService.hide();
 

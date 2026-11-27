@@ -10,9 +10,9 @@ namespace BankingTool.Service.Service
     {
         private readonly ICreditCardStatementRepository _statementRepository = statementRepository;
 
-        public async Task<ResponseDto<StatementDTO>> GetStatementWithDetails(int statementId)
+        public async Task<ResponseDto<StatementResponseObject>> GetStatementWithDetails(int statementId)
         {
-            var response = new ResponseDto<StatementDTO>
+            var response = new ResponseDto<StatementResponseObject>
             {
                 StatuCode = 200,
                 Status = false,
@@ -33,20 +33,35 @@ namespace BankingTool.Service.Service
                 if (statement == null)
                 {
                     response.Errors.Add(new Errors { ErrorMessage = "Statement not found" });
-                    response.StatuCode = 404;
+                    response.StatuCode = 200;
                     return response;
                 }
 
                 var statementDetails = await _statementRepository.GetStatementDetails(statementId);
-                var statementDTO = MapToStatementDTO(statement);
-                statementDTO.StatementDetails = statementDetails.Select(detail => new StatementDetailDTO
+                var statementDTO = new StatementResponseObject()
                 {
-                    StatementDetailId = detail.StatementDetailId,
-                    TransactionDate = detail.TransactionDate,
-                    Description = detail.Description,
-                    Amount = detail.Amount,
-                    TransactionType = detail.TransactionType
-                }).ToList();
+                    Response = new StatementResponse
+                    {
+                        Statement = new StatementResponseStatement
+                        {
+                            Id = statement.StatementId,
+                            BillingCycleStartDate = statement.BillingCycleStartDate,
+                            BillingCycleEndDate = statement.BillingCycleEndDate,
+                            StatementDate = statement.StatementDate,
+                            TotalPayments = statement.TotalPayments,
+                            Fees = statement.Fees,
+                            StatementStatus = statement.StatementStatus.EnumToString(),
+                            StatementDetails = statementDetails.Select(detail => new StatementResponseStatementDetail
+                            {
+                                Id = detail.StatementDetailId,
+                                TransactionDate = detail.TransactionDate,
+                                Description = detail.Description,
+                                Amount = detail.Amount,
+                                TransactionType = detail.TransactionType
+                            }).ToList()
+                        }
+                    }
+                };
 
                 response.Status = true;
                 response.Message = "Statement retrieved successfully";
@@ -62,44 +77,9 @@ namespace BankingTool.Service.Service
             return response;
         }
 
-        public async Task<ResponseDto<StatementDTO>> GetCurrentStatement(int creditCardId)
+        public async Task<ResponseDto<StatementResponseListObject>> GetStatementsByCardId(int creditCardId)
         {
-            var response = new ResponseDto<StatementDTO>
-            {
-                StatuCode = 200,
-                Status = false,
-                Errors = [],
-                ValidationErrors = []
-            };
-
-            try
-            {
-                if (creditCardId <= 0)
-                {
-                    response.Errors.Add(new Errors { ErrorMessage = "Invalid credit card ID" });
-                    response.StatuCode = 400;
-                    return response;
-                }
-
-                var statement = await _statementRepository.GetCurrentStatement(creditCardId);
-
-                response.Status = true;
-                response.Message = "Current statement retrieved successfully";
-                response.Response = statement == null ? null : MapToStatementDTO(statement);
-                response.StatuCode = 200;
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Errors { ErrorMessage = $"An error occurred while retrieving current statement: {ex.Message}" });
-                response.StatuCode = 500;
-            }
-
-            return response;
-        }
-
-        public async Task<ResponseDto<List<StatementDTO>>> GetStatementsByCardId(int creditCardId)
-        {
-            var response = new ResponseDto<List<StatementDTO>>
+            var response = new ResponseDto<StatementResponseListObject>
             {
                 StatuCode = 200,
                 Status = false,
@@ -120,7 +100,22 @@ namespace BankingTool.Service.Service
 
                 response.Status = true;
                 response.Message = "Statements retrieved successfully";
-                response.Response = statement == null ? [] : [.. statement.Select(x => MapToStatementDTO(x))];
+                response.Response = statement == null ? null : new StatementResponseListObject
+                {
+                    Responses = statement.Select(s => new StatementResponse
+                    {
+                        Statement = new StatementResponseStatement
+                        {
+                            Id = s.StatementId,
+                            BillingCycleStartDate = s.BillingCycleStartDate,
+                            BillingCycleEndDate = s.BillingCycleEndDate,
+                            StatementDate = s.StatementDate,
+                            TotalPayments = s.TotalPayments,
+                            Fees = s.Fees,
+                            StatementStatus = s.StatementStatus.EnumToString()
+                        }
+                    }).ToList()
+                };
                 response.StatuCode = 200;
             }
             catch (Exception ex)
@@ -130,20 +125,6 @@ namespace BankingTool.Service.Service
             }
 
             return response;
-        }
-
-        private StatementDTO MapToStatementDTO(CreditCardStatement statement)
-        {
-            return new StatementDTO
-            {
-                StatementId = statement.StatementId,
-                BillingCycleStartDate = statement.BillingCycleStartDate,
-                BillingCycleEndDate = statement.BillingCycleEndDate,
-                StatementDate = statement.StatementDate,
-                TotalPayments = statement.TotalPayments,
-                Fees = statement.Fees,
-                StatementStatus = statement.StatementStatus.EnumToString()
-            };
         }
     }
 }

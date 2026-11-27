@@ -1,4 +1,5 @@
 using BankingTool.Api.Filter;
+using BankingTool.Api.Validators;
 using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.CreditCard;
 using BankingTool.Model.Dto.ResponseDto.CreditCard;
@@ -24,186 +25,169 @@ namespace BankingTool.Api.Controllers
         private readonly ICreditCardStatementService _statementService = statementService;
 
         [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<List<CreditCardApplicationResponseDTO>>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<CreditCardDashboardInitialLoadResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<CreditCardDashboardInitialLoadResponse>), 400)]
         public async Task<IActionResult> GetCreditCardDashboardInitialLoad()
         {
-            var result = await _creditCardService.GetCreditCardDashboardInitialLoad();
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, CreditCardDashboardInitialLoadResponse>(
+               null,
+               null,
+               () => _creditCardService.GetCreditCardDashboardInitialLoad()
+            );
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<List<CreditCardDTO>>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<CreditCardResponseListObject>), 200)]
         public async Task<IActionResult> GetCustomerCreditCards()
         {
-            var result = await _creditCardService.GetCustomerCreditCards();
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, CreditCardResponseListObject>(
+               null,
+               null,
+               () => _creditCardService.GetCustomerCreditCards()
+            );
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<CreditCardApplicationResponseDTO>), 201)]
-        [ProducesResponseType(typeof(ResponseDto<CreditCardApplicationResponseDTO>), 400)]
-        public async Task<IActionResult> ApplyCreditCard([FromBody] CreditCardApplicationRequestDTO request)
+        [ProducesResponseType(typeof(ResponseDto<bool>), 201)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> ApplyCreditCard([FromBody] CreditCardApplicationRequestObject request)
         {
-            if (request == null)
-                return BadRequest(new ResponseDto<CreditCardApplicationResponseDTO> { StatuCode = 400, Status = false, Message = "Invalid request" });
 
-            var result = await _creditCardService.ApplyCreditCard(request);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<CreditCardApplicationRequestObject, bool>(
+                request,
+                ValidationRules.CreditCardApplicationRequestRules,
+                () => _creditCardService.ApplyCreditCard(request.Request)
+            );
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<CreditCardDTO>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<CreditCardDTO>), 404)]
+        [ProducesResponseType(typeof(ResponseDto<CreditCardResponseObject>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<CreditCardResponseObject>), 404)]
         public async Task<IActionResult> GetCardDetails([FromQuery] int creditCardId)
         {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<CreditCardDTO> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
-
-            var result = await _creditCardService.GetCardDetails(creditCardId);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, CreditCardResponseObject>(
+               null,
+               null,
+               () => _creditCardService.GetCardDetails(creditCardId)
+            );
         }
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public async Task<IActionResult> UpdateCardLimit([FromQuery] int creditCardId, [FromQuery] decimal newLimit)
         {
-            if (creditCardId <= 0 || newLimit <= 0)
-                return BadRequest(new ResponseDto<bool> { StatuCode = 400, Status = false, Message = "Invalid credit card ID or new limit" });
-
-            var result = await _creditCardService.UpdateCardLimit(creditCardId, newLimit);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, bool>(
+               null,
+               null,
+               () => _creditCardService.UpdateCardLimit(creditCardId, newLimit)
+            );
         }
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public async Task<IActionResult> CloseCreditCard([FromQuery] int creditCardId, [FromQuery] string closureReason = "")
         {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<bool> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
-
-            var result = await _creditCardService.CloseCreditCard(creditCardId, closureReason);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, bool>(
+               null,
+               null,
+               () => _creditCardService.CloseCreditCard(creditCardId, closureReason)
+            );
         }
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public async Task<IActionResult> BlockCreditCard([FromQuery] int creditCardId, [FromQuery] string blockReason = "")
         {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<bool> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
+            return await HandleRequestAsync<int?, bool>(
+               null,
+               null,
+               () => _creditCardService.BlockCreditCard(creditCardId, blockReason)
+            );
+        }
 
-            var result = await _creditCardService.BlockCreditCard(creditCardId, blockReason);
-            return StatusCode(result.StatuCode, result);
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> UnblockCreditCard([FromQuery] int creditCardId)
+        {
+            return await HandleRequestAsync<int?, bool>(
+               null,
+               null,
+               () => _creditCardService.UnblockCreditCard(creditCardId)
+            );
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 201)]
+        [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
+        public async Task<IActionResult> RecordTransaction([FromBody] RecordCreditCardTransactionRequestObject request)
+        {
+            return await HandleRequestAsync<RecordCreditCardTransactionRequestObject, bool>(
+                request,
+                ValidationRules.RecordCreditCardTransactionRequestRules,
+                () => _transactionService.RecordTransaction(
+                request.Request.CreditCard.Id,
+                request.Request.Transaction.TransactionType,
+                request.Request.Transaction.Amount,
+                request.Request.Transaction.Description,
+                request.Request.Transaction.MerchantName,
+                request.Request.BudgetAccounts,
+                request.Request.Transaction.TransactionDate)
+            );
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
-        public async Task<IActionResult> UnblockCreditCard([FromQuery] int creditCardId)
+        public async Task<IActionResult> ProcessPayment([FromBody] ProcessCreditCardPaymentRequestObject request)
         {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<bool> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
-
-            var result = await _creditCardService.UnblockCreditCard(creditCardId);
-            return StatusCode(result.StatuCode, result);
-        }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<TransactionDTO>), 201)]
-        [ProducesResponseType(typeof(ResponseDto<TransactionDTO>), 400)]
-        public async Task<IActionResult> RecordTransaction([FromBody] RecordCreditCardTransactionRequestDTO request)
-        {
-            if (request == null || request.CreditCardId <= 0 || request.Amount <= 0 ||
-                !Enum.TryParse<TransactionType>(request.TransactionType, true, out var txType))
-                return BadRequest(new ResponseDto<TransactionDTO> { StatuCode = 400, Status = false, Message = "Invalid parameters" });
-
-            var result = await _transactionService.RecordTransaction(
-                request.CreditCardId,
-                txType,
-                request.Amount,
-                request.Description,
-                request.MerchantName,
-                request.BudgetAccounts,
-                request.TransactionDate);
-            return StatusCode(result.StatuCode, result);
-        }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(ResponseDto<TransactionDTO>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<TransactionDTO>), 400)]
-        public async Task<IActionResult> ProcessPayment([FromBody] ProcessCreditCardPaymentRequestDTO request)
-        {
-            if (request == null || request.CreditCardId <= 0 || request.PaymentAmount <= 0)
-                return BadRequest(new ResponseDto<TransactionDTO> { StatuCode = 400, Status = false, Message = "Invalid parameters" });
-
-            var result = await _transactionService.ProcessPayment(
-                request.CreditCardId,
-                request.PaymentAmount,
-                request.Description ?? "Payment",
-                request.TransactionDate,
-                request.Fees);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<ProcessCreditCardPaymentRequestObject, bool>(
+                request,
+                ValidationRules.ProcessCreditCardPaymentRequestRules,
+                () => _transactionService.ProcessPayment(
+                request.Request.CreditCard.Id,
+                request.Request.Transaction.PaymentAmount,
+                request.Request.Transaction.Description ?? "Payment",
+                request.Request.Transaction.TransactionDate,
+                request.Request.Transaction.Fees)
+            );  
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<List<TransactionDTO>>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<List<TransactionDTO>>), 404)]
-        public async Task<IActionResult> GetTransactionHistory([FromQuery] int creditCardId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [ProducesResponseType(typeof(ResponseDto<TransactionResponseListObject>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<TransactionResponseListObject>), 404)]
+        public async Task<IActionResult> GetTransactionHistory([FromQuery] int creditCardId)
         {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<List<TransactionDTO>> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
-
-            var result = await _transactionService.GetTransactionHistory(creditCardId, pageNumber, pageSize);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, TransactionResponseListObject>(
+               null,
+               null,
+               () => _transactionService.GetTransactionHistory(creditCardId)
+            );
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<List<TransactionDTO>>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<List<TransactionDTO>>), 400)]
-        public async Task<IActionResult> GetTransactionsByDateRange([FromQuery] int creditCardId, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
-        {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<List<TransactionDTO>> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
-
-            var result = await _transactionService.GetTransactionsByDateRange(creditCardId, fromDate, toDate);
-            return StatusCode(result.StatuCode, result);
-        }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<List<StatementDTO>>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<StatementResponseListObject>), 200)]
         public async Task<IActionResult> GetStatementHistory([FromQuery] int creditCardId)
         {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<List<StatementDTO>> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
-
-            var result = await _statementService.GetStatementsByCardId(creditCardId);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, StatementResponseListObject>(
+               null,
+               null,
+               () => _statementService.GetStatementsByCardId(creditCardId)
+            );
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<StatementDTO>), 200)]
-        [ProducesResponseType(typeof(ResponseDto<StatementDTO>), 404)]
-        public async Task<IActionResult> GetCurrentStatement([FromQuery] int creditCardId)
-        {
-            if (creditCardId <= 0)
-                return BadRequest(new ResponseDto<StatementDTO> { StatuCode = 400, Status = false, Message = "Invalid credit card ID" });
-
-            var result = await _statementService.GetCurrentStatement(creditCardId);
-            return StatusCode(result.StatuCode, result);
-        }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto<StatementDTO>), 200)]
+        [ProducesResponseType(typeof(ResponseDto<StatementResponseObject>), 200)]
         public async Task<IActionResult> GetStatementWithDetails([FromQuery] int statementId)
         {
-            if (statementId <= 0)
-                return BadRequest(new ResponseDto<StatementDTO> { StatuCode = 400, Status = false, Message = "Invalid statement ID" });
-
-            var result = await _statementService.GetStatementWithDetails(statementId);
-            return StatusCode(result.StatuCode, result);
+            return await HandleRequestAsync<int?, StatementResponseObject>(
+               null,
+               null,
+               () => _statementService.GetStatementWithDetails(statementId)
+            );
         }
     }
 }

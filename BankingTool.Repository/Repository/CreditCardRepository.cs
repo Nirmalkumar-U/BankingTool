@@ -40,12 +40,6 @@ namespace BankingTool.Repository.Repository
             return creditCard.CreditCardId;
         }
 
-        public async Task<bool> UpdateCreditCard(CreditCard creditCard)
-        {
-            creditCard.ModifiedDate = DateTime.UtcNow;
-            dataContext.CreditCard.Update(creditCard);
-            return await dataContext.SaveChangesAsync() > 0;
-        }
         public async Task<bool> UpdateCreditLimit(int creditCardId, decimal newLimit)
         {
             var card = await dataContext.CreditCard.FirstOrDefaultAsync(x => x.CreditCardId == creditCardId);

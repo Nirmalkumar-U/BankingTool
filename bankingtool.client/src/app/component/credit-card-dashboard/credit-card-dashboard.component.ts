@@ -4,6 +4,11 @@ import { CreditCardService } from '../../core/service/credit-card.service';
 import { LoaderService } from '../../core/service/loader.service';
 import { NotificationService } from '../../core/notificationService/notification-service';
 import { ResponseDto } from '../../dto/internal-dto/response-dto';
+import {
+  CreditCardResponse,
+} from '../../dto/response/credit-card/credit-card-response';
+import { CreditCardDashboardInitialLoadResponse } from '../../dto/response/credit-card/credit-card-dashboard-initial-load-response';
+import { TransactionResponse } from '../../dto/response/credit-card/transaction-response';
 
 @Component({
   selector: 'app-credit-card-dashboard',
@@ -31,22 +36,32 @@ export class CreditCardDashboardComponent implements OnInit {
   loadCreditCards(): void {
     this.loaderService.show();
     this.creditCardService.getCreditCardDashboardInitialLoad().subscribe(
-      (response: ResponseDto<any>) => {
+      (response: ResponseDto<CreditCardDashboardInitialLoadResponse>) => {
         this.loaderService.hide();
         if (response.status === true && response.response) {
           const cards = Array.isArray(response.response.creditCards)
             ? response.response.creditCards
             : [];
 
-          this.creditCards = cards.map((card: any) => ({
-            ...card,
-            maskedCardNumber: card.cardNumber?.maskedCardNumber || card.maskedCardNumber || '**** **** **** ****',
-            accountDetail: card.accountDetail || `${card.accountAbbreviation || 'Account'} | ${String(card.cardNumber?.maskedCardNumber || card.maskedCardNumber || '').slice(-4)}`
+          this.creditCards = cards.map((card: CreditCardResponse) => ({
+            creditCardId: card.creditCard.id,
+            ...card.creditCard,
+            accountId: card.account.id,
+            accountNumber: card.account.accountNumber,
+            accountAbbreviation: card.account.accountAbbreviation,
+            accountDetail: card.account.accountDetail,
+            maskedCardNumber: card.creditCard.cardNumber?.maskedCardNumber || '**** **** **** ****'
           }));
 
-          this.recentTransactions = Array.isArray(response.response.transactions)
-            ? response.response.transactions
-            : [];
+          this.recentTransactions = (response.response.transactions || []).map((item: TransactionResponse) => ({
+            ...item.transaction,
+            transactionId: item.transaction.id,
+            creditCardId: item.creditCard.id,
+            creditCardNumber: item.creditCard.creditCardNumber,
+            accountId: item.account.id,
+            cardDetail: item.creditCard.cardDetail,
+            cardholderName: item.creditCard.cardholderName
+          }));
 
           this.calculateTotals();
 

@@ -8,30 +8,12 @@ namespace BankingTool.Repository.Repository
 {
     public class CreditCardTransactionRepository(DataContext dataContext) : EntityRepository<CreditCardTransaction>(dataContext), ICreditCardTransactionRepository
     {
-        public async Task<CreditCardTransaction> GetTransactionById(int transactionId)
-        {
-            return await dataContext.CreditCardTransaction
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.TransactionId == transactionId);
-        }
-
         public async Task<List<CreditCardTransaction>> GetTransactionsByCardId(int creditCardId)
         {
             return await dataContext.CreditCardTransaction
                 .AsNoTracking()
                 .Where(x => x.CreditCardId == creditCardId)
                 .OrderByDescending(x => x.TransactionDate)
-                .ToListAsync();
-        }
-
-        public async Task<List<CreditCardTransaction>> GetTransactionsByCardIdWithPagination(int creditCardId, int pageNumber, int pageSize)
-        {
-            return await dataContext.CreditCardTransaction
-                .AsNoTracking()
-                .Where(x => x.CreditCardId == creditCardId)
-                .OrderByDescending(x => x.TransactionDate)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -42,35 +24,6 @@ namespace BankingTool.Repository.Repository
                 .Where(x => x.CreditCardId == creditCardId && x.TransactionDate >= fromDate && x.TransactionDate.Date <= toDate.Date)
                 .OrderByDescending(x => x.TransactionDate)
                 .ToListAsync();
-        }
-
-        public async Task<List<CreditCardTransaction>> GetTransactionsByType(int creditCardId, TransactionType transactionType)
-        {
-            return await dataContext.CreditCardTransaction
-                .AsNoTracking()
-                .Where(x => x.CreditCardId == creditCardId && x.TransactionType == transactionType)
-                .OrderByDescending(x => x.TransactionDate)
-                .ToListAsync();
-        }
-
-        public async Task<List<CreditCardTransaction>> GetTransactionsByStatus(int creditCardId, TransactionStatus status)
-        {
-            return await dataContext.CreditCardTransaction
-                .AsNoTracking()
-                .Where(x => x.CreditCardId == creditCardId && x.TransactionStatus == status)
-                .OrderByDescending(x => x.TransactionDate)
-                .ToListAsync();
-        }
-
-        public async Task<int> InsertTransaction(CreditCardTransaction transaction)
-        {
-            transaction.CreatedDate = DateTime.UtcNow;
-            transaction.ModifiedDate = DateTime.UtcNow;
-            transaction.CreatedBy = dataContext.UserName;
-            transaction.ModifiedBy = dataContext.UserName;
-            dataContext.CreditCardTransaction.Add(transaction);
-            await dataContext.SaveChangesAsync();
-            return transaction.TransactionId;
         }
 
         public async Task<(bool Success, int TransactionId)> SaveCreditCardTransaction(CreditCardTransaction transaction, CreditCard creditCard, List<BudgetTransactionDto> budgetTransactions)
@@ -177,36 +130,7 @@ namespace BankingTool.Repository.Repository
             }
         }
 
-        public async Task<bool> UpdateTransaction(CreditCardTransaction transaction)
-        {
-            transaction.ModifiedDate = DateTime.UtcNow;
-            dataContext.CreditCardTransaction.Update(transaction);
-            return await dataContext.SaveChangesAsync() > 0;
-        }
-
-        public async Task<decimal> CalculateTotalCharges(int creditCardId, DateTime startDate, DateTime endDate)
-        {
-            return await dataContext.CreditCardTransaction
-                .Where(x => x.CreditCardId == creditCardId
-                    && x.TransactionDate >= startDate
-                    && x.TransactionDate <= endDate
-                    && x.TransactionType == TransactionType.Purchase
-                    && x.TransactionStatus == TransactionStatus.Completed)
-                .SumAsync(x => x.Amount);
-        }
-
-        public async Task<decimal> CalculateTotalPayments(int creditCardId, DateTime startDate, DateTime endDate)
-        {
-            return await dataContext.CreditCardTransaction
-                .Where(x => x.CreditCardId == creditCardId
-                    && x.TransactionDate >= startDate
-                    && x.TransactionDate <= endDate
-                    && x.TransactionType == TransactionType.Payment
-                    && x.TransactionStatus == TransactionStatus.Completed)
-                .SumAsync(x => x.Amount);
-        }
-
-        public async Task<List<TransactionDTO>> GetAllTransactionsOfCustomer()
+        public async Task<List<TransactionResponse>> GetAllTransactionsOfCustomer()
         {
             return await (from cc in dataContext.CreditCard
                           join a in dataContext.Account on cc.AccountId equals a.AccountId
@@ -215,31 +139,32 @@ namespace BankingTool.Repository.Repository
                           join cct in dataContext.CreditCardTransaction on cc.CreditCardId equals cct.CreditCardId
                           where c.CustomerId == dataContext.CustomerId
                           orderby cct.TransactionDate descending
-                          select new TransactionDTO
+                          select new TransactionResponse
                           {
-                              TransactionId = cct.TransactionId,
-                              TransactionDate = cct.TransactionDate,
-                              TransactionType = cct.TransactionType.EnumToString(),
-                              Amount = cct.Amount,
-                              Description = cct.Description,
-                              MerchantName = cct.MerchantName,
-                              TransactionStatus = cct.TransactionStatus.EnumToString(),
-                              ReferenceNumber = cct.ReferenceNumber,
-                              CreditCardId = cc.CreditCardId,
-                              CreditCardNumber = cc.CardNumber,
-                              AccountId = a.AccountId,
-                              CardDetail = b.BankAbbrivation + " | " + cc.CardNumber.Substring(cc.CardNumber.Length - 4),
-                              CardholderName = cc.CardHolderName
+                              Transaction = new TransactionResponseTransaction
+                              {
+                                  Id = cct.TransactionId,
+                                  TransactionDate = cct.TransactionDate,
+                                  TransactionType = cct.TransactionType.EnumToString(),
+                                  Amount = cct.Amount,
+                                  Description = cct.Description,
+                                  MerchantName = cct.MerchantName,
+                                  TransactionStatus = cct.TransactionStatus.EnumToString(),
+                                  ReferenceNumber = cct.ReferenceNumber
+                              },
+
+                              CreditCard = new TransactionResponseCreditCard
+                              {
+                                  Id = cc.CreditCardId,
+                                  CardDetail = b.BankAbbrivation + " | " + cc.CardNumber.Substring(cc.CardNumber.Length - 4),
+                                  CardholderName = cc.CardHolderName,
+                                  CreditCardNumber = cc.CardNumber
+                              },
+                              Account = new TransactionResponseAccount
+                              {
+                                  Id = a.AccountId,
+                              }
                           }).ToListAsync();
-        }
-
-        public async Task<bool> DeleteTransaction(int transactionId)
-        {
-            var transaction = await dataContext.CreditCardTransaction.FirstOrDefaultAsync(x => x.TransactionId == transactionId);
-            if (transaction == null) return false;
-
-            dataContext.CreditCardTransaction.Remove(transaction);
-            return await dataContext.SaveChangesAsync() > 0;
         }
     }
 }

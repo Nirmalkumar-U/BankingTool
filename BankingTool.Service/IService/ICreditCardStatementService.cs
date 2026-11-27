@@ -5,8 +5,7 @@ namespace BankingTool.Service.IService
 {
     public interface ICreditCardStatementService
     {
-        Task<ResponseDto<StatementDTO>> GetStatementWithDetails(int statementId);
-        Task<ResponseDto<StatementDTO>> GetCurrentStatement(int creditCardId);
-        Task<ResponseDto<List<StatementDTO>>> GetStatementsByCardId(int creditCardId);
+        Task<ResponseDto<StatementResponseObject>> GetStatementWithDetails(int statementId);
+        Task<ResponseDto<StatementResponseListObject>> GetStatementsByCardId(int creditCardId);
     }
 }
