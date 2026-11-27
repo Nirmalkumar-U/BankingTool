@@ -4,12 +4,13 @@ using BankingTool.Model;
 using BankingTool.Model.Dto.RequestDto.BulkTransaction;
 using BankingTool.Service.IService;
 using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
-    [TokenAuthorization]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class BulkTransactionController(IBulkTransactionService bulkTransaction,
         IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)

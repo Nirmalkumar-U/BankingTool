@@ -5,12 +5,13 @@ using BankingTool.Model.Dto.RequestDto.CreditCard;
 using BankingTool.Model.Dto.ResponseDto.CreditCard;
 using BankingTool.Service.IService;
 using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
-    [TokenAuthorization]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class CreditCardController(
         ICreditCardService creditCardService,

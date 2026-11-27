@@ -17,7 +17,8 @@ namespace BankingTool.Api.Filter
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var authHeader = context.HttpContext.Request.Headers.Authorization.FirstOrDefault();
-            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(authHeader) ||
+                !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 context.Result = new UnauthorizedResult();
                 return;
@@ -40,11 +41,11 @@ namespace BankingTool.Api.Filter
             {
                 ValidateIssuer = true,
                 ValidIssuer = issuer,
-                ValidateAudience = false,
+                ValidateAudience = true,
                 ValidAudience = audience,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = mySecurityKey,
-                ValidateLifetime = false,
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(10)
             };
 
@@ -53,10 +54,21 @@ namespace BankingTool.Api.Filter
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var principal = tokenHandler.ValidateToken(token, validateParameters, out var validatedToken);
                 context.HttpContext.User = principal;
-                List<ClaimDto> claims = JsonSerializer.Deserialize<List<ClaimDto>>(context.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(ClaimTypes.Email))?.Value);
 
-                var expireAtClaim = claims.FirstOrDefault(x => x.Key == AppClaimTypes.ExpiresAt)?.Value;
-                var emailId = claims.FirstOrDefault(x => x.Key == AppClaimTypes.EmailId)?.Value;
+                var emailClaim = principal.Claims.FirstOrDefault(claim =>
+                    claim.Type == nameof(ClaimTypes.Email) ||
+                    claim.Type == ClaimTypes.Email ||
+                    claim.Type == "email")?.Value;
+
+                List<ClaimDto>? claims = null;
+                if (!string.IsNullOrEmpty(emailClaim))
+                {
+                    claims = JsonSerializer.Deserialize<List<ClaimDto>>(emailClaim);
+                }
+
+                var expireAtClaim = claims?.FirstOrDefault(x => x.Key == AppClaimTypes.ExpiresAt)?.Value;
+                var emailId = claims?.FirstOrDefault(x => x.Key == AppClaimTypes.EmailId)?.Value;
+
                 if (!string.IsNullOrEmpty(expireAtClaim) && DateTime.TryParse(expireAtClaim, out DateTime expireAt))
                 {
                     var now = DateTime.UtcNow;
@@ -84,11 +96,19 @@ namespace BankingTool.Api.Filter
                     }
                 }
             }
-            catch (SecurityTokenException ex)
+            catch (SecurityTokenExpiredException)
+            {
+                context.Result = new ContentResult
+                {
+                    StatusCode = 498,
+                    Content = "Token expired, refresh required."
+                };
+            }
+            catch (SecurityTokenException)
             {
                 context.Result = new UnauthorizedResult();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 context.Result = new UnauthorizedResult();
             }

@@ -5,12 +5,13 @@ using BankingTool.Model.Dto.RequestDto.Note;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Service.IService;
 using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
-    [TokenAuthorization]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class NoteController(INoteService noteService,
         IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)

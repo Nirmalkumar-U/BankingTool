@@ -106,6 +106,38 @@ namespace BankingTool.Api.ApplicationSetUp
                     IssuerSigningKey = mySecurityKey,
                     ValidateLifetime = true
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception is SecurityTokenExpiredException)
+                        {
+                            context.HttpContext.Items["JwtTokenExpired"] = true;
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+
+                        var isExpired = context.HttpContext.Items.TryGetValue("JwtTokenExpired", out var expired)
+                            && expired is true;
+
+                        context.Response.StatusCode = isExpired
+                            ? 498
+                            : StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            message = isExpired
+                                ? "Token expired, refresh required."
+                                : "Unauthorized."
+                        });
+                    }
+                };
             });
             return services;
         }

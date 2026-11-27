@@ -24,13 +24,12 @@ namespace BankingTool.Repository
         {
             if (httpContextAccessor.HttpContext.User.Claims.Any())
             {
-                List<ClaimDto> claims = JsonSerializer.Deserialize<List<ClaimDto>>(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(ClaimTypes.Email))?.Value);
-                UserId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.UserId).Value);
-                RoleId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.RoleId).Value);
-                StaffId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.StaffId)?.Value);
-                CustomerId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.CustomerId).Value);
-                UserEmail = claims.FirstOrDefault(x => x.Key == AppClaimTypes.EmailId).Value;
-                UserName = claims.FirstOrDefault(x => x.Key == AppClaimTypes.UserName).Value;
+                this.UserId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(AppClaimTypes.UserId))?.Value);
+                this.UserName = httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(AppClaimTypes.UserName))?.Value;
+                this.UserEmail = httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(AppClaimTypes.EmailId))?.Value;
+                this.RoleId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(AppClaimTypes.RoleId))?.Value);
+                this.StaffId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(AppClaimTypes.StaffId))?.Value);
+                this.CustomerId = Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(AppClaimTypes.CustomerId))?.Value);
             }
         }
 

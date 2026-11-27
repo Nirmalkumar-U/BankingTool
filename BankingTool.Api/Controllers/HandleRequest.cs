@@ -22,10 +22,7 @@ namespace BankingTool.Api.Controllers
         {
             if (_httpContextAccessor.HttpContext.User.Claims.Any())
             {
-                List<ClaimDto> claims = JsonSerializer.Deserialize<List<ClaimDto>>(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(ClaimTypes.Email))?.Value);
-                var UserId = Convert.ToInt32(claims.FirstOrDefault(x => x.Key == AppClaimTypes.UserId).Value);
-
-                return UserId.ToString();
+                return Convert.ToInt32(httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == nameof(AppClaimTypes.UserId))?.Value).ToString();
             }
             return string.Empty;
         }

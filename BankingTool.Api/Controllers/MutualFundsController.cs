@@ -3,11 +3,13 @@ using BankingTool.Model.Dto.MutualFunds;
 using BankingTool.Model.Model;
 using BankingTool.Service.IService;
 using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class MutualFundsController(IMutualFundsService mutualFundsService,
         IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)

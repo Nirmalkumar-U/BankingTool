@@ -1,19 +1,17 @@
-﻿using BankingTool.Api.Filter;
-using BankingTool.Api.Validators;
+﻿using BankingTool.Api.Validators;
 using BankingTool.Model;
-using BankingTool.Model.Dto.RequestDto.BankAccount;
 using BankingTool.Model.Dto.RequestDto.Budget;
 using BankingTool.Model.Dto.RequestDto.Wallet;
 using BankingTool.Model.Dto.ResponseDto;
 using BankingTool.Service.IService;
-using BankingTool.Service.Service;
 using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
-    [TokenAuthorization]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class WalletController(IWalletService walletService, IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor)
         : HandleRequest(validatorService, cacheProvider, httpContextAccessor)

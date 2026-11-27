@@ -5,12 +5,13 @@ using BankingTool.Model.Dto.InternalDto;
 using BankingTool.Model.Dto.RequestDto.Calender;
 using BankingTool.Service.IService;
 using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
 {
     [ApiController]
-    [TokenAuthorization]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class CalenderController(ICalenderService calenderService,
         IValidatorService validatorService, ICacheProvider cacheProvider, IHttpContextAccessor httpContextAccessor) : HandleRequest(validatorService, cacheProvider, httpContextAccessor)

@@ -6,6 +6,7 @@ using BankingTool.Model.Dto.Response;
 using BankingTool.Service;
 using BankingTool.Service.IService;
 using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingTool.Api.Controllers
@@ -57,7 +58,7 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [TokenAuthorization]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseDto<UserInitialLoadResponse>), 200)]
         [ProducesResponseType(typeof(ResponseDto<UserInitialLoadResponse>), 400)]
         public async Task<IActionResult> GetUserInitialLoad(GetUserInitialLoadRequestObject model)
@@ -71,7 +72,7 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [TokenAuthorization]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseDto<bool>), 200)]
         [ProducesResponseType(typeof(ResponseDto<bool>), 400)]
         public async Task<IActionResult> GetCityDropDownListByStateId(GetCityListRequestObject model)
@@ -85,7 +86,7 @@ namespace BankingTool.Api.Controllers
         }
 
         [HttpPost]
-        [TokenAuthorization]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseDto<int?>), 200)]
         [ProducesResponseType(typeof(ResponseDto<int?>), 400)]
         public async Task<IActionResult> SaveUser(SaveUserRequestObject model)
@@ -97,7 +98,7 @@ namespace BankingTool.Api.Controllers
             );
         }
         [HttpGet]
-        [TokenAuthorization]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 200)]
         [ProducesResponseType(typeof(ResponseDto<List<UserListResponse>>), 400)]
         public async Task<IActionResult> GetUserList()

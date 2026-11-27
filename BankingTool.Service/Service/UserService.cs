@@ -103,14 +103,9 @@ namespace BankingTool.Service
                         new() { Key = AppClaimTypes.CustomerId, Value = customer != null? customer.CustomerId.ToString():"0"},
                         new() { Key = AppClaimTypes.ExpiresAt, Value = expiresAt.ToString()}
                     };
-            var json = JsonSerializer.Serialize(claimsList);
-            var claims = new List<ClaimDto>
-                    {
-                        new() { Key = nameof(ClaimTypes.Email), Value = json },
-                    };
 
             var actionPaths = await _userRepository.GetActionsByUserId(user.Id);
-            var accessToken = GenerateToken(user.Id.ToString(), claims, securityKey, issuer, audience, expiresAt);
+            var accessToken = GenerateToken(user.Id.ToString(), claimsList, securityKey, issuer, audience, expiresAt);
 
             var updateMutualFunds = await _mutualFundsService.InsertDailyMutualFundValue();
 
